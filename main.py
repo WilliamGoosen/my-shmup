@@ -12,7 +12,8 @@ clock = pg.time.Clock()
 font_name = pg.font.match_font(FONT_NAME)
 
 all_sprites = pg.sprite.Group()
-player = Player()
+bullets = pg.sprite.Group()
+player = Player(all_sprites, bullets)
 all_sprites.add(player)
 
 running = True
@@ -28,6 +29,7 @@ while running:
     keystate = pg.key.get_pressed()
     all_sprites.update(keystate)
     all_sprites.draw(screen)
+    
     pg.display.flip()
     clock.tick(FPS)
 
