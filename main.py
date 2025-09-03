@@ -25,7 +25,8 @@ while running:
             pg.quit()
             exit()
 
-    all_sprites.update()
+    keystate = pg.key.get_pressed()
+    all_sprites.update(keystate)
     all_sprites.draw(screen)
     pg.display.flip()
     clock.tick(FPS)

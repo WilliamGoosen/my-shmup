@@ -19,3 +19,4 @@ BG_COLOUR = BLACK
 
 # player attributes
 PLAYER_START_Y_OFFSET = 10
+PLAYER_SPEED = 8

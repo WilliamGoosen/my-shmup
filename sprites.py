@@ -1,4 +1,5 @@
 import pygame as pg
+import math
 from settings import *
 
 class Player(pg.sprite.Sprite):
@@ -9,7 +10,30 @@ class Player(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = HEIGHT - PLAYER_START_Y_OFFSET
+        self.speedx = 0
+        self.speedy = 0
 
 
-    def update(self):
-        pass
+    def update(self, keystate):
+        self.speedx = 0
+        if keystate[pg.K_LEFT] and not keystate[pg.K_RIGHT]:
+            self.speedx = -PLAYER_SPEED
+        elif keystate[pg.K_RIGHT] and not keystate[pg.K_LEFT]:
+            self.speedx = PLAYER_SPEED
+        else:
+            self.speedx = 0
+        
+        self.speedy = 0
+        if keystate[pg.K_UP] and not keystate[pg.K_DOWN]:
+            self.speedy = -PLAYER_SPEED
+        elif keystate[pg.K_DOWN] and not keystate[pg.K_UP]:
+            self.speedy = PLAYER_SPEED
+        else:
+            self.speedy = 0
+
+        if self.speedx != 0 and self.speedy != 0:
+            self.speedx = self.speedx / math.sqrt(2)
+            self.speedy = self.speedy / math.sqrt(2)   
+        
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
