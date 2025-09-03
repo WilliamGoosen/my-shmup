@@ -15,4 +15,7 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 
-BG_COLOUR = GREEN
+BG_COLOUR = BLACK
+
+# player attributes
+PLAYER_START_Y_OFFSET = 10

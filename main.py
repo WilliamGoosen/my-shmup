@@ -1,6 +1,7 @@
 import pygame as pg
 from sys import exit
 from settings import *
+from sprites import Player
 
 pg.init()
 pg.mixer.init()
@@ -10,6 +11,9 @@ clock = pg.time.Clock()
 
 font_name = pg.font.match_font(FONT_NAME)
 
+all_sprites = pg.sprite.Group()
+player = Player()
+all_sprites.add(player)
 
 running = True
 while running:
@@ -21,6 +25,8 @@ while running:
             pg.quit()
             exit()
 
+    all_sprites.update()
+    all_sprites.draw(screen)
     pg.display.flip()
     clock.tick(FPS)
 
