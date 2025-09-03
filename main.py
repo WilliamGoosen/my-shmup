@@ -1,7 +1,10 @@
 import pygame as pg
+from os import path
 from sys import exit
 from settings import *
 from sprites import Player
+
+img_dir = path.join(path.dirname(__file__), 'img')
 
 pg.init()
 pg.mixer.init()
@@ -10,6 +13,9 @@ pg.display.set_caption(TITLE)
 clock = pg.time.Clock()
 
 font_name = pg.font.match_font(FONT_NAME)
+
+#player_img = pg.image.load(path.join(img_dir, "playerShip1_orange.png")).convert_alpha()
+#bullet_img = pg.image.load(path.join(img_dir, "laserRed16.png")).convert_alpha()
 
 all_sprites = pg.sprite.Group()
 bullets = pg.sprite.Group()

@@ -5,8 +5,8 @@ from settings import *
 class Player(pg.sprite.Sprite):
     def __init__(self, all_sprite_group, bullets_group):
         pg.sprite.Sprite.__init__(self)
-        self.image = pg.Surface((50, 40))
-        self.image.fill(YELLOW)
+        self.image = pg.transform.scale(pg.image.load('img/playerShip1_orange.png'), (50, 38)) #pg.Surface((50, 40))
+        self.image.set_colorkey(BLACK) #self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = HEIGHT - PLAYER_START_Y_OFFSET
@@ -76,8 +76,8 @@ class Player(pg.sprite.Sprite):
 class Bullet(pg.sprite.Sprite):
     def __init__(self, x, y):
         pg.sprite.Sprite.__init__(self)
-        self.image = pg.Surface((5,5))
-        self.image.fill(RED)
+        self.image = pg.image.load('img/laserRed16.png')
+        self.image.set_colorkey(BLACK)    #self.image.fill(RED)
         self.rect = self.image.get_rect()
         self.rect.bottom = y
         self.rect.centerx = x
