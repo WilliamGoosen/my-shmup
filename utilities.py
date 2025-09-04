@@ -15,3 +15,13 @@ def draw_lives(surf, x, y, lives, player_mini_img):
         img_rect.x = x + PLAYER_LIVES_ICON_SPACING * i
         img_rect.y = y
         surf.blit(player_mini_img, img_rect)
+
+
+def draw_shield_bar(surf, x, y, percent):
+    if percent < 0:
+        percent = 0
+    fill = (percent / 100) * BAR_LENGTH
+    outline_rect = pg.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
+    fill_rect = pg.Rect(x, y, fill, BAR_HEIGHT)
+    pg.draw.rect(surf, RED, fill_rect)
+    pg.draw.rect(surf, WHITE, outline_rect, 2)

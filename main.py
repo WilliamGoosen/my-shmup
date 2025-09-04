@@ -4,7 +4,7 @@ from sys import exit
 from random import random, choice
 from settings import *
 from sprites import Player, Starfield, Meteroid, Explosion
-from utilities import draw_text, draw_lives
+from utilities import draw_text, draw_lives, draw_shield_bar
 
 
 img_dir = path.join(path.dirname(__file__), 'img')
@@ -154,6 +154,7 @@ while running:
     all_sprites.draw(screen)
     draw_text(screen, "Score: " + str(score), 18, WIDTH / 2, 10, font_name, WHITE)
     draw_lives(screen, 5, 5, player.lives, player_mini_image)
+    draw_shield_bar(screen, WIDTH - BAR_LENGTH - 5, 5, player.shield)
     # screen.blit(player.image, player.rect)
     pg.display.flip()
     clock.tick(FPS)

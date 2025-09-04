@@ -6,6 +6,9 @@ FPS = 60
 FONT_NAME = 'arial'
 HS_FILE = 'highscore.txt'
 
+BAR_LENGTH = 100
+BAR_HEIGHT = 20
+
 
 # define colours
 WHITE = (255, 255, 255)
