@@ -1,8 +1,9 @@
 import pygame as pg
 from os import path
 from sys import exit
+from random import random
 from settings import *
-from sprites import Player, Starfield, Meteroid
+from sprites import Player, Starfield, Meteroid, Explosion
 
 
 img_dir = path.join(path.dirname(__file__), 'img')
@@ -38,6 +39,22 @@ for img in meteor_list:
     img_surface.set_colorkey(BLACK)
     meteor_images.append(img_surface)
 
+explosion_animation = {'large_explosion': [], 'small_explosion': [], 'player_explosion': [], 'boss_explosion': []}
+for _ in range(9):
+    filename = 'regularExplosion0{}.png'.format(_)
+    img = pg.image.load(path.join("img/", filename)).convert_alpha()
+    img.set_colorkey(BLACK)
+    img_large = pg.transform.scale(img, (75, 75)).convert_alpha()
+    explosion_animation['large_explosion'].append(img_large)
+    img_small = pg.transform.scale(img, (60, 60)).convert_alpha()
+    explosion_animation['small_explosion'].append(img_small)
+    filename = 'sonicExplosion0{}.png'.format(_)
+    img = pg.image.load(path.join("img/", filename)).convert_alpha()
+    img.set_colorkey(BLACK)
+    explosion_animation['player_explosion'].append(img)
+    img_boss_explode = pg.transform.scale(img, (298, 302))
+    explosion_animation['boss_explosion'].append(img_boss_explode)
+
 
 all_sprites = pg.sprite.Group()
 bullets = pg.sprite.Group()
@@ -52,9 +69,14 @@ for _ in range(NUMBER_OF_STARS):
 for _ in range(NUMBER_OF_METEOROIDS):
     new_meteroid(meteor_images)
 
+score = 0
+
+
 running = True
 while running:
-    screen.fill(BG_COLOUR)
+    keystate = pg.key.get_pressed()
+    player.update(keystate)
+    all_sprites.update()
     
 
     for event in pg.event.get():
@@ -62,12 +84,24 @@ while running:
             pg.quit()
             exit()
 
-    keystate = pg.key.get_pressed()
-    player.update(keystate)
-    # players.draw(screen)
-    all_sprites.update()
+    screen.fill(BG_COLOUR)
     all_sprites.draw(screen)
     screen.blit(player.image, player.rect)
+    
+        # check to see if a bullet hit a meteoroid
+    hits = pg.sprite.groupcollide(meteors, bullets, True, True)
+    for hit in hits:
+        score += 62 - hit.radius
+        # hit_sound = choice(expl_sounds)
+        # hit_sound.play()
+        # hit_sound.set_volume(0.2)
+        explosion = Explosion(hit.rect.center, 'large_explosion', explosion_animation)
+        all_sprites.add(explosion)
+        # if random() > 0.9:
+        #     power = Power(hit.rect.center)
+        #     all_sprites.add(power)
+        #     powerups.add(power)
+        new_meteroid(meteor_images)
     
     pg.display.flip()
     clock.tick(FPS)

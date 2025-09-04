@@ -167,3 +167,28 @@ class Starfield(pg.sprite.Sprite):
             self.pos_y = -self.rect.height
             self.rect.y = int(self.pos_y)
             self.rect.x = randint(0, WIDTH - self.rect.width)
+
+class Explosion(pg.sprite.Sprite):
+    def __init__(self, center, size, explosion_animation):
+        pg.sprite.Sprite.__init__(self)
+        self.size = size
+        self.explosion_animation = explosion_animation
+        self.image = explosion_animation[self.size][0]
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+        self.frame = 0
+        self.last_update = pg.time.get_ticks()
+        self.frame_rate = EXPLOSION_FRAME_RATE
+    
+    def update(self):
+        now = pg.time.get_ticks()
+        if now - self.last_update > self.frame_rate:
+            self.last_update = now
+            self.frame += 1
+        if self.frame == len(self.explosion_animation[self.size]):
+            self.kill()
+        else:
+            center = self.rect.center
+            self.image = self.explosion_animation[self.size][self.frame]
+            self.rect = self.image.get_rect()
+            self.rect.center = center
