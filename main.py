@@ -29,6 +29,10 @@ def new_meteroid(meteor_images):
     all_sprites.add(m)
     meteors.add(m)
 
+def spawn_meteoroid_wave():
+    for _ in range(NUMBER_OF_METEOROIDS):
+        new_meteroid(meteor_images)
+
 # Load all game graphics
 meteor_images = []
 meteor_list = ['meteorBrown_big1.png', 'meteorBrown_big2.png', 'meteorBrown_big3.png', 'meteorBrown_big4.png',
@@ -75,12 +79,13 @@ stars = pg.sprite.Group()
 meteors = pg.sprite.Group()
 players = pg.sprite.Group()
 player = Player(all_sprites, bullets, shoot_sound)
-# all_sprites.add(player)
+all_sprites.add(player)
 for _ in range(NUMBER_OF_STARS):
     new_star()
 
-for _ in range(NUMBER_OF_METEOROIDS):
-    new_meteroid(meteor_images)
+# for _ in range(NUMBER_OF_METEOROIDS):
+#     new_meteroid(meteor_images)
+spawn_meteoroid_wave()
 
 score = 0
 
@@ -88,20 +93,23 @@ score = 0
 running = True
 while running:
     keystate = pg.key.get_pressed()
-    player.update(keystate)
+    player.update_with_keystate(keystate)
     all_sprites.update()
+
+    if player.just_respawned:        
+        spawn_meteoroid_wave()
+        player.rect.centerx = WIDTH /2
+        player.rect.bottom = HEIGHT - PLAYER_START_Y_OFFSET
+        player.just_respawned = False
     
 
     for event in pg.event.get():
         if event.type == pg.QUIT:
             pg.quit()
             exit()
-
-    screen.fill(BG_COLOUR)
-    all_sprites.draw(screen)
-    screen.blit(player.image, player.rect)
     
-        # check to see if a bullet hit a meteoroid
+    
+    # check to see if a bullet hit a meteoroid
     hits = pg.sprite.groupcollide(meteors, bullets, True, True)
     for hit in hits:
         score += 62 - hit.radius
@@ -116,7 +124,7 @@ while running:
         #     powerups.add(power)
         new_meteroid(meteor_images)
         
-    # check to see if a mob hits the player
+    # check to see if a meteoroid hits the player
     hits = pg.sprite.spritecollide(player, meteors, True, pg.sprite.collide_circle)
     for hit in hits:
         hit_sound = expl_sounds[0]
@@ -139,6 +147,9 @@ while running:
             player.lives -= 1
             player.shield = 100
     
+    screen.fill(BG_COLOUR)
+    all_sprites.draw(screen)
+    # screen.blit(player.image, player.rect)
     pg.display.flip()
     clock.tick(FPS)
 

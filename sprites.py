@@ -22,15 +22,41 @@ class Player(pg.sprite.Sprite):
         self.all_sprites = all_sprite_group
         self.bullets = bullets_group
         self.power = PLAYER_START_POWER
+        self.just_respawned = False
         self.power_time = pg.time.get_ticks()
 
 
-    def update(self, keystate):
-
+    def update(self):
         if self.power >= 2 and pg.time.get_ticks() - self.power_time > POWERUP_TIME:
             self.power -= 1
             self.power_time = pg.time.get_ticks()
 
+        # unhide if hidden
+        # self.hidden = False
+        if self.hidden:            
+            if (pg.time.get_ticks() - self.hide_timer) > PLAYER_RESPAWN_TIME:                
+                self.hidden = False
+                self.just_respawned = True
+
+        if self.speedx != 0 and self.speedy != 0:
+            self.speedx = self.speedx / math.sqrt(2)
+            self.speedy = self.speedy / math.sqrt(2)   
+        
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+
+        if self.rect.right > WIDTH:
+            self.rect.right = WIDTH
+        if self.rect.left < 0:
+            self.rect.left = 0
+
+        if not self.hidden:
+            if self.rect.bottom > HEIGHT:
+                self.rect.bottom = HEIGHT
+            if self.rect.top < 0:
+                self.rect.top = 0
+
+    def update_with_keystate(self, keystate):
         if keystate[pg.K_SPACE]:
             self.shoot()
 
@@ -50,22 +76,6 @@ class Player(pg.sprite.Sprite):
         else:
             self.speedy = 0
 
-        if self.speedx != 0 and self.speedy != 0:
-            self.speedx = self.speedx / math.sqrt(2)
-            self.speedy = self.speedy / math.sqrt(2)   
-        
-        self.rect.x += self.speedx
-        self.rect.y += self.speedy
-
-        if self.rect.right > WIDTH:
-            self.rect.right = WIDTH
-        if self.rect.left < 0:
-            self.rect.left = 0
-
-        if self.rect.bottom > HEIGHT:
-            self.rect.bottom = HEIGHT
-        if self.rect.top < 0:
-            self.rect.top = 0
 
     def shoot(self):
         now = pg.time.get_ticks()
@@ -81,8 +91,7 @@ class Player(pg.sprite.Sprite):
         # hide the player temporarily
         self.hidden = True
         self.hide_timer = pg.time.get_ticks()
-        self.rect.center = (WIDTH / 2, HEIGHT + 200)
-
+        self.rect.center = (WIDTH / 2, HEIGHT + self.rect.height / 2)
 
 
 class Bullet(pg.sprite.Sprite):
@@ -136,7 +145,7 @@ class Meteroid(pg.sprite.Sprite):
         self.rotate()
         self.rect.x += self.speedx
         self.rect.y += self.speedy
-        if self.rect.top > HEIGHT + 10 or self.rect.left < -self.rect.width or self.rect.right > WIDTH + self.rect.width:
+        if self.rect.top > HEIGHT + self.rect.height or self.rect.left < -self.rect.width or self.rect.right > WIDTH + self.rect.width:
             self.reset()
             # self.rect.x = randrange(WIDTH - self.rect.width)
             # self.rect.y = randrange(-100, -40)
