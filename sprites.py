@@ -4,7 +4,7 @@ from random import random, randrange, uniform, choice, randint
 from settings import *
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, all_sprite_group, bullets_group):
+    def __init__(self, all_sprite_group, bullets_group, shoot_sound):
         pg.sprite.Sprite.__init__(self)
         self.image = pg.transform.scale(pg.image.load('img/playerShip1_orange.png'), (50, 38)) #pg.Surface((50, 40))
         self.image.set_colorkey(BLACK) #self.image.fill(YELLOW)
@@ -13,20 +13,50 @@ class Player(pg.sprite.Sprite):
         self.rect.bottom = HEIGHT - PLAYER_START_Y_OFFSET
         self.speedx = 0
         self.speedy = 0
+        self.shield = PLAYER_MAX_SHIELD
+        self.shoot_sound = shoot_sound
         self.shoot_delay = PLAYER_SHOOT_DELAY
         self.last_shot = pg.time.get_ticks()
+        self.lives = PLAYER_START_LIVES
+        self.hidden = False
         self.all_sprites = all_sprite_group
         self.bullets = bullets_group
         self.power = PLAYER_START_POWER
+        self.just_respawned = False
         self.power_time = pg.time.get_ticks()
 
 
-    def update(self, keystate):
-
+    def update(self):
         if self.power >= 2 and pg.time.get_ticks() - self.power_time > POWERUP_TIME:
             self.power -= 1
             self.power_time = pg.time.get_ticks()
 
+        # unhide if hidden
+        # self.hidden = False
+        if self.hidden:            
+            if (pg.time.get_ticks() - self.hide_timer) > PLAYER_RESPAWN_TIME:                
+                self.hidden = False
+                self.just_respawned = True
+
+        if self.speedx != 0 and self.speedy != 0:
+            self.speedx = self.speedx / math.sqrt(2)
+            self.speedy = self.speedy / math.sqrt(2)   
+        
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+
+        if self.rect.right > WIDTH:
+            self.rect.right = WIDTH
+        if self.rect.left < 0:
+            self.rect.left = 0
+
+        if not self.hidden:
+            if self.rect.bottom > HEIGHT:
+                self.rect.bottom = HEIGHT
+            if self.rect.top < 0:
+                self.rect.top = 0
+
+    def update_with_keystate(self, keystate):
         if keystate[pg.K_SPACE]:
             self.shoot()
 
@@ -46,22 +76,6 @@ class Player(pg.sprite.Sprite):
         else:
             self.speedy = 0
 
-        if self.speedx != 0 and self.speedy != 0:
-            self.speedx = self.speedx / math.sqrt(2)
-            self.speedy = self.speedy / math.sqrt(2)   
-        
-        self.rect.x += self.speedx
-        self.rect.y += self.speedy
-
-        if self.rect.right > WIDTH:
-            self.rect.right = WIDTH
-        if self.rect.left < 0:
-            self.rect.left = 0
-
-        if self.rect.bottom > HEIGHT:
-            self.rect.bottom = HEIGHT
-        if self.rect.top < 0:
-            self.rect.top = 0
 
     def shoot(self):
         now = pg.time.get_ticks()
@@ -71,7 +85,13 @@ class Player(pg.sprite.Sprite):
                 bullet = Bullet(self.rect.centerx, self.rect.top)
                 self.all_sprites.add(bullet)
                 self.bullets.add(bullet)
+                self.shoot_sound.play()
 
+    def hide(self):
+        # hide the player temporarily
+        self.hidden = True
+        self.hide_timer = pg.time.get_ticks()
+        self.rect.center = (WIDTH / 2, HEIGHT + self.rect.height / 2)
 
 
 class Bullet(pg.sprite.Sprite):
@@ -125,7 +145,7 @@ class Meteroid(pg.sprite.Sprite):
         self.rotate()
         self.rect.x += self.speedx
         self.rect.y += self.speedy
-        if self.rect.top > HEIGHT + 10 or self.rect.left < -self.rect.width or self.rect.right > WIDTH + self.rect.width:
+        if self.rect.top > HEIGHT + self.rect.height or self.rect.left < -self.rect.width or self.rect.right > WIDTH + self.rect.width:
             self.reset()
             # self.rect.x = randrange(WIDTH - self.rect.width)
             # self.rect.y = randrange(-100, -40)
@@ -167,3 +187,28 @@ class Starfield(pg.sprite.Sprite):
             self.pos_y = -self.rect.height
             self.rect.y = int(self.pos_y)
             self.rect.x = randint(0, WIDTH - self.rect.width)
+
+class Explosion(pg.sprite.Sprite):
+    def __init__(self, center, size, explosion_animation):
+        pg.sprite.Sprite.__init__(self)
+        self.size = size
+        self.explosion_animation = explosion_animation
+        self.image = explosion_animation[self.size][0]
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+        self.frame = 0
+        self.last_update = pg.time.get_ticks()
+        self.frame_rate = EXPLOSION_FRAME_RATE
+    
+    def update(self):
+        now = pg.time.get_ticks()
+        if now - self.last_update > self.frame_rate:
+            self.last_update = now
+            self.frame += 1
+        if self.frame == len(self.explosion_animation[self.size]):
+            self.kill()
+        else:
+            center = self.rect.center
+            self.image = self.explosion_animation[self.size][self.frame]
+            self.rect = self.image.get_rect()
+            self.rect.center = center
