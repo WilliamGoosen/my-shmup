@@ -2,7 +2,8 @@ import pygame as pg
 from os import path
 from sys import exit
 from settings import *
-from sprites import Player
+from sprites import Player, Starfield
+
 
 img_dir = path.join(path.dirname(__file__), 'img')
 
@@ -17,10 +18,19 @@ font_name = pg.font.match_font(FONT_NAME)
 #player_img = pg.image.load(path.join(img_dir, "playerShip1_orange.png")).convert_alpha()
 #bullet_img = pg.image.load(path.join(img_dir, "laserRed16.png")).convert_alpha()
 
+def new_star():
+    s = Starfield()
+    all_sprites.add(s)
+    stars.add(s)
+
 all_sprites = pg.sprite.Group()
 bullets = pg.sprite.Group()
+stars = pg.sprite.Group()
+players = pg.sprite.Group()
 player = Player(all_sprites, bullets)
-all_sprites.add(player)
+# all_sprites.add(player)
+for _ in range(NUMBER_OF_STARS):
+    new_star()
 
 running = True
 while running:
@@ -33,8 +43,11 @@ while running:
             exit()
 
     keystate = pg.key.get_pressed()
-    all_sprites.update(keystate)
+    player.update(keystate)
+    # players.draw(screen)
+    all_sprites.update()
     all_sprites.draw(screen)
+    screen.blit(player.image, player.rect)
     
     pg.display.flip()
     clock.tick(FPS)
