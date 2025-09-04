@@ -13,9 +13,12 @@ class Player(pg.sprite.Sprite):
         self.rect.bottom = HEIGHT - PLAYER_START_Y_OFFSET
         self.speedx = 0
         self.speedy = 0
+        self.shield = PLAYER_MAX_SHIELD
         self.shoot_sound = shoot_sound
         self.shoot_delay = PLAYER_SHOOT_DELAY
         self.last_shot = pg.time.get_ticks()
+        self.lives = PLAYER_START_LIVES
+        self.hidden = False
         self.all_sprites = all_sprite_group
         self.bullets = bullets_group
         self.power = PLAYER_START_POWER
@@ -73,6 +76,12 @@ class Player(pg.sprite.Sprite):
                 self.all_sprites.add(bullet)
                 self.bullets.add(bullet)
                 self.shoot_sound.play()
+
+    def hide(self):
+        # hide the player temporarily
+        self.hidden = True
+        self.hide_timer = pg.time.get_ticks()
+        self.rect.center = (WIDTH / 2, HEIGHT + 200)
 
 
 

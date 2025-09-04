@@ -64,7 +64,7 @@ shoot_sound.set_volume(0.1)
 expl_sounds = []
 for snd in ['Explosion1.wav', 'Explosion2.wav']:
     expl_sounds.append(pg.mixer.Sound(path.join("snd/", snd)))
-# player_die_sound = pg.mixer.Sound(path.join("snd/", 'rumble1.ogg'))
+player_die_sound = pg.mixer.Sound(path.join("snd/", 'rumble1.ogg'))
 # pg.mixer.music.load(path.join("snd/", 'tgfcoder-FrozenJam-SeamlessLoop.ogg'))
 # pg.mixer.music.set_volume(0.1)
 
@@ -115,6 +115,29 @@ while running:
         #     all_sprites.add(power)
         #     powerups.add(power)
         new_meteroid(meteor_images)
+        
+    # check to see if a mob hits the player
+    hits = pg.sprite.spritecollide(player, meteors, True, pg.sprite.collide_circle)
+    for hit in hits:
+        hit_sound = expl_sounds[0]
+        hit_sound.play()
+        hit_sound.set_volume(0.1)
+        player.power = 1
+        player.shield -= hit.radius * 2
+        explosion = Explosion(hit.rect.center, 'small_explosion', explosion_animation)
+        all_sprites.add(explosion)
+        new_meteroid(meteor_images)
+
+        if player.shield <= 0:
+            player_die_sound.play()
+            player_die_sound.set_volume(0.1)
+            death_explosion = Explosion(player.rect.center, 'player_explosion', explosion_animation)
+            all_sprites.add(death_explosion)
+            player.hide()
+            for meteor in meteors:
+                meteor.kill()
+            player.lives -= 1
+            player.shield = 100
     
     pg.display.flip()
     clock.tick(FPS)
