@@ -2,7 +2,7 @@ import pygame as pg
 from os import path
 from sys import exit
 from settings import *
-from sprites import Player, Starfield
+from sprites import Player, Starfield, Meteroid
 
 
 img_dir = path.join(path.dirname(__file__), 'img')
@@ -23,14 +23,34 @@ def new_star():
     all_sprites.add(s)
     stars.add(s)
 
+def new_meteroid(meteor_images):
+    m = Meteroid(meteor_images)
+    all_sprites.add(m)
+    meteors.add(m)
+
+# Load all game graphics
+meteor_images = []
+meteor_list = ['meteorBrown_big1.png', 'meteorBrown_big2.png', 'meteorBrown_big3.png', 'meteorBrown_big4.png',
+               'meteorBrown_med1.png', 'meteorBrown_med3.png', 'meteorBrown_small1.png', 'meteorBrown_small2.png',
+               'meteorBrown_tiny1.png', 'meteorBrown_tiny2.png']
+for img in meteor_list:
+    img_surface = pg.image.load(path.join("img/", img)).convert_alpha()
+    img_surface.set_colorkey(BLACK)
+    meteor_images.append(img_surface)
+
+
 all_sprites = pg.sprite.Group()
 bullets = pg.sprite.Group()
 stars = pg.sprite.Group()
+meteors = pg.sprite.Group()
 players = pg.sprite.Group()
 player = Player(all_sprites, bullets)
 # all_sprites.add(player)
 for _ in range(NUMBER_OF_STARS):
     new_star()
+
+for _ in range(NUMBER_OF_METEOROIDS):
+    new_meteroid(meteor_images)
 
 running = True
 while running:

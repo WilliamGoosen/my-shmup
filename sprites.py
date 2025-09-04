@@ -88,7 +88,49 @@ class Bullet(pg.sprite.Sprite):
         self.rect.y += self.speedy
         if self.rect.bottom < 0:
             self.kill()
-            
+
+
+class Meteroid(pg.sprite.Sprite):
+    def __init__(self, meteor_images):
+        pg.sprite.Sprite.__init__(self)
+        self.meteor_images = meteor_images
+        self.last_update = pg.time.get_ticks()
+        self.reset()
+    
+    def reset(self):
+        self.image_orig = choice(self.meteor_images)
+        self.image_orig.set_colorkey(BLACK)
+        self.image = self.image_orig.copy()
+        self.rect = self.image.get_rect()
+        self.radius = int(self.rect.width * 0.85 / 2)
+        self.rect.x = randrange(WIDTH - self.rect.width)
+        self.rect.y = randrange(-150, -100)
+        self.speedx = randint(METEOROID_MIN_SPEED_X, METEOROID_MAX_SPEED_X)
+        self.speedy = randint(METEOROID_MIN_SPEED_Y, METEOROID_MAX_SPEED_Y)
+        self.rot = 0
+        self.rot_speed = randint(METEOROID_MIN_ROTATE_SPEED, METEOROID_MAX_ROTATE_SPEED)
+    
+    def rotate(self):
+        now = pg.time.get_ticks()
+        if now - self.last_update > 50:
+            self.last_update = now
+            self.rot = (self.rot + self.rot_speed) % 360
+            new_image = pg.transform.rotate(self.image_orig, self.rot).convert_alpha()
+            old_center = self.rect.center
+            self.image = new_image
+            self.rect = self.image.get_rect()
+            self.rect.center = old_center
+        
+    def update(self):
+        self.rotate()
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+        if self.rect.top > HEIGHT + 10 or self.rect.left < -self.rect.width or self.rect.right > WIDTH + self.rect.width:
+            self.reset()
+            # self.rect.x = randrange(WIDTH - self.rect.width)
+            # self.rect.y = randrange(-100, -40)
+            # self.speedy = randint(METEOROID_MIN_SPEED_Y, METEOROID_MAX_SPEED_Y)
+        
 
 class Starfield(pg.sprite.Sprite):
     def __init__(self):
