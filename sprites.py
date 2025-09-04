@@ -4,7 +4,7 @@ from random import random, randrange, uniform, choice, randint
 from settings import *
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, all_sprite_group, bullets_group):
+    def __init__(self, all_sprite_group, bullets_group, shoot_sound):
         pg.sprite.Sprite.__init__(self)
         self.image = pg.transform.scale(pg.image.load('img/playerShip1_orange.png'), (50, 38)) #pg.Surface((50, 40))
         self.image.set_colorkey(BLACK) #self.image.fill(YELLOW)
@@ -13,6 +13,7 @@ class Player(pg.sprite.Sprite):
         self.rect.bottom = HEIGHT - PLAYER_START_Y_OFFSET
         self.speedx = 0
         self.speedy = 0
+        self.shoot_sound = shoot_sound
         self.shoot_delay = PLAYER_SHOOT_DELAY
         self.last_shot = pg.time.get_ticks()
         self.all_sprites = all_sprite_group
@@ -71,6 +72,7 @@ class Player(pg.sprite.Sprite):
                 bullet = Bullet(self.rect.centerx, self.rect.top)
                 self.all_sprites.add(bullet)
                 self.bullets.add(bullet)
+                self.shoot_sound.play()
 
 
 

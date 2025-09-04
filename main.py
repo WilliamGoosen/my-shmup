@@ -1,7 +1,7 @@
 import pygame as pg
 from os import path
 from sys import exit
-from random import random
+from random import random, choice
 from settings import *
 from sprites import Player, Starfield, Meteroid, Explosion
 
@@ -55,13 +55,26 @@ for _ in range(9):
     img_boss_explode = pg.transform.scale(img, (298, 302))
     explosion_animation['boss_explosion'].append(img_boss_explode)
 
+# Load all game sounds
+shoot_sound = pg.mixer.Sound(path.join("snd/", "Laser_Shoot2.wav"))
+shoot_sound.set_volume(0.1)
+# shield_sound = pg.mixer.Sound(path.join("snd/", "pow4.wav"))
+# power_sound = pg.mixer.Sound(path.join("snd/", "pow5.wav"))
+# life_up_sound = pg.mixer.Sound(path.join("snd/", "jingles_NES09.ogg"))
+expl_sounds = []
+for snd in ['Explosion1.wav', 'Explosion2.wav']:
+    expl_sounds.append(pg.mixer.Sound(path.join("snd/", snd)))
+# player_die_sound = pg.mixer.Sound(path.join("snd/", 'rumble1.ogg'))
+# pg.mixer.music.load(path.join("snd/", 'tgfcoder-FrozenJam-SeamlessLoop.ogg'))
+# pg.mixer.music.set_volume(0.1)
+
 
 all_sprites = pg.sprite.Group()
 bullets = pg.sprite.Group()
 stars = pg.sprite.Group()
 meteors = pg.sprite.Group()
 players = pg.sprite.Group()
-player = Player(all_sprites, bullets)
+player = Player(all_sprites, bullets, shoot_sound)
 # all_sprites.add(player)
 for _ in range(NUMBER_OF_STARS):
     new_star()
@@ -92,9 +105,9 @@ while running:
     hits = pg.sprite.groupcollide(meteors, bullets, True, True)
     for hit in hits:
         score += 62 - hit.radius
-        # hit_sound = choice(expl_sounds)
-        # hit_sound.play()
-        # hit_sound.set_volume(0.2)
+        hit_sound = choice(expl_sounds)
+        hit_sound.play()
+        hit_sound.set_volume(0.1)
         explosion = Explosion(hit.rect.center, 'large_explosion', explosion_animation)
         all_sprites.add(explosion)
         # if random() > 0.9:
