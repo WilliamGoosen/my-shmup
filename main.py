@@ -4,7 +4,7 @@ from sys import exit
 from random import random, choice
 from settings import *
 from sprites import Player, Starfield, Meteroid, Explosion
-from utilities import draw_text
+from utilities import draw_text, draw_lives
 
 
 img_dir = path.join(path.dirname(__file__), 'img')
@@ -35,6 +35,8 @@ def spawn_meteoroid_wave():
         new_meteroid(meteor_images)
 
 # Load all game graphics
+player_image = pg.image.load(path.join("img/", "playerShip1_orange.png")).convert_alpha()
+player_mini_image = pg.transform.scale(player_image, (25, 19))
 meteor_images = []
 meteor_list = ['meteorBrown_big1.png', 'meteorBrown_big2.png', 'meteorBrown_big3.png', 'meteorBrown_big4.png',
                'meteorBrown_med1.png', 'meteorBrown_med3.png', 'meteorBrown_small1.png', 'meteorBrown_small2.png',
@@ -151,6 +153,7 @@ while running:
     screen.fill(BG_COLOUR)
     all_sprites.draw(screen)
     draw_text(screen, "Score: " + str(score), 18, WIDTH / 2, 10, font_name, WHITE)
+    draw_lives(screen, 5, 5, player.lives, player_mini_image)
     # screen.blit(player.image, player.rect)
     pg.display.flip()
     clock.tick(FPS)

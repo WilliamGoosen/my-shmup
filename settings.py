@@ -43,3 +43,6 @@ NUMBER_OF_METEOROIDS = 10
 
 # Explosion attributes
 EXPLOSION_FRAME_RATE = 35
+
+# UI attributes
+PLAYER_LIVES_ICON_SPACING = 30
