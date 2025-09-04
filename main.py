@@ -4,6 +4,7 @@ from sys import exit
 from random import random, choice
 from settings import *
 from sprites import Player, Starfield, Meteroid, Explosion
+from utilities import draw_text
 
 
 img_dir = path.join(path.dirname(__file__), 'img')
@@ -149,6 +150,7 @@ while running:
     
     screen.fill(BG_COLOUR)
     all_sprites.draw(screen)
+    draw_text(screen, "Score: " + str(score), 18, WIDTH / 2, 10, font_name, WHITE)
     # screen.blit(player.image, player.rect)
     pg.display.flip()
     clock.tick(FPS)
