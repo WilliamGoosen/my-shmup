@@ -36,6 +36,26 @@ def new_meteroid(meteor_images):
 def spawn_meteoroid_wave(meteor_images):
     spawn_wave(new_meteroid, NUMBER_OF_METEOROIDS, meteor_images)
 
+def reset_game():
+    global score, game_state, life_gained, player
+
+    game_state = "playing"
+    score = 0
+    life_gained = 0
+
+    all_sprites.empty()
+    bullets.empty()
+    meteors.empty()
+    players.empty()
+    stars.empty()
+
+    player = Player(all_sprites, bullets, shoot_sound)
+    all_sprites.add(player)
+    players.add(player)
+
+    spawn_starfield()
+    spawn_meteoroid_wave(meteor_images)
+
 # Load all game graphics
 player_image = pg.image.load(path.join("img/", "playerShip1_orange.png")).convert_alpha()
 player_mini_image = pg.transform.scale(player_image, (25, 19))
@@ -83,13 +103,7 @@ bullets = pg.sprite.Group()
 stars = pg.sprite.Group()
 meteors = pg.sprite.Group()
 players = pg.sprite.Group()
-player = Player(all_sprites, bullets, shoot_sound)
-all_sprites.add(player)
-spawn_starfield()
-spawn_meteoroid_wave(meteor_images)
-
-score = 0
-
+reset_game()
 
 running = True
 while running:
