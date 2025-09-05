@@ -25,3 +25,16 @@ def draw_shield_bar(surf, x, y, percent):
     fill_rect = pg.Rect(x, y, fill, BAR_HEIGHT)
     pg.draw.rect(surf, RED, fill_rect)
     pg.draw.rect(surf, WHITE, outline_rect, 2)
+
+
+def spawn_wave(function_to_call, count, *args):
+    """
+    Calls a given function a specified number of times with provided arguments.
+
+    Args:
+        function_to_call (callable): The function to be called repeatedly.
+        count (int): The number of times to call the function.
+        *args: Variable-length argument list to pass to the function.
+    """
+    for _ in range(count):
+        function_to_call(*args)
