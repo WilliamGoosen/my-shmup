@@ -78,14 +78,15 @@ class Player(pg.sprite.Sprite):
 
 
     def shoot(self):
-        now = pg.time.get_ticks()
-        if now - self.last_shot > self.shoot_delay:            
-            self.last_shot = now
-            if self.power == 1:                
-                bullet = Bullet(self.rect.centerx, self.rect.top)
-                self.all_sprites.add(bullet)
-                self.bullets.add(bullet)
-                self.shoot_sound.play()
+        if not self.hidden:
+            now = pg.time.get_ticks()
+            if now - self.last_shot > self.shoot_delay:            
+                self.last_shot = now
+                if self.power == 1:                
+                    bullet = Bullet(self.rect.centerx, self.rect.top)
+                    self.all_sprites.add(bullet)
+                    self.bullets.add(bullet)
+                    self.shoot_sound.play()
 
     def hide(self):
         # hide the player temporarily
