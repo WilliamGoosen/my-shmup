@@ -110,7 +110,7 @@ class Bullet(pg.sprite.Sprite):
             self.kill()
 
 
-class Meteroid(pg.sprite.Sprite):
+class Meteoroid(pg.sprite.Sprite):
     def __init__(self, meteor_images):
         pg.sprite.Sprite.__init__(self)
         self.meteor_images = meteor_images

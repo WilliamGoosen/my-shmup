@@ -3,8 +3,8 @@ from os import path
 from sys import exit
 from random import random, choice
 from settings import *
-from sprites import Player, Starfield, Meteroid, Explosion
-from utilities import draw_text, draw_lives, draw_shield_bar
+from sprites import Player, Starfield, Meteoroid, Explosion
+from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave
 
 
 img_dir = path.join(path.dirname(__file__), 'img')
@@ -25,14 +25,16 @@ def new_star():
     all_sprites.add(s)
     stars.add(s)
 
+def spawn_starfield():
+    spawn_wave(new_star, NUMBER_OF_STARS)
+
 def new_meteroid(meteor_images):
-    m = Meteroid(meteor_images)
+    m = Meteoroid(meteor_images)
     all_sprites.add(m)
     meteors.add(m)
 
-def spawn_meteoroid_wave():
-    for _ in range(NUMBER_OF_METEOROIDS):
-        new_meteroid(meteor_images)
+def spawn_meteoroid_wave(meteor_images):
+    spawn_wave(new_meteroid, NUMBER_OF_METEOROIDS, meteor_images)
 
 # Load all game graphics
 player_image = pg.image.load(path.join("img/", "playerShip1_orange.png")).convert_alpha()
@@ -83,12 +85,8 @@ meteors = pg.sprite.Group()
 players = pg.sprite.Group()
 player = Player(all_sprites, bullets, shoot_sound)
 all_sprites.add(player)
-for _ in range(NUMBER_OF_STARS):
-    new_star()
-
-# for _ in range(NUMBER_OF_METEOROIDS):
-#     new_meteroid(meteor_images)
-spawn_meteoroid_wave()
+spawn_starfield()
+spawn_meteoroid_wave(meteor_images)
 
 score = 0
 
@@ -100,7 +98,7 @@ while running:
     all_sprites.update()
 
     if player.just_respawned:        
-        spawn_meteoroid_wave()
+        spawn_meteoroid_wave(meteor_images)
         player.rect.centerx = WIDTH /2
         player.rect.bottom = HEIGHT - PLAYER_START_Y_OFFSET
         player.just_respawned = False
