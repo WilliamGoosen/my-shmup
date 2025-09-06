@@ -20,20 +20,66 @@ font_name = pg.font.match_font(FONT_NAME)
 #player_img = pg.image.load(path.join(img_dir, "playerShip1_orange.png")).convert_alpha()
 #bullet_img = pg.image.load(path.join(img_dir, "laserRed16.png")).convert_alpha()
 
-def draw_start_title():    
+def load_data():        
+        # Create the full path to the high score file
+        hs_file_path = HS_FILE
+
+        # Check if the file exists first
+        if path.exists(hs_file_path):
+            # If it exists, open it and try to read the score
+            try:
+                with open(hs_file_path, 'r') as f:
+                    high_score = int(f.read())
+            except ValueError:
+                # This happens if the file exists but is empty/corrupt (not a number)
+                high_score = 0
+        else:
+            # If the file does NOT exist, set high score to 0
+            high_score = 0
+        return high_score
+
+def new_high_score_check():
+    global high_score
+    # new_high score_achieved = False
+    if score > high_score:
+        high_score = score
+        new_high_score_achieved = True
+        with open(HS_FILE, "w") as f:
+            f.write(str(score))
+    else:
+        new_high_score_achieved = False
+    return new_high_score_achieved
+
+def reset_high_score():
+    global high_score, high_score_reset_message, message_timer
+    high_score = 0
+    with open(HS_FILE, 'w') as f:
+        f.write('0')
+    
+    # Activate the message and set the timer
+    high_score_reset_message = True
+    message_timer = pg.time.get_ticks()  # Record the current time
+
+
+def draw_start_title():
+    draw_text(screen, "High Score: " + str(high_score), 22, WIDTH / 2, 15, font_name)
     draw_text(screen, "SHMUP!", 64, WIDTH / 2, HEIGHT / 4, font_name)
     draw_text(screen, "Arrow keys move, Space to fire", 22, WIDTH / 2, HEIGHT / 2, font_name)
     draw_text(screen, "Press SPACE to play", 18, WIDTH / 2, HEIGHT * 3 / 4, font_name)
     draw_text(screen, "Press ENTER to Open Settings", 18, WIDTH / 2, HEIGHT * 3 / 4 + 40, font_name)
     draw_text(screen, "Press ESC to Quit Game", 18, WIDTH / 2, HEIGHT * 3 / 4 + 80, font_name)
 
-def draw_settings_menu():    
-    draw_text(screen, "SETTINGS", 64, WIDTH / 2, HEIGHT / 4, font_name)
+def draw_settings_menu():   
+    draw_text(screen, "High Score: " + str(high_score), 22, WIDTH / 2, 15, font_name) 
+    draw_text(screen, "SETTINGS", 48, WIDTH / 2, HEIGHT / 4, font_name)
     draw_text(screen, "S: Toggle Sound Effects", 22, WIDTH / 2, HEIGHT / 2 - 20, font_name)
     draw_text(screen, f"Sound is {"ON" if sound_enabled else "OFF"}", 22, WIDTH / 2, HEIGHT / 2 + 10, font_name)
     draw_text(screen, "M: Toggle Music", 22, WIDTH / 2, HEIGHT / 2 + 40, font_name)
     draw_text(screen, f"Music is {"ON" if music_enabled else "OFF"}", 22, WIDTH / 2, HEIGHT / 2 + 70, font_name)
-    draw_text(screen, "Press ESC to go back", 18, WIDTH / 2, HEIGHT * 3 / 4, font_name)    
+    draw_text(screen, "Press ESC to go back", 18, WIDTH / 2, HEIGHT * 3 / 4, font_name)
+    draw_text(screen, "R: Reset High Score", 22, WIDTH / 2, HEIGHT / 2 + 100, font_name)
+    if high_score_reset_message:
+        draw_text(screen, "High Score Reset!", 22, WIDTH/2, HEIGHT/2 + 130, font_name, GREEN)
     # draw_text(screen, "Press ESC to Open Settings", 18, WIDTH / 2, HEIGHT * 3 / 4 + 40, font_name)
     # draw_text(screen, "Press Q to Quit", 18, WIDTH / 2, HEIGHT * 3 / 4 + 80, font_name)
 
@@ -43,11 +89,15 @@ def draw_pause_menu():
     draw_text(screen, "Press ENTER to Open Settings", 18, WIDTH / 2, HEIGHT * 3 / 4 + 40, font_name)
     draw_text(screen, "Press Q to Quit to Title", 18, WIDTH / 2, HEIGHT * 3 / 4 + 80, font_name)
 
-def draw_game_over_title():
+def draw_game_over_title(new_high_score_achieved):
+    draw_text(screen, "High Score: " + str(high_score), 22, WIDTH / 2, 15, font_name)
     draw_text(screen, "GAME OVER", 48, WIDTH / 2, HEIGHT / 4, font_name)
-    draw_text(screen, "Score: " + str(score), 22, WIDTH / 2, HEIGHT / 2, font_name)
+    draw_text(screen, "Score: " + str(score), 30, WIDTH / 2, HEIGHT / 2, font_name)
     draw_text(screen, "Press SPACE to play again", 18, WIDTH / 2, HEIGHT * 3 / 4, font_name)
     draw_text(screen, "Press Q to Quit to Title", 18, WIDTH / 2, HEIGHT * 3 / 4 + 40, font_name)
+    if new_high_score_achieved:
+        draw_text(screen, "NEW HIGH SCORE!", 22, WIDTH / 2, HEIGHT / 2 + 40, font_name, GREEN)
+    
 
 def new_star():
     s = Starfield()
@@ -167,6 +217,9 @@ sound_enabled = True
 music_enabled = True
 game_state = "title"
 previous_state = None
+high_score_reset_message = False
+message_timer = 0
+high_score = load_data()
 
 running = True
 while running:
@@ -175,6 +228,7 @@ while running:
     space_key_pressed = False
     esc_key_pressed = False
     q_key_pressed = False
+    r_key_pressed = False
     s_key_pressed = False
     m_key_pressed = False
     enter_key_pressed = False
@@ -195,6 +249,8 @@ while running:
                 m_key_pressed = True
             if event.key == pg.K_RETURN:
                 enter_key_pressed = True
+            if event.key == pg.K_r:
+                r_key_pressed = True
 
     if quit_event:
         running = False
@@ -222,6 +278,15 @@ while running:
                 pg.mixer.music.unpause()
             else:
                 pg.mixer.music.pause()
+        if r_key_pressed:
+            reset_high_score()
+        
+        # Check if the message timer has expired
+        if high_score_reset_message:
+            now = pg.time.get_ticks()
+            if now - message_timer > MESSAGE_DISPLAY_TIME:
+                high_score_reset_message = False  # Hide the message
+
         clock.tick(10)
         
     elif game_state == "playing":
@@ -296,6 +361,7 @@ while running:
         # if the player died and the explosion has finished playing
         if player.lives == 0 and not death_explosion.alive():
             game_state = "game_over"
+            new_high_score_achieved = new_high_score_check()  
 
     elif game_state == "paused":
         if esc_key_pressed:
@@ -309,7 +375,7 @@ while running:
         all_sprites.draw(screen)        
         clock.tick(10)
         
-    elif game_state == "game_over":
+    elif game_state == "game_over":        
         if space_key_pressed:
             start_game()
             game_state = "playing"            
@@ -361,8 +427,8 @@ while running:
         draw_pause_menu()
         
 
-    if game_state == "game_over":
-        draw_game_over_title()
+    if game_state == "game_over":        
+        draw_game_over_title(new_high_score_achieved)
 
     pg.display.flip()
     clock.tick(FPS)
