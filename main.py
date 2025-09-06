@@ -1,9 +1,9 @@
 import pygame as pg
 from os import path
 from sys import exit
-from random import random, choice
+from random import random, choice, randint
 from settings import *
-from sprites import Player, Starfield, Meteoroid, Explosion
+from sprites import Player, Starfield, Meteoroid, Explosion, Powerup
 from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave
 
 
@@ -60,10 +60,12 @@ def spawn_meteoroid_wave(meteor_images):
     spawn_wave(new_meteroid, NUMBER_OF_METEOROIDS, meteor_images)
 
 def clear_game_objects():
-    for meteor in meteors:
-        meteor.kill()
+    for meteoroid in meteors:
+        meteoroid.kill()
     for bullet in bullets:
         bullet.kill()
+    for powerup in powerups:
+        powerup.kill()
 
 
 def start_game():
@@ -129,11 +131,15 @@ for _ in range(9):
     img_boss_explode = pg.transform.scale(img, (298, 302))
     explosion_animation['boss_explosion'].append(img_boss_explode)
 
+powerup_images = {}
+powerup_images['shield'] = pg.image.load(path.join("img/", 'shield_gold.png')).convert_alpha()
+powerup_images['gun'] = pg.image.load(path.join("img/", 'bolt_gold.png')).convert_alpha()
+
 # Load all game sounds
 shoot_sound = pg.mixer.Sound(path.join("snd/", "Laser_Shoot2.wav"))
 shoot_sound.set_volume(0.1)
-# shield_sound = pg.mixer.Sound(path.join("snd/", "pow4.wav"))
-# power_sound = pg.mixer.Sound(path.join("snd/", "pow5.wav"))
+shield_sound = pg.mixer.Sound(path.join("snd/", "pow4.wav"))
+power_sound = pg.mixer.Sound(path.join("snd/", "pow5.wav"))
 # life_up_sound = pg.mixer.Sound(path.join("snd/", "jingles_NES09.ogg"))
 expl_sounds = []
 for snd in ['Explosion1.wav', 'Explosion2.wav']:
@@ -148,6 +154,7 @@ all_sprites = pg.sprite.Group()
 bullets = pg.sprite.Group()
 stars = pg.sprite.Group()
 meteors = pg.sprite.Group()
+powerups = pg.sprite.Group()
 players = pg.sprite.Group()
 
 sound_enabled = True
@@ -226,10 +233,10 @@ while running:
                 hit_sound.set_volume(0.1)
             explosion = Explosion(hit.rect.center, 'large_explosion', explosion_animation)
             all_sprites.add(explosion)
-            # if random() > 0.9:
-            #     power = Power(hit.rect.center)
-            #     all_sprites.add(power)
-            #     powerups.add(power)
+            if random() > 0.6:
+                power = Powerup(powerup_images, hit.rect.center)
+                all_sprites.add(power)
+                powerups.add(power)
             new_meteroid(meteor_images)
         
         # check to see if a meteoroid hits the player
@@ -256,6 +263,23 @@ while running:
                 player.lives -= 1
                 player.shield = 100
 
+        # check to see if player hit a powerup
+        hits = pg.sprite.spritecollide(player, powerups, True)
+        for hit in hits:
+            if hit.type == 'shield':
+                player.shield += randint(10, 30)
+                if sound_enabled:
+                    shield_sound.play()
+                    shield_sound.set_volume(0.2)
+                if player.shield >= 100:
+                    player.shield = 100
+            if hit.type == 'gun':
+                player.powerup()
+                if sound_enabled:
+                    power_sound.play()
+                    power_sound.set_volume(0.2)
+
+        # if the player died and the explosion has finished playing
         if player.lives == 0 and not death_explosion.alive():
             game_state = "game_over"
 
