@@ -42,6 +42,13 @@ def new_meteroid(meteor_images):
 def spawn_meteoroid_wave(meteor_images):
     spawn_wave(new_meteroid, NUMBER_OF_METEOROIDS, meteor_images)
 
+def clear_game_objects():
+    for meteor in meteors:
+        meteor.kill()
+    for bullet in bullets:
+        bullet.kill()
+
+
 def reset_game():
     global score, game_state, life_gained, player, draw_game_over_screen
 
@@ -55,6 +62,8 @@ def reset_game():
     meteors.empty()
     players.empty()
     stars.empty()
+
+    clear_game_objects()
 
     player = Player(all_sprites, bullets, shoot_sound)
     all_sprites.add(player)
@@ -189,8 +198,7 @@ while running:
                 death_explosion = Explosion(player.rect.center, 'player_explosion', explosion_animation)
                 all_sprites.add(death_explosion)
                 player.hide()
-                for meteor in meteors:
-                    meteor.kill()
+                clear_game_objects()
                 player.lives -= 1
                 player.shield = 100
 
