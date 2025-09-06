@@ -24,13 +24,24 @@ def draw_start_title():
     draw_text(screen, "SHMUP!", 64, WIDTH / 2, HEIGHT / 4, font_name)
     draw_text(screen, "Arrow keys move, Space to fire", 22, WIDTH / 2, HEIGHT / 2, font_name)
     draw_text(screen, "Press SPACE to play", 18, WIDTH / 2, HEIGHT * 3 / 4, font_name)
-    draw_text(screen, "Press ESC to Quit", 18, WIDTH / 2, HEIGHT * 3 / 4 + 40, font_name)
+    draw_text(screen, "Press ESC to Open Settings", 18, WIDTH / 2, HEIGHT * 3 / 4 + 40, font_name)
+    draw_text(screen, "Press Q to Quit", 18, WIDTH / 2, HEIGHT * 3 / 4 + 80, font_name)
+
+def draw_settings_menu():    
+    draw_text(screen, "SETTINGS", 64, WIDTH / 2, HEIGHT / 4, font_name)
+    draw_text(screen, "S: Toggle Sound Effects", 22, WIDTH / 2, HEIGHT / 2 - 20, font_name)
+    draw_text(screen, f"Sound is {"ON" if sound_enabled else "OFF"}", 22, WIDTH / 2, HEIGHT / 2 + 10, font_name)
+    draw_text(screen, "M: Toggle Music", 22, WIDTH / 2, HEIGHT / 2 + 40, font_name)
+    draw_text(screen, f"Music is {"ON" if music_enabled else "OFF"}", 22, WIDTH / 2, HEIGHT / 2 + 70, font_name)
+    draw_text(screen, "Press ESC to go back", 18, WIDTH / 2, HEIGHT * 3 / 4, font_name)    
+    # draw_text(screen, "Press ESC to Open Settings", 18, WIDTH / 2, HEIGHT * 3 / 4 + 40, font_name)
+    # draw_text(screen, "Press Q to Quit", 18, WIDTH / 2, HEIGHT * 3 / 4 + 80, font_name)
 
 def draw_game_over_title():
     draw_text(screen, "GAME OVER", 48, WIDTH / 2, HEIGHT / 4, font_name)
     draw_text(screen, "Score: " + str(score), 22, WIDTH / 2, HEIGHT / 2, font_name)
     draw_text(screen, "Press SPACE to play again", 18, WIDTH / 2, HEIGHT * 3 / 4, font_name)
-    draw_text(screen, "Press ESC to Quit", 18, WIDTH / 2, HEIGHT * 3 / 4 + 40, font_name)
+    draw_text(screen, "Press Q to Quit", 18, WIDTH / 2, HEIGHT * 3 / 4 + 40, font_name)
 
 def new_star():
     s = Starfield()
@@ -138,6 +149,8 @@ stars = pg.sprite.Group()
 meteors = pg.sprite.Group()
 players = pg.sprite.Group()
 
+sound_enabled = True
+music_enabled = True
 game_state = "title"
 running = True
 while running:
@@ -145,6 +158,9 @@ while running:
     quit_event = False
     space_key_pressed = False
     esc_key_pressed = False
+    q_key_pressed = False
+    s_key_pressed = False
+    m_key_pressed = False
 
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -154,6 +170,12 @@ while running:
                 space_key_pressed = True
             if event.key == pg.K_ESCAPE:
                 esc_key_pressed = True
+            if event.key == pg.K_q:
+                q_key_pressed = True
+            if event.key == pg.K_s:
+                s_key_pressed = True
+            if event.key == pg.K_m:
+                m_key_pressed = True
 
     if quit_event:
         running = False
@@ -162,14 +184,29 @@ while running:
     if game_state == "title":
         if space_key_pressed:
             start_game()
-            game_state = "playing"            
+            game_state = "playing"
         if esc_key_pressed:
+            game_state = "settings"
+        if q_key_pressed:
             running = False
-        # print("title screen")
+        clock.tick(10)
+
+    elif game_state == "settings":
+        if esc_key_pressed:
+            game_state = "title"
+        if s_key_pressed:
+            sound_enabled = not sound_enabled
+        if m_key_pressed:
+            music_enabled = not music_enabled
+            if music_enabled:
+                pg.mixer.music.unpause()
+            else:
+                pg.mixer.music.pause()
+        clock.tick(10)
         
     elif game_state == "playing":
         keystate = pg.key.get_pressed()
-        player.update_with_keystate(keystate)
+        player.update_with_keystate(keystate, sound_enabled)
         all_sprites.update()
 
         if player.just_respawned:        
@@ -183,8 +220,9 @@ while running:
         for hit in hits:
             score += 62 - hit.radius
             hit_sound = choice(expl_sounds)
-            hit_sound.play()
-            hit_sound.set_volume(0.1)
+            if sound_enabled:
+                hit_sound.play()
+                hit_sound.set_volume(0.1)
             explosion = Explosion(hit.rect.center, 'large_explosion', explosion_animation)
             all_sprites.add(explosion)
             # if random() > 0.9:
@@ -197,8 +235,9 @@ while running:
         hits = pg.sprite.spritecollide(player, meteors, True, pg.sprite.collide_circle)
         for hit in hits:
             hit_sound = expl_sounds[0]
-            hit_sound.play()
-            hit_sound.set_volume(0.1)
+            if sound_enabled:
+                hit_sound.play()
+                hit_sound.set_volume(0.1)
             player.power = 1
             player.shield -= hit.radius * 2
             explosion = Explosion(hit.rect.center, 'small_explosion', explosion_animation)
@@ -206,8 +245,9 @@ while running:
             new_meteroid(meteor_images)
 
             if player.shield <= 0:
-                player_die_sound.play()
-                player_die_sound.set_volume(0.1)
+                if sound_enabled:
+                    player_die_sound.play()
+                    player_die_sound.set_volume(0.1)
                 death_explosion = Explosion(player.rect.center, 'player_explosion', explosion_animation)
                 all_sprites.add(death_explosion)
                 player.hide()
@@ -225,7 +265,7 @@ while running:
         if space_key_pressed:
             start_game()
             game_state = "playing"            
-        if esc_key_pressed:
+        if q_key_pressed:
             running = False
         clock.tick(10)
         # for event in pg.event.get():
@@ -241,7 +281,7 @@ while running:
 
     # --- DRAWING SECTION ---
 
-    if game_state in ("title", "game_over"):
+    if game_state in ("title", "settings", "game_over"):
         screen.blit(game_background, (0, 0))
     # elif game_state == "game_over":
     #     screen.blit(game_background, (0, 0))
@@ -251,6 +291,9 @@ while running:
     all_sprites.draw(screen)
     if game_state == "title":
         draw_start_title()
+
+    if game_state == "settings":
+        draw_settings_menu()
 
     if game_state == "playing":
         draw_text(screen, "Score: " + str(score), 18, WIDTH / 2, 10, font_name, WHITE)

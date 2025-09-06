@@ -55,12 +55,12 @@ class Player(pg.sprite.Sprite):
                 self.hidden = False
                 self.just_respawned = True
 
-    def update_with_keystate(self, keystate):
+    def update_with_keystate(self, keystate, sound_enabled):
         if self.hidden:
             return
                     
-        if keystate[pg.K_SPACE]:
-            self.shoot()
+        if keystate[pg.K_SPACE]:            
+            self.shoot(sound_enabled)
 
         self.speedx = 0
         if keystate[pg.K_LEFT] and not keystate[pg.K_RIGHT]:
@@ -79,7 +79,7 @@ class Player(pg.sprite.Sprite):
             self.speedy = 0
 
 
-    def shoot(self):
+    def shoot(self, sound_enabled):
         if not self.hidden:
             now = pg.time.get_ticks()
             if now - self.last_shot > self.shoot_delay:            
@@ -88,7 +88,8 @@ class Player(pg.sprite.Sprite):
                     bullet = Bullet(self.rect.centerx, self.rect.top)
                     self.all_sprites.add(bullet)
                     self.bullets.add(bullet)
-                    self.shoot_sound.play()
+                    if sound_enabled:
+                        self.shoot_sound.play()
 
     def hide(self):
         # hide the player temporarily
