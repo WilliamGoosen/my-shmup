@@ -24,8 +24,8 @@ def draw_start_title():
     draw_text(screen, "SHMUP!", 64, WIDTH / 2, HEIGHT / 4, font_name)
     draw_text(screen, "Arrow keys move, Space to fire", 22, WIDTH / 2, HEIGHT / 2, font_name)
     draw_text(screen, "Press SPACE to play", 18, WIDTH / 2, HEIGHT * 3 / 4, font_name)
-    draw_text(screen, "Press ESC to Open Settings", 18, WIDTH / 2, HEIGHT * 3 / 4 + 40, font_name)
-    draw_text(screen, "Press Q to Quit", 18, WIDTH / 2, HEIGHT * 3 / 4 + 80, font_name)
+    draw_text(screen, "Press ENTER to Open Settings", 18, WIDTH / 2, HEIGHT * 3 / 4 + 40, font_name)
+    draw_text(screen, "Press ESC to Quit Game", 18, WIDTH / 2, HEIGHT * 3 / 4 + 80, font_name)
 
 def draw_settings_menu():    
     draw_text(screen, "SETTINGS", 64, WIDTH / 2, HEIGHT / 4, font_name)
@@ -37,11 +37,17 @@ def draw_settings_menu():
     # draw_text(screen, "Press ESC to Open Settings", 18, WIDTH / 2, HEIGHT * 3 / 4 + 40, font_name)
     # draw_text(screen, "Press Q to Quit", 18, WIDTH / 2, HEIGHT * 3 / 4 + 80, font_name)
 
+def draw_pause_menu():
+    draw_text(screen, "PAUSED", 48, WIDTH / 2, HEIGHT / 4, font_name)
+    draw_text(screen, "Press ESC to resume", 18, WIDTH / 2, HEIGHT * 3 / 4, font_name)
+    draw_text(screen, "Press ENTER to Open Settings", 18, WIDTH / 2, HEIGHT * 3 / 4 + 40, font_name)
+    draw_text(screen, "Press Q to Quit to Title", 18, WIDTH / 2, HEIGHT * 3 / 4 + 80, font_name)
+
 def draw_game_over_title():
     draw_text(screen, "GAME OVER", 48, WIDTH / 2, HEIGHT / 4, font_name)
     draw_text(screen, "Score: " + str(score), 22, WIDTH / 2, HEIGHT / 2, font_name)
     draw_text(screen, "Press SPACE to play again", 18, WIDTH / 2, HEIGHT * 3 / 4, font_name)
-    draw_text(screen, "Press Q to Quit", 18, WIDTH / 2, HEIGHT * 3 / 4 + 40, font_name)
+    draw_text(screen, "Press Q to Quit to Title", 18, WIDTH / 2, HEIGHT * 3 / 4 + 40, font_name)
 
 def new_star():
     s = Starfield()
@@ -160,6 +166,8 @@ players = pg.sprite.Group()
 sound_enabled = True
 music_enabled = True
 game_state = "title"
+previous_state = None
+
 running = True
 while running:
     # --- EVENT HANDLING ---
@@ -169,6 +177,7 @@ while running:
     q_key_pressed = False
     s_key_pressed = False
     m_key_pressed = False
+    enter_key_pressed = False
 
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -184,6 +193,8 @@ while running:
                 s_key_pressed = True
             if event.key == pg.K_m:
                 m_key_pressed = True
+            if event.key == pg.K_RETURN:
+                enter_key_pressed = True
 
     if quit_event:
         running = False
@@ -193,15 +204,16 @@ while running:
         if space_key_pressed:
             start_game()
             game_state = "playing"
-        if esc_key_pressed:
+        if enter_key_pressed:
+            previous_state = game_state
             game_state = "settings"
-        if q_key_pressed:
+        if esc_key_pressed:
             running = False
         clock.tick(10)
 
     elif game_state == "settings":
         if esc_key_pressed:
-            game_state = "title"
+            game_state = previous_state
         if s_key_pressed:
             sound_enabled = not sound_enabled
         if m_key_pressed:
@@ -213,6 +225,8 @@ while running:
         clock.tick(10)
         
     elif game_state == "playing":
+        if esc_key_pressed:
+            game_state = "paused"
         keystate = pg.key.get_pressed()
         player.update_with_keystate(keystate, sound_enabled)
         all_sprites.update()
@@ -284,14 +298,24 @@ while running:
             game_state = "game_over"
 
     elif game_state == "paused":
-        pass
-
+        if esc_key_pressed:
+            game_state = "playing"
+        if q_key_pressed:
+            game_state = "title"
+            # running = False
+        if enter_key_pressed:
+            previous_state = game_state
+            game_state = "settings"
+        all_sprites.draw(screen)        
+        clock.tick(10)
+        
     elif game_state == "game_over":
         if space_key_pressed:
             start_game()
             game_state = "playing"            
         if q_key_pressed:
-            running = False
+            # running = False
+            game_state = "title"
         clock.tick(10)
         # for event in pg.event.get():
         #     if event.type == pg.KEYDOWN:
@@ -313,7 +337,9 @@ while running:
     else:
         screen.fill(BG_COLOUR)
     
-    all_sprites.draw(screen)
+    if game_state not in ("title", "settings"):
+        all_sprites.draw(screen)
+
     if game_state == "title":
         draw_start_title()
 
@@ -324,6 +350,16 @@ while running:
         draw_text(screen, "Score: " + str(score), 18, WIDTH / 2, 10, font_name, WHITE)
         draw_lives(screen, 5, 5, player.lives, player_mini_image)
         draw_shield_bar(screen, WIDTH - BAR_LENGTH - 5, 5, player.shield)
+        
+    if game_state == "paused":        
+        overlay = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA)
+        overlay.fill(PAUSE_OVERLAY)
+        screen.blit(overlay, (0, 0))
+        draw_text(screen, "Score: " + str(score), 18, WIDTH / 2, 10, font_name, WHITE)
+        draw_lives(screen, 5, 5, player.lives, player_mini_image)
+        draw_shield_bar(screen, WIDTH - BAR_LENGTH - 5, 5, player.shield)
+        draw_pause_menu()
+        
 
     if game_state == "game_over":
         draw_game_over_title()
