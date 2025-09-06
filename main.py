@@ -20,6 +20,12 @@ font_name = pg.font.match_font(FONT_NAME)
 #player_img = pg.image.load(path.join(img_dir, "playerShip1_orange.png")).convert_alpha()
 #bullet_img = pg.image.load(path.join(img_dir, "laserRed16.png")).convert_alpha()
 
+def draw_start_title():    
+    draw_text(screen, "SHMUP!", 64, WIDTH / 2, HEIGHT / 4, font_name)
+    draw_text(screen, "Arrow keys move, Space to fire", 22, WIDTH / 2, HEIGHT / 2, font_name)
+    draw_text(screen, "Press SPACE to play", 18, WIDTH / 2, HEIGHT * 3 / 4, font_name)
+    draw_text(screen, "Press ESC to Quit", 18, WIDTH / 2, HEIGHT * 3 / 4 + 40, font_name)
+
 def draw_game_over_title():
     draw_text(screen, "GAME OVER", 48, WIDTH / 2, HEIGHT / 4, font_name)
     draw_text(screen, "Score: " + str(score), 22, WIDTH / 2, HEIGHT / 2, font_name)
@@ -49,10 +55,10 @@ def clear_game_objects():
         bullet.kill()
 
 
-def reset_game():
-    global score, game_state, life_gained, player, draw_game_over_screen
+def start_game():
+    global score, game_state, life_gained, player
 
-    game_state = "playing"
+    # game_state = "playing"
     draw_game_over_screen = False
     score = 0
     life_gained = 0
@@ -131,8 +137,8 @@ bullets = pg.sprite.Group()
 stars = pg.sprite.Group()
 meteors = pg.sprite.Group()
 players = pg.sprite.Group()
-reset_game()
 
+game_state = "title"
 running = True
 while running:
     # --- EVENT HANDLING ---
@@ -153,8 +159,15 @@ while running:
         running = False
 
     # --- GAME LOGIC & STATE UPDATES ---
-
-    if game_state == "playing":
+    if game_state == "title":
+        if space_key_pressed:
+            start_game()
+            game_state = "playing"            
+        if esc_key_pressed:
+            running = False
+        # print("title screen")
+        
+    elif game_state == "playing":
         keystate = pg.key.get_pressed()
         player.update_with_keystate(keystate)
         all_sprites.update()
@@ -210,7 +223,8 @@ while running:
 
     elif game_state == "game_over":
         if space_key_pressed:
-            reset_game()            
+            start_game()
+            game_state = "playing"            
         if esc_key_pressed:
             running = False
         clock.tick(10)
@@ -223,18 +237,21 @@ while running:
         # clock.tick(10)
         # draw_game_over_screen = True
         # screen.blit(game_background, (0, 0))
-
-    else:
-        draw_game_over_screen = False
+    
 
     # --- DRAWING SECTION ---
 
-    if game_state == "game_over":
+    if game_state in ("title", "game_over"):
         screen.blit(game_background, (0, 0))
+    # elif game_state == "game_over":
+    #     screen.blit(game_background, (0, 0))
     else:
         screen.fill(BG_COLOUR)
     
     all_sprites.draw(screen)
+    if game_state == "title":
+        draw_start_title()
+
     if game_state == "playing":
         draw_text(screen, "Score: " + str(score), 18, WIDTH / 2, 10, font_name, WHITE)
         draw_lives(screen, 5, 5, player.lives, player_mini_image)
