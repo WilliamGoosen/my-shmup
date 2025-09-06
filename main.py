@@ -233,7 +233,7 @@ while running:
                 hit_sound.set_volume(0.1)
             explosion = Explosion(hit.rect.center, 'large_explosion', explosion_animation)
             all_sprites.add(explosion)
-            if random() > 0.6:
+            if random() < POWERUP_DROP_CHANCE:
                 power = Powerup(powerup_images, hit.rect.center)
                 all_sprites.add(power)
                 powerups.add(power)
