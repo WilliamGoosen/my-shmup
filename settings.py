@@ -49,3 +49,6 @@ EXPLOSION_FRAME_RATE = 35
 
 # UI attributes
 PLAYER_LIVES_ICON_SPACING = 30
+
+# Powerup attributes
+POWERUP_SPEED = 4

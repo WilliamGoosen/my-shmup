@@ -78,18 +78,33 @@ class Player(pg.sprite.Sprite):
         else:
             self.speedy = 0
 
+    def powerup(self):
+        self.power += 1
+        self.power_time = pg.time.get_ticks()
+
 
     def shoot(self, sound_enabled):
         if not self.hidden:
             now = pg.time.get_ticks()
             if now - self.last_shot > self.shoot_delay:            
                 self.last_shot = now
-                if self.power == 1:                
-                    bullet = Bullet(self.rect.centerx, self.rect.top)
+                bullet_locations = []
+                if self.power == 1:
+                    bullet_locations = [(self.rect.centerx, self.rect.top)]
+                elif self.power == 2:
+                    bullet_locations = [(self.rect.left, self.rect.centery),
+                                        (self.rect.right, self.rect.centery)]
+                else:
+                    bullet_locations = [(self.rect.centerx, self.rect.top),
+                                    (self.rect.left, self.rect.centery),
+                                    (self.rect.right, self.rect.centery)]
+                for bullet_location in bullet_locations:
+                    bullet = Bullet(bullet_location[0], bullet_location[1])
                     self.all_sprites.add(bullet)
                     self.bullets.add(bullet)
-                    if sound_enabled:
-                        self.shoot_sound.play()
+                if sound_enabled:
+                    self.shoot_sound.play()                
+
 
     def hide(self):
         # hide the player temporarily
@@ -191,6 +206,22 @@ class Starfield(pg.sprite.Sprite):
             self.pos_y = -self.rect.height
             self.rect.y = int(self.pos_y)
             self.rect.x = randint(0, WIDTH - self.rect.width)
+
+class Powerup(pg.sprite.Sprite):
+    def __init__(self, powerup_images, center):
+        pg.sprite.Sprite.__init__(self)
+        self.type = choice(["shield", "gun"])
+        self.image = powerup_images[self.type]
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+        self.speedy = POWERUP_SPEED
+    
+    def update(self):
+        self.rect.y += self.speedy
+        if self.rect.top > HEIGHT:
+            self.kill()
+
 
 class Explosion(pg.sprite.Sprite):
     def __init__(self, center, size, explosion_animation):
