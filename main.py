@@ -139,8 +139,9 @@ expl_sounds = []
 for snd in ['Explosion1.wav', 'Explosion2.wav']:
     expl_sounds.append(pg.mixer.Sound(path.join("snd/", snd)))
 player_die_sound = pg.mixer.Sound(path.join("snd/", 'rumble1.ogg'))
-# pg.mixer.music.load(path.join("snd/", 'tgfcoder-FrozenJam-SeamlessLoop.ogg'))
-# pg.mixer.music.set_volume(0.1)
+pg.mixer.music.load(path.join("snd/", 'tgfcoder-FrozenJam-SeamlessLoop.ogg'))
+pg.mixer.music.set_volume(0.1)
+pg.mixer.music.play(loops=-1)
 
 
 all_sprites = pg.sprite.Group()
