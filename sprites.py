@@ -27,36 +27,38 @@ class Player(pg.sprite.Sprite):
 
 
     def update(self):
-        if self.power >= 2 and pg.time.get_ticks() - self.power_time > POWERUP_TIME:
-            self.power -= 1
-            self.power_time = pg.time.get_ticks()
-
-        # unhide if hidden
-        # self.hidden = False
-        if self.hidden:            
-            if (pg.time.get_ticks() - self.hide_timer) > PLAYER_RESPAWN_TIME:                
-                self.hidden = False
-                self.just_respawned = True
-
-        if self.speedx != 0 and self.speedy != 0:
-            self.speedx = self.speedx / math.sqrt(2)
-            self.speedy = self.speedy / math.sqrt(2)   
-        
-        self.rect.x += self.speedx
-        self.rect.y += self.speedy
-
-        if self.rect.right > WIDTH:
-            self.rect.right = WIDTH
-        if self.rect.left < 0:
-            self.rect.left = 0
-
         if not self.hidden:
+            if self.power >= 2 and pg.time.get_ticks() - self.power_time > POWERUP_TIME:
+                self.power -= 1
+                self.power_time = pg.time.get_ticks()        
+
+            if self.speedx != 0 and self.speedy != 0:
+                self.speedx = self.speedx / math.sqrt(2)
+                self.speedy = self.speedy / math.sqrt(2)   
+
+            self.rect.x += self.speedx
+            self.rect.y += self.speedy
+
+            if self.rect.right > WIDTH:
+                self.rect.right = WIDTH
+            if self.rect.left < 0:
+                self.rect.left = 0
+
             if self.rect.bottom > HEIGHT:
                 self.rect.bottom = HEIGHT
             if self.rect.top < 0:
                 self.rect.top = 0
 
+        # unhide if hidden   
+        else:
+            if (pg.time.get_ticks() - self.hide_timer) > PLAYER_RESPAWN_TIME:
+                self.hidden = False
+                self.just_respawned = True
+
     def update_with_keystate(self, keystate):
+        if self.hidden:
+            return
+                    
         if keystate[pg.K_SPACE]:
             self.shoot()
 
