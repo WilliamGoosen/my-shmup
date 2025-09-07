@@ -434,152 +434,168 @@ while running:
     if quit_event:
         running = False
 
-    # --- GAME LOGIC & STATE UPDATES ---
-    if game_state == "title":
-        if space_key_pressed:
-            start_game()
-            game_state = "playing"
-        if enter_key_pressed:
-            previous_state = game_state
-            game_state = "settings"
-        if esc_key_pressed:
-            running = False
-        clock.tick(10)
-
-    elif game_state == "settings":
-        if esc_key_pressed:
-            game_state = previous_state
-        if s_key_pressed:
-            sound_enabled = not sound_enabled
-        if m_key_pressed:
-            music_enabled = not music_enabled
-            if music_enabled:
-                pg.mixer.music.unpause()
-            else:
-                pg.mixer.music.pause()
-        if r_key_pressed:
-            reset_high_score()
-        
-        now = pg.time.get_ticks()
-        if now - last_highlight_time > highlight_delay:
-            last_highlight_time = now
-
-            for icon in arrows_list:
-                icon.set_alpha(150)
-
-            arrows_list[highlight_index].set_alpha(255)
-            highlight_index = (highlight_index + 1) % 4
-        
-        # Check if the message timer has expired
-        if high_score_reset_message:
-            now = pg.time.get_ticks()
-            if now - message_timer > MESSAGE_DISPLAY_TIME:
-                high_score_reset_message = False  # Hide the message
-
-        clock.tick(10)
-        
-    elif game_state == "playing":
-        if esc_key_pressed:
-            game_state = "paused"
-        keystate = pg.key.get_pressed()
-        player.update_with_keystate(keystate, sound_enabled)
-        all_sprites.update()
-
-        if player.just_respawned:        
-            spawn_meteoroid_wave(meteor_images)
-            player.rect.centerx = WIDTH /2
-            player.rect.bottom = HEIGHT - PLAYER_START_Y_OFFSET
-            player.just_respawned = False
-    
-        # check to see if a bullet hit a meteoroid
-        hits = pg.sprite.groupcollide(meteors, bullets, True, True)
-        for hit in hits:
-            score += 62 - hit.radius
-            hit_sound = choice(expl_sounds)
-            if sound_enabled:
-                hit_sound.play()
-                hit_sound.set_volume(0.1)
-            explosion = Explosion(hit.rect.center, 'large_explosion', explosion_animation)
-            all_sprites.add(explosion)
-            if random() < POWERUP_DROP_CHANCE:
-                power = Powerup(powerup_images, hit.rect.center, WIDTH, HEIGHT)
-                all_sprites.add(power)
-                powerups.add(power)
-            new_meteroid(meteor_images)
-        
-        # check to see if a meteoroid hits the player
-        hits = pg.sprite.spritecollide(player, meteors, True, pg.sprite.collide_circle)
-        for hit in hits:
-            hit_sound = expl_sounds[0]
-            if sound_enabled:
-                hit_sound.play()
-                hit_sound.set_volume(0.1)
-            player.power = 1
-            player.shield -= hit.radius * 2
-            explosion = Explosion(hit.rect.center, 'small_explosion', explosion_animation)
-            all_sprites.add(explosion)
-            new_meteroid(meteor_images)
-
-            if player.shield <= 0:
-                if sound_enabled:
-                    player_die_sound.play()
-                    player_die_sound.set_volume(0.1)
-                death_explosion = Explosion(player.rect.center, 'player_explosion', explosion_animation)
-                all_sprites.add(death_explosion)
-                player.hide()
-                clear_game_objects()
-                player.lives -= 1
-                player.shield = 100
-
-        # check to see if player hit a powerup
-        hits = pg.sprite.spritecollide(player, powerups, True)
-        for hit in hits:
-            if hit.type == 'shield':
-                player.shield += randint(10, 30)
-                if sound_enabled:
-                    shield_sound.play()
-                    shield_sound.set_volume(0.2)
-                if player.shield >= 100:
-                    player.shield = 100
-            if hit.type == 'gun':
-                player.powerup()
-                if sound_enabled:
-                    power_sound.play()
-                    power_sound.set_volume(0.2)
-
-        # if the player died and the explosion has finished playing
-        if player.lives == 0 and not death_explosion.alive():
-            game_state = "game_over"
-            new_high_score_achieved = int(new_high_score_check())
-
-    elif game_state == "paused":
-        if show_confirmation:
+    if show_confirmation:
             if y_key_pressed:
-                game_state = "title"
+                if pending_action == "quit_to_title":
+                    game_state = "title"
+                elif pending_action == "reset_high_score":
+                    reset_high_score()
+
                 show_confirmation = False
+                pending_action = None
+
             elif n_key_pressed or esc_key_pressed:
                 show_confirmation = False
-        else:
+                pending_action = None
+
+    # --- GAME LOGIC & STATE UPDATES ---
+    else:
+        if game_state == "title":
             if space_key_pressed:
+                start_game()
                 game_state = "playing"
-            if esc_key_pressed:
-                pending_action = "title"
-                show_confirmation = True                
             if enter_key_pressed:
                 previous_state = game_state
                 game_state = "settings"
-            all_sprites.draw(screen)        
-            clock.tick(10)            
-        
-    elif game_state == "game_over":        
-        if space_key_pressed:
-            start_game()
-            game_state = "playing"            
-        if q_key_pressed:
-            running = False
-        if esc_key_pressed:
-            game_state = "title"
-        clock.tick(10)    
+            if esc_key_pressed:
+                running = False
+            clock.tick(10)
+
+        elif game_state == "settings":        
+            if esc_key_pressed:
+                game_state = previous_state
+            if s_key_pressed:
+                sound_enabled = not sound_enabled
+            if m_key_pressed:
+                music_enabled = not music_enabled
+                if music_enabled:
+                    pg.mixer.music.unpause()
+                else:
+                    pg.mixer.music.pause()
+            if r_key_pressed:
+                pending_action = "reset_high_score"
+                show_confirmation = True                
+            now = pg.time.get_ticks()
+            if now - last_highlight_time > highlight_delay:
+                last_highlight_time = now
+                for icon in arrows_list:
+                    icon.set_alpha(150)
+                arrows_list[highlight_index].set_alpha(255)
+                highlight_index = (highlight_index + 1) % 4
+            # Check if the message timer has expired
+            if high_score_reset_message:
+                now = pg.time.get_ticks()
+                if now - message_timer > MESSAGE_DISPLAY_TIME:
+                    high_score_reset_message = False  # Hide the message
+            clock.tick(10)
+
+        elif game_state == "playing":
+            if esc_key_pressed:
+                game_state = "paused"
+            keystate = pg.key.get_pressed()
+            player.update_with_keystate(keystate, sound_enabled)
+            all_sprites.update()
+
+            if player.just_respawned:        
+                spawn_meteoroid_wave(meteor_images)
+                player.rect.centerx = WIDTH /2
+                player.rect.bottom = HEIGHT - PLAYER_START_Y_OFFSET
+                player.just_respawned = False
+
+            # check to see if a bullet hit a meteoroid
+            hits = pg.sprite.groupcollide(meteors, bullets, True, True)
+            for hit in hits:
+                score += 62 - hit.radius
+                hit_sound = choice(expl_sounds)
+                if sound_enabled:
+                    hit_sound.play()
+                    hit_sound.set_volume(0.1)
+                explosion = Explosion(hit.rect.center, 'large_explosion', explosion_animation)
+                all_sprites.add(explosion)
+                if random() < POWERUP_DROP_CHANCE:
+                    power = Powerup(powerup_images, hit.rect.center, WIDTH, HEIGHT)
+                    all_sprites.add(power)
+                    powerups.add(power)
+                new_meteroid(meteor_images)
+
+            # check to see if a meteoroid hits the player
+            hits = pg.sprite.spritecollide(player, meteors, True, pg.sprite.collide_circle)
+            for hit in hits:
+                hit_sound = expl_sounds[0]
+                if sound_enabled:
+                    hit_sound.play()
+                    hit_sound.set_volume(0.1)
+                player.power = 1
+                player.shield -= hit.radius * 2
+                explosion = Explosion(hit.rect.center, 'small_explosion', explosion_animation)
+                all_sprites.add(explosion)
+                new_meteroid(meteor_images)
+
+                if player.shield <= 0:
+                    if sound_enabled:
+                        player_die_sound.play()
+                        player_die_sound.set_volume(0.1)
+                    death_explosion = Explosion(player.rect.center, 'player_explosion', explosion_animation)
+                    all_sprites.add(death_explosion)
+                    player.hide()
+                    clear_game_objects()
+                    player.lives -= 1
+                    player.shield = 100
+
+            # check to see if player hit a powerup
+            hits = pg.sprite.spritecollide(player, powerups, True)
+            for hit in hits:
+                if hit.type == 'shield':
+                    player.shield += randint(10, 30)
+                    if sound_enabled:
+                        shield_sound.play()
+                        shield_sound.set_volume(0.2)
+                    if player.shield >= 100:
+                        player.shield = 100
+                if hit.type == 'gun':
+                    player.powerup()
+                    if sound_enabled:
+                        power_sound.play()
+                        power_sound.set_volume(0.2)
+
+            # if the player died and the explosion has finished playing
+            if player.lives == 0 and not death_explosion.alive():
+                game_state = "game_over"
+                new_high_score_achieved = int(new_high_score_check())
+
+        elif game_state == "paused":
+            if show_confirmation:
+                if y_key_pressed:
+                    if pending_action == "quit_to_title":
+                        game_state = "title"
+                    show_confirmation = False
+                    pending_action = None
+
+                elif n_key_pressed or esc_key_pressed:
+                    show_confirmation = False
+                    pending_action = None
+
+            else:
+                if space_key_pressed:
+                    game_state = "playing"
+                if esc_key_pressed:
+                    pending_action = "quit_to_title"
+                    show_confirmation = True                
+                if enter_key_pressed:
+                    previous_state = game_state
+                    game_state = "settings"
+                all_sprites.draw(screen)        
+                clock.tick(10)            
+
+        elif game_state == "game_over":
+            if space_key_pressed:
+                start_game()
+                game_state = "playing"            
+            if q_key_pressed:
+                running = False
+            if esc_key_pressed:
+                game_state = "title"
+            clock.tick(10)    
 
     # --- DRAWING SECTION ---
 
@@ -597,7 +613,9 @@ while running:
         draw_start_title()
 
     if game_state == "settings":
-        draw_settings_menu()       
+        draw_settings_menu()
+        if show_confirmation:
+            draw_confirm_popup()
 
     if game_state == "playing":
         draw_text(screen, "Score: " + str(score), 22, WIDTH / 2, HEIGHT * 0.01, font_name, WHITE)
