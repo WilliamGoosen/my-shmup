@@ -1,10 +1,12 @@
 # Game options/settings
 TITLE = "My Shmup!"
-WIDTH = 576
-HEIGHT = 720
+BASE_WIDTH = 576
+BASE_HEIGHT = 720
+SCALE_FACTOR = 1.33
 FPS = 60
 FONT_NAME = 'arial'
 HS_FILE = 'highscore.txt'
+CONFIG_FILE = "config.ini"
 MESSAGE_DISPLAY_TIME = 2000
 
 BAR_LENGTH = 100

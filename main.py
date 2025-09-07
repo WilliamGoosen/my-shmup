@@ -4,39 +4,38 @@ from sys import exit
 from random import random, choice, randint
 from settings import *
 from sprites import Player, Starfield, Meteoroid, Explosion, Powerup
-from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text
-
-
-img_dir = path.join(path.dirname(__file__), 'img')
-
-pg.init()
-pg.mixer.init()
-screen = pg.display.set_mode((WIDTH, HEIGHT))
-pg.display.set_caption(TITLE)
-clock = pg.time.Clock()
-
-font_name = pg.font.match_font(FONT_NAME)
+from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text, load_or_create_file
 
 #player_img = pg.image.load(path.join(img_dir, "playerShip1_orange.png")).convert_alpha()
 #bullet_img = pg.image.load(path.join(img_dir, "laserRed16.png")).convert_alpha()
 
-def load_data():        
-        # Create the full path to the high score file
-        hs_file_path = HS_FILE
+# def load_data():        
+#         # Create the full path to the high score file
+#         hs_file_path = HS_FILE
 
-        # Check if the file exists first
-        if path.exists(hs_file_path):
-            # If it exists, open it and try to read the score
-            try:
-                with open(hs_file_path, 'r') as f:
-                    high_score = int(f.read())
-            except ValueError:
-                # This happens if the file exists but is empty/corrupt (not a number)
-                high_score = 0
-        else:
-            # If the file does NOT exist, set high score to 0
-            high_score = 0
-        return high_score
+#         # Check if the file exists first
+#         if path.exists(hs_file_path):
+#             # If it exists, open it and try to read the score
+#             try:
+#                 with open(hs_file_path, 'r') as f:
+#                     high_score = int(f.read())
+#             except ValueError:
+#                 # This happens if the file exists but is empty/corrupt (not a number)
+#                 high_score = 0
+#         else:
+#             # If the file does NOT exist, set high score to 0
+#             high_score = 0
+#         return high_score
+
+def load_config():
+    config_dict = {}
+    config_lines = load_or_create_file(CONFIG_FILE, 'scale_factor=1.0').splitlines()
+
+    for line in config_lines:
+        if "=" in line:
+            key, value = line.split("=", 1)
+            config_dict[key] = value
+    return config_dict
 
 def new_high_score_check():
     global high_score
@@ -62,28 +61,73 @@ def reset_high_score():
 
 
 def draw_start_title():
-    draw_text(screen, "High Score: " + str(high_score), 22, WIDTH / 2, 15, font_name)
-    draw_text(screen, "SHMUP!", 64, WIDTH / 2, HEIGHT / 4, font_name)
-    draw_text(screen, "Arrow keys move, Space to fire", 22, WIDTH / 2, HEIGHT / 2, font_name)
-    draw_text(screen, "Press SPACE to play", 18, WIDTH / 2, HEIGHT * 3 / 4, font_name)
-    draw_text(screen, "Press ENTER to Open Settings", 18, WIDTH / 2, HEIGHT * 3 / 4 + 40, font_name)
-    draw_text(screen, "Press ESC to Quit Game", 18, WIDTH / 2, HEIGHT * 3 / 4 + 80, font_name)
+    icon_x = WIDTH * 0.40
+    icon_text_padding_x = 0.06
+    text_x = icon_x + WIDTH * icon_text_padding_x
+    icon_y = HEIGHT * 2 / 5
+    icon_text_padding_y = 0.026
+    text_y = icon_y + WIDTH * icon_text_padding_y
+    y_increment = 40
 
-def draw_settings_menu():   
-    draw_text(screen, "High Score: " + str(high_score), 22, WIDTH / 2, 15, font_name) 
-    draw_text(screen, "SETTINGS", 48, WIDTH / 2, HEIGHT / 4, font_name)    
-    draw_icon_text(screen, f"Sound: {"ON" if sound_enabled else "OFF"}", 22, WIDTH * 0.4, HEIGHT / 2.5, font_name)    
-    draw_icon_text(screen, f"Music: {"ON" if music_enabled else "OFF"}", 22, WIDTH * 0.4, HEIGHT / 2.5 + 40, font_name)
-    draw_icon_text(screen, "Back", 18, 72, HEIGHT * 0.925, font_name)
-    draw_icon_text(screen, "R: Reset High Score", 22, WIDTH * 0.4, HEIGHT / 2.5 + 80, font_name)
+    draw_text(screen, "High Score: " + str(high_score), 22, WIDTH * 0.5, HEIGHT * 0.02, font_name)
+    draw_text(screen, "SHMUP!", 64, WIDTH / 2, HEIGHT / 4, font_name)
+
+    draw_icon(screen, enter_icon_scaled, icon_x, icon_y + icon_text_padding_y)
+    draw_icon_text(screen, "Settings", 22, text_x, text_y, font_name)
+
+    draw_icon(screen, spacebar_icon_scaled, icon_x, icon_y + icon_text_padding_y + y_increment)
+    draw_icon_text(screen, "Start Game", 22, text_x, text_y + y_increment, font_name)    
+
+    draw_icon(screen, esc_icon_scaled, WIDTH * 0.07, HEIGHT * 0.92)
+    draw_icon_text(screen, "Quit Game", 18, WIDTH * 0.11, HEIGHT * 0.940, font_name)    
+    
+
+def draw_settings_menu():
+    icon_x = WIDTH * 0.37
+    icon_text_padding_x = 0.05
+    text_x = icon_x + WIDTH * icon_text_padding_x
+    icon_y = HEIGHT * 2 / 5
+    icon_text_padding_y = 0.026
+    text_y = icon_y + WIDTH * icon_text_padding_y
+    y_increment = 40
+
+    draw_text(screen, "High Score: " + str(high_score), 22, WIDTH * 0.5, HEIGHT * 0.02, font_name) 
+    draw_text(screen, "SETTINGS", 48, WIDTH * 0.5, HEIGHT * 0.25, font_name)
+
+    draw_icon(screen, s_icon_scaled, icon_x, icon_y + icon_text_padding_y)
+    draw_icon_text(screen, f"Sound: {"ON" if sound_enabled else "OFF"}", 22, text_x, text_y, font_name) 
+
+    draw_icon(screen, m_icon_scaled, icon_x, icon_y + icon_text_padding_y + y_increment)
+    draw_icon_text(screen, f"Music: {"ON" if music_enabled else "OFF"}", 22, text_x, text_y + y_increment, font_name)
+
+    draw_icon(screen, r_icon_scaled, icon_x, icon_y + icon_text_padding_y + 2 * y_increment)
+    draw_icon_text(screen, "Reset High Score", 22, text_x, text_y + 2 * y_increment, font_name)
     if high_score_reset_message:
-        draw_text(screen, "High Score Reset!", 22, WIDTH/2, HEIGHT/2 + 130, font_name, GREEN)    
+        draw_text(screen, "High Score Reset!", 22, WIDTH/2, HEIGHT * 0.68, font_name, GREEN)
+
+    draw_icon(screen, esc_icon_scaled, WIDTH * 0.07, HEIGHT * 0.92)    
+    draw_icon_text(screen, "Back", 18, WIDTH * 0.11, HEIGHT * 0.940, font_name)
+
 
 def draw_pause_menu():
+    icon_x = WIDTH * 0.42
+    icon_text_padding = 0.05
+    text_x = icon_x + WIDTH * icon_text_padding
+    base_y = HEIGHT * 2 / 5
+    icon_text_offset = -2
+    y_increment = 40
+
     draw_text(screen, "PAUSED", 48, WIDTH / 2, HEIGHT / 4, font_name)
-    draw_text(screen, "Press ESC to resume", 18, WIDTH / 2, HEIGHT * 3 / 4, font_name)
-    draw_text(screen, "Press ENTER to Open Settings", 18, WIDTH / 2, HEIGHT * 3 / 4 + 40, font_name)
-    draw_text(screen, "Press Q to Quit to Title", 18, WIDTH / 2, HEIGHT * 3 / 4 + 80, font_name)
+
+    draw_icon(screen, enter_icon_scaled, icon_x, base_y + icon_text_offset)
+    draw_icon_text(screen, "Settings", 22, text_x, base_y, font_name)
+
+    draw_icon(screen, spacebar_icon_scaled, icon_x, base_y + icon_text_offset + y_increment)
+    draw_icon_text(screen, "Resume", 22, text_x, base_y + y_increment, font_name)    
+
+    draw_icon(screen, q_icon_scaled, icon_x, base_y + icon_text_offset + 2 * y_increment)
+    draw_icon_text(screen, "Quit to Title", 22, text_x, base_y + 2 * y_increment, font_name)
+
 
 def draw_game_over_title(new_high_score_achieved):
     draw_text(screen, "High Score: " + str(high_score), 22, WIDTH / 2, 15, font_name)
@@ -96,7 +140,7 @@ def draw_game_over_title(new_high_score_achieved):
     
 
 def new_star():
-    s = Starfield()
+    s = Starfield(WIDTH, HEIGHT)
     all_sprites.add(s)
     stars.add(s)
 
@@ -104,7 +148,7 @@ def spawn_starfield():
     spawn_wave(new_star, NUMBER_OF_STARS)
 
 def new_meteroid(meteor_images):
-    m = Meteoroid(meteor_images)
+    m = Meteoroid(meteor_images, WIDTH, HEIGHT)
     all_sprites.add(m)
     meteors.add(m)
 
@@ -136,12 +180,28 @@ def start_game():
 
     clear_game_objects()
 
-    player = Player(all_sprites, bullets, shoot_sound)
+    player = Player(all_sprites, bullets, shoot_sound, WIDTH, HEIGHT)
     all_sprites.add(player)
     players.add(player)
 
     spawn_starfield()
     spawn_meteoroid_wave(meteor_images)
+
+# Constants and initialisation
+config = load_config()
+SCALE_FACTOR = float(config.get("scale_factor", 1.0))
+music_volume = float(config.get("music_volume", 0.1))
+WIDTH = int(BASE_WIDTH * SCALE_FACTOR)
+HEIGHT = int(BASE_HEIGHT * SCALE_FACTOR)
+img_dir = path.join(path.dirname(__file__), 'img')
+
+pg.init()
+pg.mixer.init()
+screen = pg.display.set_mode((WIDTH, HEIGHT))
+pg.display.set_caption(TITLE)
+clock = pg.time.Clock()
+
+font_name = pg.font.match_font(FONT_NAME)
 
 # Load all game graphics
 plus_icon = pg.image.load(path.join("img/", "tile_0062.png"))
@@ -157,23 +217,27 @@ r_icon_scaled = pg.transform.scale_by(r_icon, 32/16)
 s_icon = pg.image.load(path.join("img/", "tile_0121.png"))
 s_icon_scaled = pg.transform.scale_by(s_icon, 32/16)
 enter_icon = pg.image.load(path.join("img/", "enter.png")).convert_alpha()
-enter_icon_scaled = pg.transform.scale_by(enter_icon,(32/20))
+enter_icon_scaled = pg.transform.scale_by(enter_icon,(32/24))
 spacebar_icon = pg.image.load(path.join("img/", "spacebar.png")).convert_alpha()
 spacebar_icon_scaled = pg.transform.scale_by(spacebar_icon,(32/16))
 esc_icon = pg.image.load(path.join("img/", "tile_0017.png"))
 esc_icon_scaled = pg.transform.scale_by(esc_icon, 32/16)
 
-game_background_original = pg.image.load(path.join("img/", "starfield.png")).convert_alpha()
-scale_factor = HEIGHT / game_background_original.get_height()
-new_width = int(game_background_original.get_height() * scale_factor)
-new_height = int(game_background_original.get_height() * scale_factor)
-game_background_scaled = pg.transform.smoothscale(game_background_original, (new_width, new_height))
+def scale_background(WIDTH, HEIGHT):
+    game_background_original = pg.image.load(path.join("img/", "starfield.png")).convert_alpha()
+    scale_factor = HEIGHT / game_background_original.get_height()
+    new_width = int(game_background_original.get_height() * scale_factor)
+    new_height = int(game_background_original.get_height() * scale_factor)
+    game_background_scaled = pg.transform.smoothscale(game_background_original, (new_width, new_height))
 
-if new_width > WIDTH:
-    crop_x = (new_width - WIDTH) // 2
-    game_background = game_background_scaled.subsurface((crop_x, 0, WIDTH, HEIGHT))
-else:
-    game_background = game_background_scaled
+    if new_width > WIDTH:
+        crop_x = (new_width - WIDTH) // 2
+        game_background = game_background_scaled.subsurface((crop_x, 0, WIDTH, HEIGHT))
+    else:
+        game_background = game_background_scaled
+    return game_background
+
+game_background = scale_background(WIDTH, HEIGHT)
 # background__original_rect = background_original.get_rect()
 player_image = pg.image.load(path.join("img/", "playerShip1_orange.png")).convert_alpha()
 player_mini_image = pg.transform.scale(player_image, (25, 19))
@@ -234,7 +298,8 @@ game_state = "title"
 previous_state = None
 high_score_reset_message = False
 message_timer = 0
-high_score = load_data()
+high_score = load_or_create_file(HS_FILE, 0)
+
 
 running = True
 while running:
@@ -328,7 +393,7 @@ while running:
             explosion = Explosion(hit.rect.center, 'large_explosion', explosion_animation)
             all_sprites.add(explosion)
             if random() < POWERUP_DROP_CHANCE:
-                power = Powerup(powerup_images, hit.rect.center)
+                power = Powerup(powerup_images, hit.rect.center, WIDTH, HEIGHT)
                 all_sprites.add(power)
                 powerups.add(power)
             new_meteroid(meteor_images)
@@ -379,7 +444,7 @@ while running:
             new_high_score_achieved = new_high_score_check()  
 
     elif game_state == "paused":
-        if esc_key_pressed:
+        if space_key_pressed:
             game_state = "playing"
         if q_key_pressed:
             game_state = "title"
@@ -425,16 +490,12 @@ while running:
         draw_start_title()
 
     if game_state == "settings":
-        draw_settings_menu()
-        draw_icon(screen, s_icon_scaled, WIDTH * 0.33, HEIGHT/ 2.5 - 2)
-        draw_icon(screen, m_icon_scaled, WIDTH * 0.33, HEIGHT/2.5 + 38)
-        draw_icon(screen, r_icon_scaled, WIDTH * 0.33, HEIGHT/2.5 + 78)
-        draw_icon(screen, esc_icon_scaled, WIDTH * 0.05, HEIGHT * 0.92)
+        draw_settings_menu()        
         # draw_icon(screen, plus_icon_scaled, 100, HEIGHT - 100)
         # draw_icon(screen, minus_icon_scaled, 100, HEIGHT - 100)
 
     if game_state == "playing":
-        draw_text(screen, "Score: " + str(score), 18, WIDTH / 2, 10, font_name, WHITE)
+        draw_text(screen, "Score: " + str(score), 22, WIDTH / 2, HEIGHT * 0.01, font_name, WHITE)
         draw_lives(screen, 5, 5, player.lives, player_mini_image)
         draw_shield_bar(screen, WIDTH - BAR_LENGTH - 5, 5, player.shield)
         
@@ -442,7 +503,7 @@ while running:
         overlay = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA)
         overlay.fill(PAUSE_OVERLAY)
         screen.blit(overlay, (0, 0))
-        draw_text(screen, "Score: " + str(score), 18, WIDTH / 2, 10, font_name, WHITE)
+        draw_text(screen, "Score: " + str(score), 22, WIDTH / 2, HEIGHT * 0.01, font_name, WHITE)
         draw_lives(screen, 5, 5, player.lives, player_mini_image)
         draw_shield_bar(screen, WIDTH - BAR_LENGTH - 5, 5, player.shield)
         draw_pause_menu()

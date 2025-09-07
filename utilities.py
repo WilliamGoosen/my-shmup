@@ -1,5 +1,21 @@
 import pygame as pg
 from settings import *
+from os import path
+
+def load_or_create_file(file_path, default_value):
+    # Check if the file exists first
+    if path.exists(file_path):
+        # If it exists, open it and try to read the score
+        try:
+            with open(file_path, 'r') as f:
+                return int(f.read().strip())
+        except ValueError:
+            # If file is corrupt or disappears, fall back to default
+            pass
+    # If file doesn't exist or is invalid, create it with the default
+    with open(file_path, 'w') as f:
+        f.write(str(default_value))
+    return default_value  # Return the default value
 
 def draw_text(surf, text, size, x, y, font_name, colour=WHITE):
     font = pg.font.Font(font_name, size)
@@ -12,7 +28,7 @@ def draw_icon_text(surf, text, size, x, y, font_name, colour=WHITE):
     font = pg.font.Font(font_name, size)
     text_surface = font.render(text, True, colour)
     text_rect = text_surface.get_rect()
-    text_rect.topleft = (x, y)
+    text_rect.midleft = (x, y)
     surf.blit(text_surface, text_rect)
 
 def draw_icon(surf, image, x, y):
@@ -20,7 +36,7 @@ def draw_icon(surf, image, x, y):
     Blits an image (icon) onto a surface at the specified position.
     """
     icon_rect = image.get_rect()
-    icon_rect.topleft = (x, y)
+    icon_rect.midtop = (x, y)
     surf.blit(image, icon_rect)
 
 
