@@ -8,6 +8,21 @@ def draw_text(surf, text, size, x, y, font_name, colour=WHITE):
     text_rect.midtop = (x, y)
     surf.blit(text_surface, text_rect)
 
+def draw_icon_text(surf, text, size, x, y, font_name, colour=WHITE):
+    font = pg.font.Font(font_name, size)
+    text_surface = font.render(text, True, colour)
+    text_rect = text_surface.get_rect()
+    text_rect.topleft = (x, y)
+    surf.blit(text_surface, text_rect)
+
+def draw_icon(surf, image, x, y):
+    """
+    Blits an image (icon) onto a surface at the specified position.
+    """
+    icon_rect = image.get_rect()
+    icon_rect.topleft = (x, y)
+    surf.blit(image, icon_rect)
+
 
 def draw_lives(surf, x, y, lives, player_mini_img):
     for i in range(lives):

@@ -4,7 +4,7 @@ from sys import exit
 from random import random, choice, randint
 from settings import *
 from sprites import Player, Starfield, Meteoroid, Explosion, Powerup
-from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave
+from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text
 
 
 img_dir = path.join(path.dirname(__file__), 'img')
@@ -71,17 +71,13 @@ def draw_start_title():
 
 def draw_settings_menu():   
     draw_text(screen, "High Score: " + str(high_score), 22, WIDTH / 2, 15, font_name) 
-    draw_text(screen, "SETTINGS", 48, WIDTH / 2, HEIGHT / 4, font_name)
-    draw_text(screen, "S: Toggle Sound Effects", 22, WIDTH / 2, HEIGHT / 2 - 20, font_name)
-    draw_text(screen, f"Sound is {"ON" if sound_enabled else "OFF"}", 22, WIDTH / 2, HEIGHT / 2 + 10, font_name)
-    draw_text(screen, "M: Toggle Music", 22, WIDTH / 2, HEIGHT / 2 + 40, font_name)
-    draw_text(screen, f"Music is {"ON" if music_enabled else "OFF"}", 22, WIDTH / 2, HEIGHT / 2 + 70, font_name)
-    draw_text(screen, "Press ESC to go back", 18, WIDTH / 2, HEIGHT * 3 / 4, font_name)
-    draw_text(screen, "R: Reset High Score", 22, WIDTH / 2, HEIGHT / 2 + 100, font_name)
+    draw_text(screen, "SETTINGS", 48, WIDTH / 2, HEIGHT / 4, font_name)    
+    draw_icon_text(screen, f"Sound: {"ON" if sound_enabled else "OFF"}", 22, WIDTH * 0.4, HEIGHT / 2.5, font_name)    
+    draw_icon_text(screen, f"Music: {"ON" if music_enabled else "OFF"}", 22, WIDTH * 0.4, HEIGHT / 2.5 + 40, font_name)
+    draw_icon_text(screen, "Back", 18, 72, HEIGHT * 0.925, font_name)
+    draw_icon_text(screen, "R: Reset High Score", 22, WIDTH * 0.4, HEIGHT / 2.5 + 80, font_name)
     if high_score_reset_message:
-        draw_text(screen, "High Score Reset!", 22, WIDTH/2, HEIGHT/2 + 130, font_name, GREEN)
-    # draw_text(screen, "Press ESC to Open Settings", 18, WIDTH / 2, HEIGHT * 3 / 4 + 40, font_name)
-    # draw_text(screen, "Press Q to Quit", 18, WIDTH / 2, HEIGHT * 3 / 4 + 80, font_name)
+        draw_text(screen, "High Score Reset!", 22, WIDTH/2, HEIGHT/2 + 130, font_name, GREEN)    
 
 def draw_pause_menu():
     draw_text(screen, "PAUSED", 48, WIDTH / 2, HEIGHT / 4, font_name)
@@ -148,6 +144,25 @@ def start_game():
     spawn_meteoroid_wave(meteor_images)
 
 # Load all game graphics
+plus_icon = pg.image.load(path.join("img/", "tile_0062.png"))
+plus_icon_scaled = pg.transform.scale_by(plus_icon, 32/16)
+minus_icon = pg.image.load(path.join("img/", "tile_0061.png"))
+minus_icon_scaled = pg.transform.scale_by(minus_icon, 32/16)
+m_icon = pg.image.load(path.join("img/", "tile_0161.png"))
+m_icon_scaled = pg.transform.scale_by(m_icon, 32/16)
+q_icon = pg.image.load(path.join("img/", "tile_0085.png"))
+q_icon_scaled = pg.transform.scale_by(q_icon, 32/16)
+r_icon = pg.image.load(path.join("img/", "tile_0088.png"))
+r_icon_scaled = pg.transform.scale_by(r_icon, 32/16)
+s_icon = pg.image.load(path.join("img/", "tile_0121.png"))
+s_icon_scaled = pg.transform.scale_by(s_icon, 32/16)
+enter_icon = pg.image.load(path.join("img/", "enter.png")).convert_alpha()
+enter_icon_scaled = pg.transform.scale_by(enter_icon,(32/20))
+spacebar_icon = pg.image.load(path.join("img/", "spacebar.png")).convert_alpha()
+spacebar_icon_scaled = pg.transform.scale_by(spacebar_icon,(32/16))
+esc_icon = pg.image.load(path.join("img/", "tile_0017.png"))
+esc_icon_scaled = pg.transform.scale_by(esc_icon, 32/16)
+
 game_background_original = pg.image.load(path.join("img/", "starfield.png")).convert_alpha()
 scale_factor = HEIGHT / game_background_original.get_height()
 new_width = int(game_background_original.get_height() * scale_factor)
@@ -411,6 +426,12 @@ while running:
 
     if game_state == "settings":
         draw_settings_menu()
+        draw_icon(screen, s_icon_scaled, WIDTH * 0.33, HEIGHT/ 2.5 - 2)
+        draw_icon(screen, m_icon_scaled, WIDTH * 0.33, HEIGHT/2.5 + 38)
+        draw_icon(screen, r_icon_scaled, WIDTH * 0.33, HEIGHT/2.5 + 78)
+        draw_icon(screen, esc_icon_scaled, WIDTH * 0.05, HEIGHT * 0.92)
+        # draw_icon(screen, plus_icon_scaled, 100, HEIGHT - 100)
+        # draw_icon(screen, minus_icon_scaled, 100, HEIGHT - 100)
 
     if game_state == "playing":
         draw_text(screen, "Score: " + str(score), 18, WIDTH / 2, 10, font_name, WHITE)
