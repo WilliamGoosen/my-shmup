@@ -2,7 +2,6 @@
 TITLE = "My Shmup!"
 BASE_WIDTH = 576
 BASE_HEIGHT = 720
-SCALE_FACTOR = 1.33
 FPS = 60
 FONT_NAME = 'arial'
 HS_FILE = 'highscore.txt'

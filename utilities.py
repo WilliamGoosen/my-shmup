@@ -8,7 +8,7 @@ def load_or_create_file(file_path, default_value):
         # If it exists, open it and try to read the score
         try:
             with open(file_path, 'r') as f:
-                return int(f.read().strip())
+                return f.read().strip()
         except ValueError:
             # If file is corrupt or disappears, fall back to default
             pass
