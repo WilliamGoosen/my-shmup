@@ -440,6 +440,8 @@ while running:
                     game_state = "title"
                 elif pending_action == "reset_high_score":
                     reset_high_score()
+                elif pending_action == "quit_game":
+                    running = False
 
                 show_confirmation = False
                 pending_action = None
@@ -592,7 +594,8 @@ while running:
                 start_game()
                 game_state = "playing"            
             if q_key_pressed:
-                running = False
+                pending_action = "quit_game"
+                show_confirmation = True                
             if esc_key_pressed:
                 game_state = "title"
             clock.tick(10)    
@@ -635,6 +638,8 @@ while running:
 
     if game_state == "game_over":        
         draw_game_over_title(new_high_score_achieved)
+        if show_confirmation:
+            draw_confirm_popup()
 
     pg.display.flip()
     clock.tick(FPS)
