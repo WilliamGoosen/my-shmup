@@ -144,6 +144,20 @@ def draw_pause_menu():
     draw_icon(screen, icons["enter_icon"], WIDTH * 0.92, HEIGHT * 0.915)
     draw_icon_text(screen, "Settings", 18, WIDTH * 0.78, HEIGHT * 0.940, font_name)
 
+def draw_confirm_popup():    
+
+    screen.blit(confirm_overlay, (0, 0))
+    popup_rect = popup_bg.get_rect(center = (WIDTH // 2, HEIGHT // 2))    
+    screen.blit(popup_bg, popup_rect.topleft)
+
+    draw_text(screen, "Are you sure?", 24, WIDTH * 0.5, HEIGHT * 0.45, font_name, WHITE)
+
+    draw_icon(screen, icons["y_icon"], WIDTH * 0.4, HEIGHT * 0.497)   
+    draw_text(screen, "Yes", 22, WIDTH * 0.45, HEIGHT * 0.5, font_name, WHITE)
+
+    draw_icon(screen, icons["n_icon"], WIDTH * 0.55, HEIGHT * 0.497)   
+    draw_text(screen, "No", 22, WIDTH * 0.60, HEIGHT * 0.5, font_name, WHITE)
+
 
 def draw_game_over_title(new_high_score_achieved):
     icon_x = WIDTH * 0.42
@@ -238,6 +252,13 @@ font_name = pg.font.match_font(FONT_NAME)
 
 # Load all game graphics
 
+confirm_overlay = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA)
+confirm_overlay.fill(CONFIRM_OVERLAY)
+popup_width = WIDTH * 0.4
+popup_height = HEIGHT * 0.2
+popup_bg = pg.Surface((popup_width, popup_height), pg.SRCALPHA)
+popup_bg.fill(RED)
+
 def load_icons(scale_factor):
     images = {}
     icon_list = [
@@ -251,6 +272,8 @@ def load_icons(scale_factor):
         "q_icon.png",
         "r_icon.png",
         "s_icon.png",
+        "y_icon.png",
+        "n_icon.png"
     ]
     for file in icon_list:
         key = path.splitext(file)[0]
@@ -368,7 +391,8 @@ previous_state = None
 high_score_reset_message = False
 message_timer = 0
 high_score = int(load_or_create_file(HS_FILE, 0))
-
+show_confirmation = False
+pending_action = None
 
 running = True
 while running:
@@ -381,6 +405,8 @@ while running:
     s_key_pressed = False
     m_key_pressed = False
     enter_key_pressed = False
+    y_key_pressed = False
+    n_key_pressed = False
 
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -400,6 +426,10 @@ while running:
                 enter_key_pressed = True
             if event.key == pg.K_r:
                 r_key_pressed = True
+            if event.key == pg.K_y:
+                y_key_pressed = True
+            if event.key == pg.K_n:
+                n_key_pressed = True
 
     if quit_event:
         running = False
@@ -523,16 +553,23 @@ while running:
             new_high_score_achieved = int(new_high_score_check())
 
     elif game_state == "paused":
-        if space_key_pressed:
-            game_state = "playing"
-        if esc_key_pressed:
-            game_state = "title"
-            # running = False
-        if enter_key_pressed:
-            previous_state = game_state
-            game_state = "settings"
-        all_sprites.draw(screen)        
-        clock.tick(10)
+        if show_confirmation:
+            if y_key_pressed:
+                game_state = "title"
+                show_confirmation = False
+            elif n_key_pressed or esc_key_pressed:
+                show_confirmation = False
+        else:
+            if space_key_pressed:
+                game_state = "playing"
+            if esc_key_pressed:
+                pending_action = "title"
+                show_confirmation = True                
+            if enter_key_pressed:
+                previous_state = game_state
+                game_state = "settings"
+            all_sprites.draw(screen)        
+            clock.tick(10)            
         
     elif game_state == "game_over":        
         if space_key_pressed:
@@ -542,17 +579,7 @@ while running:
             running = False
         if esc_key_pressed:
             game_state = "title"
-        clock.tick(10)
-        # for event in pg.event.get():
-        #     if event.type == pg.KEYDOWN:
-        #         if event.key == pg.K_SPACE:
-        #             reset_game()
-        #         elif event.key == pg.K_ESCAPE:
-        #             running = False
-        # clock.tick(10)
-        # draw_game_over_screen = True
-        # screen.blit(game_background, (0, 0))
-    
+        clock.tick(10)    
 
     # --- DRAWING SECTION ---
 
@@ -570,9 +597,7 @@ while running:
         draw_start_title()
 
     if game_state == "settings":
-        draw_settings_menu()        
-        # draw_icon(screen, plus_icon_scaled, 100, HEIGHT - 100)
-        # draw_icon(screen, minus_icon_scaled, 100, HEIGHT - 100)
+        draw_settings_menu()       
 
     if game_state == "playing":
         draw_text(screen, "Score: " + str(score), 22, WIDTH / 2, HEIGHT * 0.01, font_name, WHITE)
@@ -587,7 +612,8 @@ while running:
         draw_lives(screen, 5, 5, player.lives, player_mini_image)
         draw_shield_bar(screen, WIDTH - BAR_LENGTH - 5, 5, player.shield)
         draw_pause_menu()
-        
+        if show_confirmation:
+            draw_confirm_popup()        
 
     if game_state == "game_over":        
         draw_game_over_title(new_high_score_achieved)
