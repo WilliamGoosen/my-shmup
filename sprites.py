@@ -171,7 +171,7 @@ class Meteoroid(pg.sprite.Sprite):
         self.rot_speed = randint(METEOROID_MIN_ROTATE_SPEED, METEOROID_MAX_ROTATE_SPEED)
     
     def can_split(self):
-        return self.radius > 50  # Extract constant
+        return self.radius > 40  # Extract constant
     
     def create_split_meteoroids(self, meteor_images_medium):
         """Return new meteoroids from split, without adding to groups"""

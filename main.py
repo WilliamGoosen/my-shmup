@@ -539,8 +539,8 @@ while running:
                         new_meteroid(meteor_images)
 
             # check to see if a meteoroid hits the player
-            meteor_is_hit = pg.sprite.spritecollide(player, meteors, True, pg.sprite.collide_circle)
-            for meteor in meteor_is_hit:
+            player_is_hit = pg.sprite.spritecollide(player, meteors, True, pg.sprite.collide_circle)
+            for meteor in player_is_hit:
                 hit_sound = expl_sounds[0]
                 if sound_enabled:
                     hit_sound.play()
@@ -563,16 +563,16 @@ while running:
                     player.shield = 100
 
             # check to see if player hit a powerup
-            meteor_is_hit = pg.sprite.spritecollide(player, powerups, True)
-            for meteor in meteor_is_hit:
-                if meteor.type == 'shield':
+            powerup_is_hit = pg.sprite.spritecollide(player, powerups, True)
+            for power in powerup_is_hit:
+                if power.type == 'shield':
                     player.shield += randint(10, 30)
                     if sound_enabled:
                         shield_sound.play()
                         shield_sound.set_volume(0.2)
                     if player.shield >= 100:
                         player.shield = 100
-                if meteor.type == 'gun':
+                if power.type == 'gun':
                     player.powerup()
                     if sound_enabled:
                         power_sound.play()
