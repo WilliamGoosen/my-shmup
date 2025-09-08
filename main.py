@@ -188,26 +188,26 @@ def draw_game_over_title(new_high_score_achieved):
 
 def new_star():
     s = Starfield(WIDTH, HEIGHT)
-    all_sprites.add(s)
-    stars.add(s)
+    all_sprites_group.add(s)
+    stars_group.add(s)
 
 def spawn_starfield():
     spawn_wave(new_star, NUMBER_OF_STARS)
 
 def new_meteroid(meteor_images, position = None, velocity = None, is_medium = False ):
     m = Meteoroid(meteor_images, WIDTH, HEIGHT, position, velocity, is_medium)
-    all_sprites.add(m)
-    meteors.add(m)
+    all_sprites_group.add(m)
+    meteors_group.add(m)
 
 def spawn_meteoroid_wave(meteor_images):
     spawn_wave(new_meteroid, NUMBER_OF_METEOROIDS, meteor_images)
 
 def clear_game_objects():
-    for meteoroid in meteors: 
+    for meteoroid in meteors_group: 
         meteoroid.kill()
-    for bullet in bullets:
+    for bullet in bullets_group:
         bullet.kill()
-    for powerup in powerups:
+    for powerup in powerups_group:
         powerup.kill()
 
 
@@ -219,17 +219,17 @@ def start_game():
     score = 0
     life_gained = 0
 
-    all_sprites.empty()
-    bullets.empty()
-    meteors.empty()
-    players.empty()
-    stars.empty()
+    all_sprites_group.empty()
+    bullets_group.empty()
+    meteors_group.empty()
+    players_group.empty()
+    stars_group.empty()
 
     clear_game_objects()
 
-    player = Player(all_sprites, bullets, shoot_sound, WIDTH, HEIGHT)
-    all_sprites.add(player)
-    players.add(player)
+    player = Player(all_sprites_group, bullets_group, shoot_sound, WIDTH, HEIGHT)
+    all_sprites_group.add(player)
+    players_group.add(player)
 
     spawn_starfield()
     spawn_meteoroid_wave(meteor_images)
@@ -387,12 +387,12 @@ pg.mixer.music.set_volume(0.1)
 pg.mixer.music.play(loops=-1)
 
 
-all_sprites = pg.sprite.Group()
-bullets = pg.sprite.Group()
-stars = pg.sprite.Group()
-meteors = pg.sprite.Group()
-powerups = pg.sprite.Group()
-players = pg.sprite.Group()
+all_sprites_group = pg.sprite.Group()
+bullets_group = pg.sprite.Group()
+stars_group = pg.sprite.Group()
+meteors_group = pg.sprite.Group()
+powerups_group = pg.sprite.Group()
+players_group = pg.sprite.Group()
 
 sound_enabled = True
 music_enabled = True
@@ -506,7 +506,7 @@ while running:
                 game_state = "paused"
             keystate = pg.key.get_pressed()
             player.update_with_keystate(keystate, sound_enabled)
-            all_sprites.update()
+            all_sprites_group.update()
 
             if player.just_respawned:        
                 spawn_meteoroid_wave(meteor_images)
@@ -515,7 +515,7 @@ while running:
                 player.just_respawned = False
 
             # check to see if a bullet hit a meteoroid
-            meteor_is_hit = pg.sprite.groupcollide(meteors, bullets, True, True)
+            meteor_is_hit = pg.sprite.groupcollide(meteors_group, bullets_group, True, True)
             for meteor in meteor_is_hit:
                 score += 62 - meteor.radius
                 hit_sound = choice(expl_sounds)
@@ -523,23 +523,23 @@ while running:
                     hit_sound.play()
                     hit_sound.set_volume(0.1)
                 explosion = Explosion(meteor.rect.center, 'large_explosion', explosion_animation)
-                all_sprites.add(explosion)
+                all_sprites_group.add(explosion)
                 if random() < POWERUP_DROP_CHANCE:
                     power = Powerup(powerup_images, meteor.rect.center, WIDTH, HEIGHT)
-                    all_sprites.add(power)
-                    powerups.add(power)
+                    all_sprites_group.add(power)
+                    powerups_group.add(power)
                 if meteor.can_split():
                     new_meteoroids = meteor.create_split_meteoroids(meteor_images_medium)
                     for new_meteor in new_meteoroids:
-                        all_sprites.add(new_meteor)
-                        meteors.add(new_meteor)
+                        all_sprites_group.add(new_meteor)
+                        meteors_group.add(new_meteor)
                     meteor.kill()
                 else:
-                    if len(meteors) < NUMBER_OF_METEOROIDS:
+                    if len(meteors_group) < NUMBER_OF_METEOROIDS:
                         new_meteroid(meteor_images)
 
             # check to see if a meteoroid hits the player
-            player_is_hit = pg.sprite.spritecollide(player, meteors, True, pg.sprite.collide_circle)
+            player_is_hit = pg.sprite.spritecollide(player, meteors_group, True, pg.sprite.collide_circle)
             for meteor in player_is_hit:
                 hit_sound = expl_sounds[0]
                 if sound_enabled:
@@ -548,7 +548,7 @@ while running:
                 player.power = 1
                 player.shield -= meteor.radius * 2
                 explosion = Explosion(meteor.rect.center, 'small_explosion', explosion_animation)
-                all_sprites.add(explosion)
+                all_sprites_group.add(explosion)
                 new_meteroid(meteor_images)
 
                 if player.shield <= 0:
@@ -556,14 +556,14 @@ while running:
                         player_die_sound.play()
                         player_die_sound.set_volume(0.1)
                     death_explosion = Explosion(player.rect.center, 'player_explosion', explosion_animation)
-                    all_sprites.add(death_explosion)
+                    all_sprites_group.add(death_explosion)
                     player.hide()
                     clear_game_objects()
                     player.lives -= 1
                     player.shield = 100
 
             # check to see if player hit a powerup
-            powerup_is_hit = pg.sprite.spritecollide(player, powerups, True)
+            powerup_is_hit = pg.sprite.spritecollide(player, powerups_group, True)
             for power in powerup_is_hit:
                 if power.type == 'shield':
                     player.shield += randint(10, 30)
@@ -604,7 +604,7 @@ while running:
                 if enter_key_pressed:
                     previous_state = game_state
                     game_state = "settings"
-                all_sprites.draw(screen)        
+                all_sprites_group.draw(screen)        
                 clock.tick(10)            
 
         elif game_state == "game_over":
@@ -628,7 +628,7 @@ while running:
         screen.fill(BG_COLOUR)
     
     if game_state not in ("title", "settings", "game_over"):
-        all_sprites.draw(screen)
+        all_sprites_group.draw(screen)
 
     if game_state == "title":
         draw_start_title()
