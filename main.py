@@ -194,8 +194,8 @@ def new_star():
 def spawn_starfield():
     spawn_wave(new_star, NUMBER_OF_STARS)
 
-def new_meteroid(meteor_images):
-    m = Meteoroid(meteor_images, WIDTH, HEIGHT)
+def new_meteroid(meteor_images, position = None, velocity = None, is_medium = False ):
+    m = Meteoroid(meteor_images, WIDTH, HEIGHT, position, velocity, is_medium)
     all_sprites.add(m)
     meteors.add(m)
 
@@ -203,7 +203,7 @@ def spawn_meteoroid_wave(meteor_images):
     spawn_wave(new_meteroid, NUMBER_OF_METEOROIDS, meteor_images)
 
 def clear_game_objects():
-    for meteoroid in meteors:
+    for meteoroid in meteors: 
         meteoroid.kill()
     for bullet in bullets:
         bullet.kill()
@@ -340,7 +340,17 @@ def load_meteors():
         meteor_images.append(img_surface)
     return meteor_images
 
+def load_med_meteors():
+    meteor_images = []
+    meteor_list = ['meteorBrown_med1.png', 'meteorBrown_med3.png']
+    for img in meteor_list:
+        img_surface = pg.image.load(path.join("img/", img)).convert_alpha()
+        img_surface.set_colorkey(BLACK)
+        meteor_images.append(img_surface)
+    return meteor_images
+
 meteor_images = load_meteors()
+meteor_images_medium = load_med_meteors()
 
 explosion_animation = {'large_explosion': [], 'small_explosion': [], 'player_explosion': [], 'boss_explosion': []}
 for _ in range(9):
@@ -505,31 +515,39 @@ while running:
                 player.just_respawned = False
 
             # check to see if a bullet hit a meteoroid
-            hits = pg.sprite.groupcollide(meteors, bullets, True, True)
-            for hit in hits:
-                score += 62 - hit.radius
+            meteor_is_hit = pg.sprite.groupcollide(meteors, bullets, True, True)
+            for meteor in meteor_is_hit:
+                score += 62 - meteor.radius
                 hit_sound = choice(expl_sounds)
                 if sound_enabled:
                     hit_sound.play()
                     hit_sound.set_volume(0.1)
-                explosion = Explosion(hit.rect.center, 'large_explosion', explosion_animation)
+                explosion = Explosion(meteor.rect.center, 'large_explosion', explosion_animation)
                 all_sprites.add(explosion)
                 if random() < POWERUP_DROP_CHANCE:
-                    power = Powerup(powerup_images, hit.rect.center, WIDTH, HEIGHT)
+                    power = Powerup(powerup_images, meteor.rect.center, WIDTH, HEIGHT)
                     all_sprites.add(power)
                     powerups.add(power)
-                new_meteroid(meteor_images)
+                if meteor.can_split():
+                    new_meteoroids = meteor.create_split_meteoroids(meteor_images_medium)
+                    for new_meteor in new_meteoroids:
+                        all_sprites.add(new_meteor)
+                        meteors.add(new_meteor)
+                    meteor.kill()
+                else:
+                    if len(meteors) < NUMBER_OF_METEOROIDS:
+                        new_meteroid(meteor_images)
 
             # check to see if a meteoroid hits the player
-            hits = pg.sprite.spritecollide(player, meteors, True, pg.sprite.collide_circle)
-            for hit in hits:
+            player_is_hit = pg.sprite.spritecollide(player, meteors, True, pg.sprite.collide_circle)
+            for meteor in player_is_hit:
                 hit_sound = expl_sounds[0]
                 if sound_enabled:
                     hit_sound.play()
                     hit_sound.set_volume(0.1)
                 player.power = 1
-                player.shield -= hit.radius * 2
-                explosion = Explosion(hit.rect.center, 'small_explosion', explosion_animation)
+                player.shield -= meteor.radius * 2
+                explosion = Explosion(meteor.rect.center, 'small_explosion', explosion_animation)
                 all_sprites.add(explosion)
                 new_meteroid(meteor_images)
 
@@ -545,16 +563,16 @@ while running:
                     player.shield = 100
 
             # check to see if player hit a powerup
-            hits = pg.sprite.spritecollide(player, powerups, True)
-            for hit in hits:
-                if hit.type == 'shield':
+            powerup_is_hit = pg.sprite.spritecollide(player, powerups, True)
+            for power in powerup_is_hit:
+                if power.type == 'shield':
                     player.shield += randint(10, 30)
                     if sound_enabled:
                         shield_sound.play()
                         shield_sound.set_volume(0.2)
                     if player.shield >= 100:
                         player.shield = 100
-                if hit.type == 'gun':
+                if power.type == 'gun':
                     player.powerup()
                     if sound_enabled:
                         power_sound.play()

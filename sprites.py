@@ -132,26 +132,61 @@ class Bullet(pg.sprite.Sprite):
 
 
 class Meteoroid(pg.sprite.Sprite):
-    def __init__(self, meteor_images, screen_width, screen_height):
+    def __init__(self, meteor_images, screen_width, screen_height, 
+                 position=None, velocity=None, is_medium=False):
         pg.sprite.Sprite.__init__(self)
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.meteor_images = meteor_images
+        self.is_medium = is_medium
+        
+        # Initialize state
         self.last_update = pg.time.get_ticks()
-        self.reset()
+        self.initialize_meteoroid(position, velocity)
     
-    def reset(self):
+    def initialize_meteoroid(self, position=None, velocity=None):
+        """Initialize or reset meteoroid with optional position/velocity"""
         self.image_orig = choice(self.meteor_images)
         self.image_orig.set_colorkey(BLACK)
         self.image = self.image_orig.copy()
         self.rect = self.image.get_rect()
         self.radius = int(self.rect.width * 0.85 / 2)
-        self.rect.x = randrange(self.screen_width - self.rect.width)
-        self.rect.y = randrange(-150, -100)
-        self.speedx = randint(METEOROID_MIN_SPEED_X, METEOROID_MAX_SPEED_X)
-        self.speedy = randint(METEOROID_MIN_SPEED_Y, METEOROID_MAX_SPEED_Y)
+        
+        # Set position
+        if position:
+            self.rect.center = position
+        else:
+            self.rect.x = randrange(self.screen_width - self.rect.width)
+            self.rect.y = randrange(-150, -100)
+        
+        # Set velocity
+        if velocity:
+            self.speedx, self.speedy = velocity
+        else:
+            self.speedx = randint(METEOROID_MIN_SPEED_X, METEOROID_MAX_SPEED_X)
+            self.speedy = randint(METEOROID_MIN_SPEED_Y, METEOROID_MAX_SPEED_Y)
+        
+        # Rotation
         self.rot = 0
         self.rot_speed = randint(METEOROID_MIN_ROTATE_SPEED, METEOROID_MAX_ROTATE_SPEED)
+    
+    def can_split(self):
+        return self.radius > 40  # Extract constant
+    
+    def create_split_meteoroids(self, meteor_images_medium):
+        """Return new meteoroids from split, without adding to groups"""
+        left_pos = (self.rect.centerx, self.rect.centery)
+        right_pos = (self.rect.centerx, self.rect.centery)
+        
+        left_velocity = (self.speedx - 1, self.speedy)
+        right_velocity = (self.speedx + 1, self.speedy)
+        
+        return [
+            Meteoroid(meteor_images_medium, self.screen_width, self.screen_height,
+                     position=left_pos, velocity=left_velocity, is_medium=True),
+            Meteoroid(meteor_images_medium, self.screen_width, self.screen_height,
+                     position=right_pos, velocity=right_velocity, is_medium=True)
+        ]
     
     def rotate(self):
         now = pg.time.get_ticks()
@@ -163,16 +198,19 @@ class Meteoroid(pg.sprite.Sprite):
             self.image = new_image
             self.rect = self.image.get_rect()
             self.rect.center = old_center
-        
+    
+    def is_off_screen(self):
+        return (self.rect.top > self.screen_height + self.rect.height or 
+                self.rect.left < -self.rect.width or 
+                self.rect.right > self.screen_width + self.rect.width)
+    
     def update(self):
         self.rotate()
         self.rect.x += self.speedx
         self.rect.y += self.speedy
-        if self.rect.top > self.screen_height + self.rect.height or self.rect.left < -self.rect.width or self.rect.right > self.screen_width + self.rect.width:
-            self.reset()
-            # self.rect.x = randrange(WIDTH - self.rect.width)
-            # self.rect.y = randrange(-100, -40)
-            # self.speedy = randint(METEOROID_MIN_SPEED_Y, METEOROID_MAX_SPEED_Y)
+        
+        if self.is_off_screen():
+            self.initialize_meteoroid()  # Full reset
         
 
 class Starfield(pg.sprite.Sprite):
