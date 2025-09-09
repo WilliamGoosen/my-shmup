@@ -332,8 +332,9 @@ player_mini_image = pg.transform.scale(player_image, (25, 19))
 def load_meteors():
     meteor_images = []
     meteor_list = ['meteorBrown_big1.png', 'meteorBrown_big2.png', 'meteorBrown_big3.png', 'meteorBrown_big4.png',
-               'meteorBrown_med1.png', 'meteorBrown_med3.png', 'meteorBrown_small1.png', 'meteorBrown_small2.png',
-               'meteorBrown_tiny1.png', 'meteorBrown_tiny2.png']
+                'meteorBrown_mid1.png','meteorBrown_mid2.png', 'meteorBrown_mid3.png','meteorBrown_mid4.png',
+                'meteorBrown_med1.png', 'meteorBrown_med3.png', 'meteorBrown_small1.png', 'meteorBrown_small2.png',
+                'meteorBrown_tiny1.png', 'meteorBrown_tiny2.png']
     for img in meteor_list:
         img_surface = pg.image.load(path.join("img/", img)).convert_alpha()
         img_surface.set_colorkey(BLACK)
@@ -342,7 +343,7 @@ def load_meteors():
 
 def load_med_meteors():
     meteor_images = []
-    meteor_list = ['meteorBrown_med1.png', 'meteorBrown_med3.png']
+    meteor_list = ['meteorBrown_mid1.png','meteorBrown_mid2.png', 'meteorBrown_mid3.png','meteorBrown_mid4.png']
     for img in meteor_list:
         img_surface = pg.image.load(path.join("img/", img)).convert_alpha()
         img_surface.set_colorkey(BLACK)
