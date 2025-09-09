@@ -107,7 +107,31 @@ def draw_settings_menu():
     draw_icon(screen, icons["r_icon"], icon_x, icon_y + icon_text_padding_y + 2 * y_increment)
     draw_icon_text(screen, "Reset High Score", 22, text_x, text_y + 2 * y_increment, font_name)
     if high_score_reset_message:
-        draw_text(screen, "High Score Reset!", 22, WIDTH/2, HEIGHT * 0.68, font_name, GREEN)
+        draw_text(screen, "High Score Reset!", 22, WIDTH / 2, HEIGHT * 0.68, font_name, GREEN)
+
+    draw_text(screen, f"Music Volume: {current_volume_step}", 22, WIDTH // 2, HEIGHT * 3 / 5, font_name)
+    
+    block_width = 15
+    block_height = 15
+    block_spacing = 5
+    start_x = WIDTH // 2 - (10 * (block_width + block_spacing)) // 2  # Center the row
+    last_block_x = start_x + (11 * (block_width + block_spacing)) - 1.5 * block_spacing
+    plus_x = last_block_x + block_spacing
+    minus_x = start_x - (block_width + block_spacing)
+
+    for i in range(1, 11):
+        if i <= current_volume_step:
+            color = GREEN  # Filled block for active volume
+        else:
+            color = GRAY   # Empty block for inactive
+        # Draw a rectangle for each block
+        block_rect = pg.Rect(start_x, HEIGHT * 3.3 / 5, block_width, block_height)
+        pg.draw.rect(screen, color, block_rect)
+        start_x += block_width + block_spacing
+
+    
+    draw_icon(screen, icons["minus_icon"], minus_x, HEIGHT * 3.25 / 5)
+    draw_icon(screen, icons["plus_icon"], plus_x, HEIGHT * 3.25 / 5)
 
     draw_icon(screen, icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)    
     draw_icon_text(screen, "Back", 18, WIDTH * 0.11, HEIGHT * 0.940, font_name)
@@ -277,9 +301,8 @@ def load_icons(scale_factor):
         "n_icon.png"
     ]
     for file in icon_list:
-        key = path.splitext(file)[0]
-        # print(repr(key))
-        icon = pg.image.load(path.join("img/", file)).convert_alpha()
+        key = path.splitext(file)[0]        
+        icon = pg.image.load(path.join("img", file)).convert_alpha()
         icon_factor = 2
         if key == "enter_icon":
             icon_factor = 4 / 3
@@ -297,9 +320,8 @@ def load_arrows(scale_factor):
         "left_icon.png"        
     ]
     for file in icon_list:
-        key = path.splitext(file)[0]
-        # print(repr(key))
-        icon = pg.image.load(path.join("img/", file)).convert_alpha()
+        key = path.splitext(file)[0]        
+        icon = pg.image.load(path.join("img", file)).convert_alpha()
         icon.set_alpha(150)
         icon_factor = 1.5      
         images[key] = pg.transform.scale_by(icon, icon_factor * scale_factor)        
@@ -312,7 +334,7 @@ last_highlight_time = 0
 highlight_delay = 600
 
 def scale_background(WIDTH, HEIGHT):
-    game_background_original = pg.image.load(path.join("img/", "starfield.png")).convert_alpha()
+    game_background_original = pg.image.load(path.join("img", "starfield.png")).convert_alpha()
     scale_factor = HEIGHT / game_background_original.get_height()
     new_width = int(game_background_original.get_height() * scale_factor)
     new_height = int(game_background_original.get_height() * scale_factor)
@@ -326,7 +348,6 @@ def scale_background(WIDTH, HEIGHT):
     return game_background
 
 game_background = scale_background(WIDTH, HEIGHT)
-# background__original_rect = background_original.get_rect()
 player_image = pg.image.load(path.join("img/", "playerShip1_orange.png")).convert_alpha()
 player_mini_image = pg.transform.scale(player_image, (25, 19))
 
@@ -356,18 +377,6 @@ powerup_images['gun'] = pg.image.load(path.join("img/", 'bolt_gold.png')).conver
 
 # Load all game sounds
 sound_manager = SoundManager()
-# shoot_sound = pg.mixer.Sound(path.join("snd", "Laser_Shoot2.wav"))
-# shoot_sound.set_volume(0.1)
-# shield_sound = pg.mixer.Sound(path.join("snd/", "pow4.wav"))
-# power_sound = pg.mixer.Sound(path.join("snd/", "pow5.wav"))
-# life_up_sound = pg.mixer.Sound(path.join("snd/", "jingles_NES09.ogg"))
-expl_sounds = []
-for snd in ['Explosion1.wav', 'Explosion2.wav']:
-    expl_sounds.append(pg.mixer.Sound(path.join("snd/", snd)))
-# player_die_sound = pg.mixer.Sound(path.join("snd/", 'rumble1.ogg'))
-pg.mixer.music.load(path.join("snd/", 'tgfcoder-FrozenJam-SeamlessLoop.ogg'))
-pg.mixer.music.set_volume(0.1)
-pg.mixer.music.play(loops=-1)
 
 
 all_sprites_group = pg.sprite.Group()
@@ -379,6 +388,7 @@ players_group = pg.sprite.Group()
 
 sound_enabled = True
 music_enabled = True
+current_volume_step = int(sound_manager.music_volume * 10)
 game_state = "title"
 previous_state = None
 high_score_reset_message = False
@@ -400,6 +410,8 @@ while running:
     enter_key_pressed = False
     y_key_pressed = False
     n_key_pressed = False
+    plus_key_pressed = False
+    minus_key_pressed = False
 
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -423,6 +435,10 @@ while running:
                 y_key_pressed = True
             if event.key == pg.K_n:
                 n_key_pressed = True
+            if event.key == pg.K_KP_PLUS or event.key == pg.K_EQUALS:                
+                plus_key_pressed = True
+            if event.key == pg.K_KP_MINUS or event.key == pg.K_MINUS:
+                minus_key_pressed = True
 
     if quit_event:
         running = False
@@ -456,12 +472,20 @@ while running:
                 running = False
             clock.tick(10)
 
-        elif game_state == "settings":        
+        elif game_state == "settings":
+            if plus_key_pressed and current_volume_step < 10:                
+                current_volume_step += 1
+                new_volume = current_volume_step / 10                
+                sound_manager.set_music_volume(new_volume)
+            if minus_key_pressed and current_volume_step > 0:                
+                current_volume_step -= 1
+                new_volume = current_volume_step / 10                
+                sound_manager.set_music_volume(new_volume)
             if esc_key_pressed:
                 game_state = previous_state
             if s_key_pressed:
                 sound_enabled = not sound_enabled
-                sound_manager.set_master_volume(1.0 if sound_enabled else 0.0)
+                sound_manager.set_sound_volume(1.0 if sound_enabled else 0.0)
             if m_key_pressed:
                 music_enabled = sound_manager.toggle_music()
             if r_key_pressed:
@@ -522,10 +546,11 @@ while running:
             # check to see if a meteoroid hits the player
             player_is_hit = pg.sprite.spritecollide(player, meteors_group, True, pg.sprite.collide_circle)
             for meteor in player_is_hit:
-                hit_sound = expl_sounds[0]
-                if sound_enabled:
-                    hit_sound.play()
-                    hit_sound.set_volume(0.1)
+                # hit_sound = expl_sounds[0]
+                # if sound_enabled:
+                #     hit_sound.play()
+                #     hit_sound.set_volume(0.1)
+                sound_manager.play("explosion")
                 player.power = 1
                 player.shield -= meteor.radius * 2
                 explosion = Explosion(meteor.rect.center, 'small_explosion', explosion_animation)
@@ -545,16 +570,14 @@ while running:
             powerup_is_hit = pg.sprite.spritecollide(player, powerups_group, True)
             for power in powerup_is_hit:
                 if power.type == 'shield':
-                    player.shield += randint(10, 30)
-                    if sound_enabled:
-                        sound_manager.play("shield")
+                    player.shield += randint(10, 30)                    
+                    sound_manager.play("shield")
                         # shield_sound.set_volume(0.2)
                     if player.shield >= 100:
                         player.shield = 100
                 if power.type == 'gun':
-                    player.powerup()
-                    if sound_enabled:
-                        sound_manager.play("power")
+                    player.powerup()                    
+                    sound_manager.play("power")
                         # power_sound.set_volume(0.2)
 
             # if the player died and the explosion has finished playing

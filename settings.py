@@ -19,6 +19,7 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
+GRAY = (128, 128, 128)
 PAUSE_OVERLAY = (0, 0, 0, 128)
 CONFIRM_OVERLAY = (0, 0, 0, 192)
 
@@ -81,7 +82,7 @@ SOUND_CONFIG = {
 }
 
 MUSIC_CONFIG = {
-    "gameplay": {"file":"tgfcoder-FrozenJam-SeamlessLoop.ogg", "volume": 0.1, "loops": -1}
+    "gameplay": {"file":"tgfcoder-FrozenJam-SeamlessLoop.ogg", "volume": 0.2, "loops": -1}
 }
 
 # Explosion attributes
