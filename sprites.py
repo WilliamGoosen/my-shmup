@@ -2,9 +2,13 @@ import pygame as pg
 import math
 from random import random, randrange, uniform, choice, randint
 from settings import *
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from asset_loader import SoundManager  # Only imported by linters/IDEs, not at runtime
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, all_sprite_group, bullets_group, shoot_sound, screen_width, screen_height):
+    def __init__(self, all_sprite_group, bullets_group, screen_width, screen_height, sound_manager: "SoundManager"):
         pg.sprite.Sprite.__init__(self)
         self.image = pg.transform.scale(pg.image.load('img/playerShip1_orange.png'), (50, 38)) #pg.Surface((50, 40))
         self.image.set_colorkey(BLACK) #self.image.fill(YELLOW)
@@ -16,7 +20,7 @@ class Player(pg.sprite.Sprite):
         self.speedx = 0
         self.speedy = 0
         self.shield = PLAYER_MAX_SHIELD
-        self.shoot_sound = shoot_sound
+        # self.shoot_sound = shoot_sound
         self.shoot_delay = PLAYER_SHOOT_DELAY
         self.last_shot = pg.time.get_ticks()
         self.lives = PLAYER_START_LIVES
@@ -26,6 +30,7 @@ class Player(pg.sprite.Sprite):
         self.power = PLAYER_START_POWER
         self.just_respawned = False
         self.power_time = pg.time.get_ticks()
+        self.sound_manager = sound_manager
 
 
     def update(self):
@@ -62,7 +67,7 @@ class Player(pg.sprite.Sprite):
             return
                     
         if keystate[pg.K_SPACE]:            
-            self.shoot(sound_enabled)
+            self.shoot(self.sound_manager)
 
         self.speedx = 0
         if keystate[pg.K_LEFT] and not keystate[pg.K_RIGHT]:
@@ -85,7 +90,7 @@ class Player(pg.sprite.Sprite):
         self.power_time = pg.time.get_ticks()
 
 
-    def shoot(self, sound_enabled):
+    def shoot(self, sound_manager):
         if not self.hidden:
             now = pg.time.get_ticks()
             if now - self.last_shot > self.shoot_delay:            
@@ -104,8 +109,7 @@ class Player(pg.sprite.Sprite):
                     bullet = Bullet(bullet_location[0], bullet_location[1])
                     self.all_sprites.add(bullet)
                     self.bullets.add(bullet)
-                if sound_enabled:
-                    self.shoot_sound.play()                
+                sound_manager.play("shoot")
 
 
     def hide(self):
