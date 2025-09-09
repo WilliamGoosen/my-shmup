@@ -461,12 +461,9 @@ while running:
                 game_state = previous_state
             if s_key_pressed:
                 sound_enabled = not sound_enabled
+                sound_manager.set_master_volume(1.0 if sound_enabled else 0.0)
             if m_key_pressed:
-                music_enabled = not music_enabled
-                if music_enabled:
-                    pg.mixer.music.unpause()
-                else:
-                    pg.mixer.music.pause()
+                music_enabled = sound_manager.toggle_music()
             if r_key_pressed:
                 pending_action = "reset_high_score"
                 show_confirmation = True                

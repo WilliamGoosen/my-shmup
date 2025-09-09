@@ -17,6 +17,10 @@ class SoundManager:
         self.sounds = {} # Holds the pg.mixer.Sound objects
         self.volumes = {} # Remembers the original volume for each sound
         self.master_volume = 1.0
+        self.music_volume = 1.0
+        self.current_track = None
+        self.music_enabled = True
+        self.play_music("gameplay")        
         for sound_name, sound_data in SOUND_CONFIG.items():
             filename, base_volume = sound_data
             self.load_sound(sound_name, filename, base_volume)
@@ -34,7 +38,7 @@ class SoundManager:
             sound = pg.mixer.Sound(path.join("snd", files))
             self.sounds[name] = sound
             self.volumes[name] = volume
-            self.update_sound_volume(name)
+            self.update_sound_volume(name)        
         
     def update_sound_volume(self, name):
         final_volume = self.volumes[name] * self.master_volume
@@ -57,3 +61,17 @@ class SoundManager:
             sound.play()
         else:
             sound_obj.play()
+
+    def play_music(self, track_name):
+        track_data = MUSIC_CONFIG[track_name]
+        pg.mixer.music.load(path.join("snd", track_data["file"]))
+        pg.mixer.music.set_volume(track_data["volume"] * self.master_volume)
+        pg.mixer.music.play(loops = track_data["loops"])
+
+    def toggle_music(self):
+        self.music_enabled = not self.music_enabled
+        if self.music_enabled:
+            pg.mixer.music.unpause()
+        else:
+            pg.mixer.music.pause()
+        return self.music_enabled
