@@ -3,15 +3,6 @@ from os import path
 from random import choice
 from settings import *
 
-
-def load_meteoroid_images(meteoroid_filenames):
-    meteor_images = []
-    for img in meteoroid_filenames:
-        img_surface = pg.image.load(path.join("img/", img)).convert_alpha()
-        img_surface.set_colorkey(BLACK)
-        meteor_images.append(img_surface)
-    return meteor_images
-
 class SoundManager:
     def __init__(self):        
         self.sounds = {} # Holds the pg.mixer.Sound objects

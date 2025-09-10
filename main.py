@@ -4,7 +4,8 @@ from sys import exit
 from random import random, choice, randint
 from settings import *
 from sprites import Player, Starfield, Meteoroid, Explosion, Powerup
-from sound_manager import load_meteoroid_images, SoundManager
+from sound_manager import SoundManager
+from graphics_manager import GraphicsManager
 from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text, load_or_create_file
 
 def load_config():
@@ -353,10 +354,9 @@ player_image_original = pg.image.load(path.join("img/", "playerShip1_orange.png"
 player_image = pg.transform.scale(player_image_original, (50, 38)) #pg.Surface((50, 40))
 player_mini_image = pg.transform.scale(player_image, (25, 19))
 
-
-
-meteor_images_list = load_meteoroid_images(ALL_METEOROID_FILES)
-meteor_images_medium_list = load_meteoroid_images(MEDIUM_METEOROID_FILES)
+graphics_manager = GraphicsManager()
+meteor_images_list = graphics_manager.load_meteoroid_images(ALL_METEOROID_FILES)
+meteor_images_medium_list = graphics_manager.load_meteoroid_images(MEDIUM_METEOROID_FILES)
 
 explosion_animation = {'large_explosion': [], 'small_explosion': [], 'player_explosion': [], 'boss_explosion': []}
 for _ in range(9):
