@@ -110,14 +110,16 @@ def draw_settings_menu():
         draw_text(screen, "High Score Reset!", 22, WIDTH / 2, HEIGHT * 0.68, font_name, GREEN)
 
     draw_text(screen, f"Music Volume: {current_volume_step}", 22, WIDTH // 2, HEIGHT * 3 / 5, font_name)
+    draw_text(screen, f"Sound Volume: {current_sound_volume_step}", 22, WIDTH // 2, HEIGHT * 3.6 / 5, font_name)
     
-    block_width = 15
-    block_height = 15
-    block_spacing = 5
+    block_width = int(15 / 576 * WIDTH)
+    block_height = 15 / 720 * HEIGHT
+    block_spacing = 0
+    icon_spacing = 5 / 576 * WIDTH
     start_x = WIDTH // 2 - (10 * (block_width + block_spacing)) // 2  # Center the row
     last_block_x = start_x + (11 * (block_width + block_spacing)) - 1.5 * block_spacing
-    plus_x = last_block_x + block_spacing
-    minus_x = start_x - (block_width + block_spacing)
+    plus_x = last_block_x + 1.6 * icon_spacing
+    minus_x = start_x - (block_width + icon_spacing)
 
     for i in range(1, 11):
         if i <= current_volume_step:
@@ -125,13 +127,31 @@ def draw_settings_menu():
         else:
             color = GRAY   # Empty block for inactive
         # Draw a rectangle for each block
-        block_rect = pg.Rect(start_x, HEIGHT * 3.3 / 5, block_width, block_height)
+        block_rect = pg.Rect(start_x, HEIGHT * 3.25 / 5, block_width, block_height)
+        pg.draw.rect(screen, color, block_rect)
+        start_x += block_width + block_spacing
+        
+    start_x = WIDTH // 2 - (10 * (block_width + block_spacing)) // 2  # Center the row
+    last_sound_block_x = start_x + (11 * (block_width + block_spacing)) - 1.5 * block_spacing
+    up_x = last_sound_block_x + 1.6 * icon_spacing
+    down_x = start_x - (block_width + icon_spacing)
+        
+    for i in range(1, 11):
+        if i <= current_sound_volume_step:
+            color = GREEN  # Filled block for active volume
+        else:
+            color = GRAY   # Empty block for inactive
+        # Draw a rectangle for each block
+        block_rect = pg.Rect(start_x, HEIGHT * 3.85 / 5, block_width, block_height)
         pg.draw.rect(screen, color, block_rect)
         start_x += block_width + block_spacing
 
     
-    draw_icon(screen, icons["minus_icon"], minus_x, HEIGHT * 3.25 / 5)
-    draw_icon(screen, icons["plus_icon"], plus_x, HEIGHT * 3.25 / 5)
+    draw_icon(screen, icons["left_icon"], minus_x, HEIGHT * 3.2 / 5)
+    draw_icon(screen, icons["right_icon"], plus_x, HEIGHT * 3.2 / 5)
+    
+    draw_icon(screen, icons["down_icon"], down_x, HEIGHT * 3.8 / 5)
+    draw_icon(screen, icons["up_icon"], up_x, HEIGHT * 3.8 / 5)
 
     draw_icon(screen, icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)    
     draw_icon_text(screen, "Back", 18, WIDTH * 0.11, HEIGHT * 0.940, font_name)
@@ -298,7 +318,11 @@ def load_icons(scale_factor):
         "r_icon.png",
         "s_icon.png",
         "y_icon.png",
-        "n_icon.png"
+        "n_icon.png",
+        "up_icon.png",
+        "down_icon.png",
+        "left_icon.png",
+        "right_icon.png"
     ]
     for file in icon_list:
         key = path.splitext(file)[0]        
@@ -389,6 +413,7 @@ players_group = pg.sprite.Group()
 sound_enabled = True
 music_enabled = True
 current_volume_step = int(sound_manager.music_volume * 10)
+current_sound_volume_step = int(sound_manager.sound_volume * 10)
 game_state = "title"
 previous_state = None
 high_score_reset_message = False
@@ -412,6 +437,10 @@ while running:
     n_key_pressed = False
     plus_key_pressed = False
     minus_key_pressed = False
+    up_key_pressed = False
+    down_key_pressed = False
+    left_key_pressed = False
+    right_key_pressed = False
 
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -435,10 +464,14 @@ while running:
                 y_key_pressed = True
             if event.key == pg.K_n:
                 n_key_pressed = True
-            if event.key == pg.K_KP_PLUS or event.key == pg.K_EQUALS:                
-                plus_key_pressed = True
-            if event.key == pg.K_KP_MINUS or event.key == pg.K_MINUS:
-                minus_key_pressed = True
+            if event.key == pg.K_RIGHT:
+                right_key_pressed = True
+            if event.key == pg.K_LEFT:
+                left_key_pressed = True
+            if event.key == pg.K_UP:
+                up_key_pressed = True
+            if event.key == pg.K_DOWN:
+                down_key_pressed = True
 
     if quit_event:
         running = False
@@ -473,14 +506,22 @@ while running:
             clock.tick(10)
 
         elif game_state == "settings":
-            if plus_key_pressed and current_volume_step < 10:                
+            if right_key_pressed and current_volume_step < 10:                
                 current_volume_step += 1
                 new_volume = current_volume_step / 10                
                 sound_manager.set_music_volume(new_volume)
-            if minus_key_pressed and current_volume_step > 0:                
+            if left_key_pressed and current_volume_step > 0:                
                 current_volume_step -= 1
                 new_volume = current_volume_step / 10                
                 sound_manager.set_music_volume(new_volume)
+            if up_key_pressed and current_sound_volume_step < 10:
+                current_sound_volume_step += 1
+                new_sound_volume = current_sound_volume_step / 10                
+                sound_manager.set_sound_volume(new_sound_volume)
+            if down_key_pressed and current_sound_volume_step > 0:
+                current_sound_volume_step -= 1
+                new_sound_volume = current_sound_volume_step / 10                
+                sound_manager.set_sound_volume(new_sound_volume)
             if esc_key_pressed:
                 game_state = previous_state
             if s_key_pressed:
