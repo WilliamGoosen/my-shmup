@@ -1,7 +1,7 @@
 import pygame as pg
 from os import path
 from sys import exit
-from random import random, choice, randint
+from random import random, choice, randint, uniform
 from settings import *
 from sprites import Player, Starfield, Meteoroid, Explosion, Powerup
 from sound_manager import SoundManager
@@ -53,13 +53,13 @@ def draw_start_title():
     draw_text(screen, "High Score: " + str(high_score), 22, WIDTH * 0.5, HEIGHT * 0.02, font_name)
     draw_text(screen, "SHMUP!", 64, WIDTH / 2, HEIGHT / 4, font_name)
 
-    draw_icon(screen, icons["spacebar_icon"], icon_x, icon_y + icon_text_padding_y)
+    draw_icon(screen, graphics_manager.icons["spacebar_icon"], icon_x, icon_y + icon_text_padding_y)
     draw_icon_text(screen, "Start Game", 22, text_x, text_y, font_name)
 
-    draw_icon(screen, icons["enter_icon"], WIDTH * 0.92, HEIGHT * 0.915)
+    draw_icon(screen, graphics_manager.icons["enter_icon"], WIDTH * 0.92, HEIGHT * 0.915)
     draw_icon_text(screen, "Settings", 18, WIDTH * 0.78, HEIGHT * 0.940, font_name) 
 
-    draw_icon(screen, icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)
+    draw_icon(screen, graphics_manager.icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)
     draw_icon_text(screen, "Quit Game", 18, WIDTH * 0.11, HEIGHT * 0.940, font_name)    
 
 
@@ -75,13 +75,13 @@ def draw_settings_menu():
     draw_text(screen, "High Score: " + str(high_score), 22, WIDTH * 0.5, HEIGHT * 0.02, font_name) 
     draw_text(screen, "SETTINGS", 48, WIDTH * 0.5, HEIGHT * 0.25, font_name)
 
-    draw_icon(screen, icons["s_icon"], icon_x, icon_y + icon_text_padding_y)
+    draw_icon(screen, graphics_manager.icons["s_icon"], icon_x, icon_y + icon_text_padding_y)
     draw_icon_text(screen, f"Sound: {"ON" if sound_enabled else "OFF"}", 22, text_x, text_y, font_name) 
 
-    draw_icon(screen, icons["m_icon"], icon_x, icon_y + icon_text_padding_y + y_increment)
+    draw_icon(screen, graphics_manager.icons["m_icon"], icon_x, icon_y + icon_text_padding_y + y_increment)
     draw_icon_text(screen, f"Music: {"ON" if music_enabled else "OFF"}", 22, text_x, text_y + y_increment, font_name)
 
-    draw_icon(screen, icons["r_icon"], icon_x, icon_y + icon_text_padding_y + 2 * y_increment)
+    draw_icon(screen, graphics_manager.icons["r_icon"], icon_x, icon_y + icon_text_padding_y + 2 * y_increment)
     draw_icon_text(screen, "Reset High Score", 22, text_x, text_y + 2 * y_increment, font_name)
     if high_score_reset_message:
         draw_text(screen, "High Score Reset!", 22, WIDTH / 2, HEIGHT * 0.68, font_name, GREEN)
@@ -124,24 +124,24 @@ def draw_settings_menu():
         start_x += block_width + block_spacing
 
     
-    draw_icon(screen, icons["left_icon"], minus_x, HEIGHT * 3.2 / 5)
-    draw_icon(screen, icons["right_icon"], plus_x, HEIGHT * 3.2 / 5)
+    draw_icon(screen, graphics_manager.icons["left_icon"], minus_x, HEIGHT * 3.2 / 5)
+    draw_icon(screen, graphics_manager.icons["right_icon"], plus_x, HEIGHT * 3.2 / 5)
     
-    draw_icon(screen, icons["down_icon"], down_x, HEIGHT * 3.8 / 5)
-    draw_icon(screen, icons["up_icon"], up_x, HEIGHT * 3.8 / 5)
+    draw_icon(screen, graphics_manager.icons["down_icon"], down_x, HEIGHT * 3.8 / 5)
+    draw_icon(screen, graphics_manager.icons["up_icon"], up_x, HEIGHT * 3.8 / 5)
 
-    draw_icon(screen, icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)    
+    draw_icon(screen, graphics_manager.icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)    
     draw_icon_text(screen, "Back", 18, WIDTH * 0.11, HEIGHT * 0.940, font_name)
 
-    draw_icon(screen, icons["spacebar_icon"], WIDTH * 0.92, HEIGHT * 0.92)
+    draw_icon(screen, graphics_manager.icons["spacebar_icon"], WIDTH * 0.92, HEIGHT * 0.92)
     draw_icon_text(screen, "Shoot", 18, WIDTH * 0.78, HEIGHT * 0.940, font_name)
 
     arrow_x = WIDTH * 0.945
     arrow_y = HEIGHT * 0.90
-    draw_icon(screen, arrows["right_icon"], arrow_x, arrow_y - 16)
-    draw_icon(screen, arrows["left_icon"], arrow_x - 2 * 16, arrow_y - 16)
-    draw_icon(screen, arrows["up_icon"], arrow_x - 16, arrow_y - 2 * 16)
-    draw_icon(screen, arrows["down_icon"], arrow_x - 16, arrow_y - 16)
+    draw_icon(screen, graphics_manager.arrows["right_icon"], arrow_x, arrow_y - 16)
+    draw_icon(screen, graphics_manager.arrows["left_icon"], arrow_x - 2 * 16, arrow_y - 16)
+    draw_icon(screen, graphics_manager.arrows["up_icon"], arrow_x - 16, arrow_y - 2 * 16)
+    draw_icon(screen, graphics_manager.arrows["down_icon"], arrow_x - 16, arrow_y - 16)
     draw_icon_text(screen, "Move", 18, WIDTH * 0.78, HEIGHT * 0.89, font_name)
 
 
@@ -156,13 +156,13 @@ def draw_pause_menu():
 
     draw_text(screen, "PAUSED", 48, WIDTH / 2, HEIGHT / 4, font_name)
 
-    draw_icon(screen, icons["spacebar_icon"], icon_x, icon_y + icon_text_padding_y)
+    draw_icon(screen, graphics_manager.icons["spacebar_icon"], icon_x, icon_y + icon_text_padding_y)
     draw_icon_text(screen, "Resume", 22, text_x, text_y, font_name)
     
-    draw_icon(screen, icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)
+    draw_icon(screen, graphics_manager.icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)
     draw_icon_text(screen, "Quit to Title", 18, WIDTH * 0.11, HEIGHT * 0.940, font_name)
 
-    draw_icon(screen, icons["enter_icon"], WIDTH * 0.92, HEIGHT * 0.915)
+    draw_icon(screen, graphics_manager.icons["enter_icon"], WIDTH * 0.92, HEIGHT * 0.915)
     draw_icon_text(screen, "Settings", 18, WIDTH * 0.78, HEIGHT * 0.940, font_name)
 
 def draw_confirm_popup():    
@@ -173,10 +173,10 @@ def draw_confirm_popup():
 
     draw_text(screen, "Are you sure?", 24, WIDTH * 0.5, HEIGHT * 0.45, font_name, WHITE)
 
-    draw_icon(screen, icons["y_icon"], WIDTH * 0.4, HEIGHT * 0.497)
+    draw_icon(screen, graphics_manager.icons["y_icon"], WIDTH * 0.4, HEIGHT * 0.497)
     draw_text(screen, "Yes", 22, WIDTH * 0.45, HEIGHT * 0.5, font_name, WHITE)
 
-    draw_icon(screen, icons["n_icon"], WIDTH * 0.55, HEIGHT * 0.497)
+    draw_icon(screen, graphics_manager.icons["n_icon"], WIDTH * 0.55, HEIGHT * 0.497)
     draw_text(screen, "No", 22, WIDTH * 0.60, HEIGHT * 0.5, font_name, WHITE)
 
 
@@ -196,13 +196,13 @@ def draw_game_over_title(new_high_score_achieved):
     if new_high_score_achieved:
         draw_text(screen, "NEW HIGH SCORE!", 30, WIDTH / 2, HEIGHT * 2 / 5, font_name, GREEN)
 
-    draw_icon(screen, icons["spacebar_icon"], icon_x, icon_y + icon_text_padding_y)
+    draw_icon(screen, graphics_manager.icons["spacebar_icon"], icon_x, icon_y + icon_text_padding_y)
     draw_icon_text(screen, "Try Again", 22, text_x, text_y, font_name)   
 
-    draw_icon(screen, icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)    
+    draw_icon(screen, graphics_manager.icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)    
     draw_icon_text(screen, "Quit to Title", 18, WIDTH * 0.11, HEIGHT * 0.940, font_name)
 
-    draw_icon(screen, icons["q_icon"], WIDTH * 0.93, HEIGHT * 0.92)
+    draw_icon(screen, graphics_manager.icons["q_icon"], WIDTH * 0.93, HEIGHT * 0.92)
     draw_icon_text(screen, "Quit Game", 18, WIDTH * 0.770, HEIGHT * 0.940, font_name)
 
 
@@ -278,58 +278,6 @@ popup_height = HEIGHT * 0.2
 popup_bg = pg.Surface((popup_width, popup_height), pg.SRCALPHA)
 popup_bg.fill(RED)
 
-def load_icons(scale_factor):
-    images = {}
-    icon_list = [
-        "enter_icon.png",
-        "spacebar_icon.png",
-        "spacebar_icon_2.png",
-        "esc_icon.png",
-        "minus_icon.png",
-        "plus_icon.png",
-        "m_icon.png",
-        "q_icon.png",
-        "r_icon.png",
-        "s_icon.png",
-        "y_icon.png",
-        "n_icon.png",
-        "up_icon.png",
-        "down_icon.png",
-        "left_icon.png",
-        "right_icon.png"
-    ]
-    for file in icon_list:
-        key = path.splitext(file)[0]
-        icon = pg.image.load(path.join("img", file)).convert_alpha()
-        icon_factor = 2
-        if key == "enter_icon":
-            icon_factor = 4 / 3
-        images[key] = pg.transform.scale_by(icon, icon_factor * scale_factor)
-    return images
-
-icons = load_icons(scale_factor)
-
-def load_arrows(scale_factor):
-    images = {}
-    icon_list = [
-        "up_icon.png",
-        "right_icon.png",
-        "down_icon.png",
-        "left_icon.png"
-    ]
-    for file in icon_list:
-        key = path.splitext(file)[0]
-        icon = pg.image.load(path.join("img", file)).convert_alpha()
-        icon.set_alpha(150)
-        icon_factor = 1.5      
-        images[key] = pg.transform.scale_by(icon, icon_factor * scale_factor)
-    return images
-
-arrows = load_arrows(scale_factor)
-arrows_list = [arrows["up_icon"], arrows["down_icon"], arrows["left_icon"], arrows["right_icon"]]
-highlight_index = 0
-last_highlight_time = 0
-highlight_delay = 600
 
 def scale_background(WIDTH, HEIGHT):
     game_background_original = pg.image.load(path.join("img", "starfield.png")).convert_alpha()
@@ -347,39 +295,57 @@ def scale_background(WIDTH, HEIGHT):
 
 game_background = scale_background(WIDTH, HEIGHT)
 
+# # --- STARFIELD INIT ---
+# star_layers = []
+# for _ in range(3):
+#     layer = []
+#     for _ in range(int(NUMBER_OF_STARS / 3)):
+#         star = {
+#             "y_pos" : uniform(0, HEIGHT),
+#             "speed" : uniform(0.5, 2.5),
+#             "shape" : choice(["pixel", "square", "circle"]),
+#             "radius" : randint(1, 2),
+#             "x_pos" : randint(0, WIDTH)
+#         }
+#         layer.append(star)
+#     star_layers.append(layer)
+# # --- END STARFIELD INIT ---
+
 bullet_image_original = pg.image.load(path.join("img", "laserRed16.png")).convert_alpha()
 bullet_image = pg.transform.scale_by(bullet_image_original, scale_factor)
 
-player_image_original = pg.image.load(path.join("img/", "playerShip1_orange.png")).convert_alpha()
+player_image_original = pg.image.load(path.join("img", "playerShip1_orange.png")).convert_alpha()
 player_image = pg.transform.scale(player_image_original, (50, 38)) #pg.Surface((50, 40))
 player_mini_image = pg.transform.scale(player_image, (25, 19))
 
-graphics_manager = GraphicsManager()
+graphics_manager = GraphicsManager(scale_factor)
 meteor_images_list = graphics_manager.load_meteoroid_images(ALL_METEOROID_FILES)
 meteor_images_medium_list = graphics_manager.load_meteoroid_images(MEDIUM_METEOROID_FILES)
+
+arrows = graphics_manager.load_arrows()
+icons = graphics_manager.load_icons()
 
 explosion_animation = {'large_explosion': [], 'small_explosion': [], 'player_explosion': [], 'boss_explosion': []}
 for _ in range(9):
     filename = 'regularExplosion0{}.png'.format(_)
-    img = pg.image.load(path.join("img/", filename)).convert_alpha()
+    img = pg.image.load(path.join("img", filename)).convert_alpha()
     img.set_colorkey(BLACK)
     img_large = pg.transform.scale(img, (75, 75)).convert_alpha()
     explosion_animation['large_explosion'].append(img_large)
     img_small = pg.transform.scale(img, (60, 60)).convert_alpha()
     explosion_animation['small_explosion'].append(img_small)
     filename = 'sonicExplosion0{}.png'.format(_)
-    img = pg.image.load(path.join("img/", filename)).convert_alpha()
+    img = pg.image.load(path.join("img", filename)).convert_alpha()
     img.set_colorkey(BLACK)
     explosion_animation['player_explosion'].append(img)
     img_boss_explode = pg.transform.scale(img, (298, 302))
     explosion_animation['boss_explosion'].append(img_boss_explode)
 
 powerup_images = {}
-powerup_images['shield'] = pg.image.load(path.join("img/", 'shield_gold.png')).convert_alpha()
-powerup_images['gun'] = pg.image.load(path.join("img/", 'bolt_gold.png')).convert_alpha()
+powerup_images['shield'] = pg.image.load(path.join("img", 'shield_gold.png')).convert_alpha()
+powerup_images['gun'] = pg.image.load(path.join("img", 'bolt_gold.png')).convert_alpha()
 
 
-pg.transform.scale(pg.image.load('img/playerShip1_orange.png'), (50, 38)) #pg.Surface((50, 40))
 
 # Load all game sounds
 sound_manager = SoundManager()
@@ -406,6 +372,7 @@ pending_action = None
 
 running = True
 while running:
+    # frame_start_time = pg.time.get_ticks() # Get the start time in milliseconds
     # --- EVENT HANDLING ---
     quit_event = False
     space_key_pressed = False
@@ -485,7 +452,7 @@ while running:
                 game_state = "settings"
             if esc_key_pressed:
                 running = False
-            clock.tick(10)
+            # clock.tick(10)
 
         elif game_state == "settings":
             if right_key_pressed and current_volume_step < 10:
@@ -515,18 +482,18 @@ while running:
                 pending_action = "reset_high_score"
                 show_confirmation = True
             now = pg.time.get_ticks()
-            if now - last_highlight_time > highlight_delay:
-                last_highlight_time = now
-                for icon in arrows_list:
+            if now - graphics_manager.last_highlight_time > graphics_manager.highlight_delay:
+                graphics_manager.last_highlight_time = now
+                for icon in graphics_manager.arrows_list:
                     icon.set_alpha(150)
-                arrows_list[highlight_index].set_alpha(255)
-                highlight_index = (highlight_index + 1) % 4
+                graphics_manager.arrows_list[graphics_manager.highlight_index].set_alpha(255)
+                graphics_manager.highlight_index = (graphics_manager.highlight_index + 1) % 4
             # Check if the message timer has expired
             if high_score_reset_message:
                 now = pg.time.get_ticks()
                 if now - message_timer > MESSAGE_DISPLAY_TIME:
                     high_score_reset_message = False  # Hide the message
-            clock.tick(10)
+            # clock.tick(10)
 
         elif game_state == "playing":
             if esc_key_pressed:
@@ -598,6 +565,15 @@ while running:
                 game_state = "game_over"
                 new_high_score_achieved = int(new_high_score_check())
 
+            # # Update starfield positions (only when game is active)
+            # for layer in star_layers:
+            #     for star in layer:
+            #         star["y_pos"] += star["speed"]
+            #         if star["y_pos"] > HEIGHT:
+            #             star["y_pos"] = 0
+            #             star["x_pos"] = randint(0, WIDTH)
+            # # --- END STARFIELD UPDATE ---
+
         elif game_state == "paused":
             if show_confirmation:
                 if y_key_pressed:
@@ -620,7 +596,7 @@ while running:
                     previous_state = game_state
                     game_state = "settings"
                 all_sprites_group.draw(screen)
-                clock.tick(10)
+                # clock.tick(10)
 
         elif game_state == "game_over":
             if space_key_pressed:
@@ -631,7 +607,7 @@ while running:
                 show_confirmation = True
             if esc_key_pressed:
                 game_state = "title"
-            clock.tick(10)
+            # clock.tick(10)
 
     # --- DRAWING SECTION ---
 
@@ -641,6 +617,18 @@ while running:
     #     screen.blit(game_background, (0, 0))
     else:
         screen.fill(BG_COLOUR)
+        # --- DRAW THE STARFIELD (Only in playing/paused state) ---
+        # for layer in star_layers:
+        #     for star in layer:
+        #         y = int(star["y_pos"])
+        #         x = star["x_pos"]
+        #         if star["shape"] == "pixel":
+        #             screen.set_at((x, y), WHITE)
+        #         elif star["shape"] == "square":
+        #             pg.draw.rect(screen, WHITE, (x, y, 2, 2))
+        #         elif star["shape"] == "circle":
+        #             pg.draw.circle(screen, WHITE, (x, y), star["radius"])
+        # --- END STARFIELD DRAW ---
     
     if game_state not in ("title", "settings", "game_over"):
         all_sprites_group.draw(screen)
@@ -675,6 +663,9 @@ while running:
             draw_confirm_popup()
 
     pg.display.flip()
+
+    # frame_time = pg.time.get_ticks() - frame_start_time # Calculate time spent
+    # print(f"Frame time: {frame_time} FPS") # Print it out
     clock.tick(MENU_FPS if game_state in ("title", "settings", "paused", "game_over") else FPS)
 
 pg.quit()
