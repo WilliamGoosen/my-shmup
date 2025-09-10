@@ -5,7 +5,7 @@ from settings import *
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from asset_loader import SoundManager  # Only imported by linters/IDEs, not at runtime
+    from sound_manager import SoundManager  # Only imported by linters/IDEs, not at runtime
 
 class Player(pg.sprite.Sprite):
     def __init__(self, all_sprite_group, bullets_group, screen_width, screen_height, sound_manager: "SoundManager", player_image):

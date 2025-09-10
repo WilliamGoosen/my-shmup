@@ -4,7 +4,7 @@ from sys import exit
 from random import random, choice, randint
 from settings import *
 from sprites import Player, Starfield, Meteoroid, Explosion, Powerup
-from asset_loader import load_meteoroid_images, SoundManager
+from sound_manager import load_meteoroid_images, SoundManager
 from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text, load_or_create_file
 
 def load_config():
