@@ -8,11 +8,12 @@ if TYPE_CHECKING:
     from asset_loader import SoundManager  # Only imported by linters/IDEs, not at runtime
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, all_sprite_group, bullets_group, screen_width, screen_height, sound_manager: "SoundManager"):
+    def __init__(self, all_sprite_group, bullets_group, screen_width, screen_height, sound_manager: "SoundManager", player_image):
         pg.sprite.Sprite.__init__(self)
-        self.image = pg.transform.scale(pg.image.load('img/playerShip1_orange.png'), (50, 38)) #pg.Surface((50, 40))
+        self.image = player_image
         self.image.set_colorkey(BLACK) #self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
+        self.bullet_image = None
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.rect.centerx = screen_width / 2
@@ -41,7 +42,7 @@ class Player(pg.sprite.Sprite):
 
             if self.speedx != 0 and self.speedy != 0:
                 self.speedx = self.speedx / math.sqrt(2)
-                self.speedy = self.speedy / math.sqrt(2)   
+                self.speedy = self.speedy / math.sqrt(2)
 
             self.rect.x += self.speedx
             self.rect.y += self.speedy
@@ -106,7 +107,7 @@ class Player(pg.sprite.Sprite):
                                     (self.rect.left, self.rect.centery),
                                     (self.rect.right, self.rect.centery)]
                 for bullet_location in bullet_locations:
-                    bullet = Bullet(bullet_location[0], bullet_location[1])
+                    bullet = Bullet(bullet_location[0], bullet_location[1], self.bullet_image)
                     self.all_sprites.add(bullet)
                     self.bullets.add(bullet)
                 sound_manager.play("shoot")
@@ -120,10 +121,10 @@ class Player(pg.sprite.Sprite):
 
 
 class Bullet(pg.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, bullet_image):
         pg.sprite.Sprite.__init__(self)
-        self.image = pg.image.load('img/laserRed16.png')
-        self.image.set_colorkey(BLACK)    #self.image.fill(RED)
+        self.image = bullet_image
+        # self.image.set_colorkey(BLACK)    #self.image.fill(RED)
         self.rect = self.image.get_rect()
         self.rect.bottom = y
         self.rect.centerx = x

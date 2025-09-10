@@ -3,6 +3,7 @@ TITLE = "My Shmup!"
 BASE_WIDTH = 576
 BASE_HEIGHT = 720
 FPS = 60
+MENU_FPS = 60
 FONT_NAME = 'arial'
 HS_FILE = 'highscore.txt'
 CONFIG_FILE = "config.ini"

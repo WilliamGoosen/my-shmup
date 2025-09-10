@@ -7,27 +7,6 @@ from sprites import Player, Starfield, Meteoroid, Explosion, Powerup
 from asset_loader import load_meteoroid_images, SoundManager
 from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text, load_or_create_file
 
-# player_img = pg.image.load(path.join(img_dir, "playerShip1_orange.png")).convert_alpha()
-# bullet_img = pg.image.load(path.join(img_dir, "laserRed16.png")).convert_alpha()
-
-# def load_data():
-#         # Create the full path to the high score file
-#         hs_file_path = HS_FILE
-
-#         # Check if the file exists first
-#         if path.exists(hs_file_path):
-#             # If it exists, open it and try to read the score
-#             try:
-#                 with open(hs_file_path, 'r') as f:
-#                     high_score = int(f.read())
-#             except ValueError:
-#                 # This happens if the file exists but is empty/corrupt (not a number)
-#                 high_score = 0
-#         else:
-#             # If the file does NOT exist, set high score to 0
-#             high_score = 0
-#         return high_score
-
 def load_config():
     config_dict = {}
     config_lines = load_or_create_file(CONFIG_FILE, 'scale_factor=1.0').splitlines()
@@ -72,9 +51,6 @@ def draw_start_title():
 
     draw_text(screen, "High Score: " + str(high_score), 22, WIDTH * 0.5, HEIGHT * 0.02, font_name)
     draw_text(screen, "SHMUP!", 64, WIDTH / 2, HEIGHT / 4, font_name)
-
-    # draw_icon(screen, icons["enter_icon"], icon_x, icon_y + icon_text_padding_y)
-    # draw_icon_text(screen, "Settings", 22, text_x, text_y, font_name)
 
     draw_icon(screen, icons["spacebar_icon"], icon_x, icon_y + icon_text_padding_y)
     draw_icon_text(screen, "Start Game", 22, text_x, text_y, font_name)
@@ -165,7 +141,6 @@ def draw_settings_menu():
     draw_icon(screen, arrows["left_icon"], arrow_x - 2 * 16, arrow_y - 16)
     draw_icon(screen, arrows["up_icon"], arrow_x - 16, arrow_y - 2 * 16)
     draw_icon(screen, arrows["down_icon"], arrow_x - 16, arrow_y - 16)
-    # draw_icon_text(screen, "Quit Game", 18, WIDTH * 0.770, HEIGHT * 0.940, font_name)
     draw_icon_text(screen, "Move", 18, WIDTH * 0.78, HEIGHT * 0.89, font_name)
 
 
@@ -175,15 +150,15 @@ def draw_pause_menu():
     text_x = icon_x + WIDTH * icon_text_padding_x
     icon_y = HEIGHT * 0.7
     icon_text_padding_y = 0.026
-    text_y = icon_y + WIDTH * icon_text_padding_y    
+    text_y = icon_y + WIDTH * icon_text_padding_y
     y_increment = 40
 
-    draw_text(screen, "PAUSED", 48, WIDTH / 2, HEIGHT / 4, font_name)    
+    draw_text(screen, "PAUSED", 48, WIDTH / 2, HEIGHT / 4, font_name)
 
     draw_icon(screen, icons["spacebar_icon"], icon_x, icon_y + icon_text_padding_y)
     draw_icon_text(screen, "Resume", 22, text_x, text_y, font_name)
     
-    draw_icon(screen, icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)    
+    draw_icon(screen, icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)
     draw_icon_text(screen, "Quit to Title", 18, WIDTH * 0.11, HEIGHT * 0.940, font_name)
 
     draw_icon(screen, icons["enter_icon"], WIDTH * 0.92, HEIGHT * 0.915)
@@ -192,15 +167,15 @@ def draw_pause_menu():
 def draw_confirm_popup():    
 
     screen.blit(confirm_overlay, (0, 0))
-    popup_rect = popup_bg.get_rect(center = (WIDTH // 2, HEIGHT // 2))    
+    popup_rect = popup_bg.get_rect(center = (WIDTH // 2, HEIGHT // 2))
     screen.blit(popup_bg, popup_rect.topleft)
 
     draw_text(screen, "Are you sure?", 24, WIDTH * 0.5, HEIGHT * 0.45, font_name, WHITE)
 
-    draw_icon(screen, icons["y_icon"], WIDTH * 0.4, HEIGHT * 0.497)   
+    draw_icon(screen, icons["y_icon"], WIDTH * 0.4, HEIGHT * 0.497)
     draw_text(screen, "Yes", 22, WIDTH * 0.45, HEIGHT * 0.5, font_name, WHITE)
 
-    draw_icon(screen, icons["n_icon"], WIDTH * 0.55, HEIGHT * 0.497)   
+    draw_icon(screen, icons["n_icon"], WIDTH * 0.55, HEIGHT * 0.497)
     draw_text(screen, "No", 22, WIDTH * 0.60, HEIGHT * 0.5, font_name, WHITE)
 
 
@@ -222,7 +197,6 @@ def draw_game_over_title(new_high_score_achieved):
 
     draw_icon(screen, icons["spacebar_icon"], icon_x, icon_y + icon_text_padding_y)
     draw_icon_text(screen, "Try Again", 22, text_x, text_y, font_name)   
-    # draw_text(screen, "Press SPACE to play again", 18, WIDTH / 2, HEIGHT * 3 / 4, font_name)
 
     draw_icon(screen, icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)    
     draw_icon_text(screen, "Quit to Title", 18, WIDTH * 0.11, HEIGHT * 0.940, font_name)
@@ -259,8 +233,6 @@ def clear_game_objects():
 def start_game():
     global score, game_state, life_gained, player
 
-    # game_state = "playing"
-    # draw_game_over_screen = False
     score = 0
     life_gained = 0
 
@@ -272,7 +244,8 @@ def start_game():
 
     clear_game_objects()
 
-    player = Player(all_sprites_group, bullets_group, WIDTH, HEIGHT, sound_manager)
+    player = Player(all_sprites_group, bullets_group, WIDTH, HEIGHT, sound_manager, player_image)
+    player.bullet_image = bullet_image
     all_sprites_group.add(player)
     players_group.add(player)
 
@@ -325,12 +298,12 @@ def load_icons(scale_factor):
         "right_icon.png"
     ]
     for file in icon_list:
-        key = path.splitext(file)[0]        
+        key = path.splitext(file)[0]
         icon = pg.image.load(path.join("img", file)).convert_alpha()
         icon_factor = 2
         if key == "enter_icon":
             icon_factor = 4 / 3
-        images[key] = pg.transform.scale_by(icon, icon_factor * scale_factor)        
+        images[key] = pg.transform.scale_by(icon, icon_factor * scale_factor)
     return images
 
 icons = load_icons(scale_factor)
@@ -341,14 +314,14 @@ def load_arrows(scale_factor):
         "up_icon.png",
         "right_icon.png",
         "down_icon.png",
-        "left_icon.png"        
+        "left_icon.png"
     ]
     for file in icon_list:
-        key = path.splitext(file)[0]        
+        key = path.splitext(file)[0]
         icon = pg.image.load(path.join("img", file)).convert_alpha()
         icon.set_alpha(150)
         icon_factor = 1.5      
-        images[key] = pg.transform.scale_by(icon, icon_factor * scale_factor)        
+        images[key] = pg.transform.scale_by(icon, icon_factor * scale_factor)
     return images
 
 arrows = load_arrows(scale_factor)
@@ -372,8 +345,14 @@ def scale_background(WIDTH, HEIGHT):
     return game_background
 
 game_background = scale_background(WIDTH, HEIGHT)
-player_image = pg.image.load(path.join("img/", "playerShip1_orange.png")).convert_alpha()
+
+bullet_image_original = pg.image.load(path.join("img", "laserRed16.png")).convert_alpha()
+bullet_image = pg.transform.scale_by(bullet_image_original, scale_factor)
+
+player_image_original = pg.image.load(path.join("img/", "playerShip1_orange.png")).convert_alpha()
+player_image = pg.transform.scale(player_image_original, (50, 38)) #pg.Surface((50, 40))
 player_mini_image = pg.transform.scale(player_image, (25, 19))
+
 
 
 meteor_images_list = load_meteoroid_images(ALL_METEOROID_FILES)
@@ -398,6 +377,9 @@ for _ in range(9):
 powerup_images = {}
 powerup_images['shield'] = pg.image.load(path.join("img/", 'shield_gold.png')).convert_alpha()
 powerup_images['gun'] = pg.image.load(path.join("img/", 'bolt_gold.png')).convert_alpha()
+
+
+pg.transform.scale(pg.image.load('img/playerShip1_orange.png'), (50, 38)) #pg.Surface((50, 40))
 
 # Load all game sounds
 sound_manager = SoundManager()
@@ -506,21 +488,21 @@ while running:
             clock.tick(10)
 
         elif game_state == "settings":
-            if right_key_pressed and current_volume_step < 10:                
+            if right_key_pressed and current_volume_step < 10:
                 current_volume_step += 1
-                new_volume = current_volume_step / 10                
+                new_volume = current_volume_step / 10
                 sound_manager.set_music_volume(new_volume)
-            if left_key_pressed and current_volume_step > 0:                
+            if left_key_pressed and current_volume_step > 0:
                 current_volume_step -= 1
-                new_volume = current_volume_step / 10                
+                new_volume = current_volume_step / 10
                 sound_manager.set_music_volume(new_volume)
             if up_key_pressed and current_sound_volume_step < 10:
                 current_sound_volume_step += 1
-                new_sound_volume = current_sound_volume_step / 10                
+                new_sound_volume = current_sound_volume_step / 10
                 sound_manager.set_sound_volume(new_sound_volume)
             if down_key_pressed and current_sound_volume_step > 0:
                 current_sound_volume_step -= 1
-                new_sound_volume = current_sound_volume_step / 10                
+                new_sound_volume = current_sound_volume_step / 10
                 sound_manager.set_sound_volume(new_sound_volume)
             if esc_key_pressed:
                 game_state = previous_state
@@ -531,7 +513,7 @@ while running:
                 music_enabled = sound_manager.toggle_music()
             if r_key_pressed:
                 pending_action = "reset_high_score"
-                show_confirmation = True                
+                show_confirmation = True
             now = pg.time.get_ticks()
             if now - last_highlight_time > highlight_delay:
                 last_highlight_time = now
@@ -563,10 +545,6 @@ while running:
             meteor_is_hit = pg.sprite.groupcollide(meteors_group, bullets_group, True, True)
             for meteor in meteor_is_hit:
                 score += 62 - meteor.radius
-                # hit_sound = choice(expl_sounds)
-                # if sound_enabled:
-                #     hit_sound.play()
-                #     hit_sound.set_volume(0.1)
                 sound_manager.play("explosion")
                 explosion = Explosion(meteor.rect.center, 'large_explosion', explosion_animation)
                 all_sprites_group.add(explosion)
@@ -587,10 +565,6 @@ while running:
             # check to see if a meteoroid hits the player
             player_is_hit = pg.sprite.spritecollide(player, meteors_group, True, pg.sprite.collide_circle)
             for meteor in player_is_hit:
-                # hit_sound = expl_sounds[0]
-                # if sound_enabled:
-                #     hit_sound.play()
-                #     hit_sound.set_volume(0.1)
                 sound_manager.play("explosion")
                 player.power = 1
                 player.shield -= meteor.radius * 2
@@ -613,13 +587,11 @@ while running:
                 if power.type == 'shield':
                     player.shield += randint(10, 30)                    
                     sound_manager.play("shield")
-                        # shield_sound.set_volume(0.2)
                     if player.shield >= 100:
                         player.shield = 100
                 if power.type == 'gun':
                     player.powerup()                    
                     sound_manager.play("power")
-                        # power_sound.set_volume(0.2)
 
             # if the player died and the explosion has finished playing
             if player.lives == 0 and not death_explosion.alive():
@@ -643,23 +615,23 @@ while running:
                     game_state = "playing"
                 if esc_key_pressed:
                     pending_action = "quit_to_title"
-                    show_confirmation = True                
+                    show_confirmation = True
                 if enter_key_pressed:
                     previous_state = game_state
                     game_state = "settings"
-                all_sprites_group.draw(screen)        
-                clock.tick(10)            
+                all_sprites_group.draw(screen)
+                clock.tick(10)
 
         elif game_state == "game_over":
             if space_key_pressed:
                 start_game()
-                game_state = "playing"            
+                game_state = "playing"
             if q_key_pressed:
                 pending_action = "quit_game"
-                show_confirmation = True                
+                show_confirmation = True
             if esc_key_pressed:
                 game_state = "title"
-            clock.tick(10)    
+            clock.tick(10)
 
     # --- DRAWING SECTION ---
 
@@ -686,7 +658,7 @@ while running:
         draw_lives(screen, 5, 5, player.lives, player_mini_image)
         draw_shield_bar(screen, WIDTH - BAR_LENGTH - 5, 5, player.shield)
         
-    if game_state == "paused":        
+    if game_state == "paused":
         overlay = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA)
         overlay.fill(PAUSE_OVERLAY)
         screen.blit(overlay, (0, 0))
@@ -695,14 +667,14 @@ while running:
         draw_shield_bar(screen, WIDTH - BAR_LENGTH - 5, 5, player.shield)
         draw_pause_menu()
         if show_confirmation:
-            draw_confirm_popup()        
+            draw_confirm_popup()
 
-    if game_state == "game_over":        
+    if game_state == "game_over":
         draw_game_over_title(new_high_score_achieved)
         if show_confirmation:
             draw_confirm_popup()
 
     pg.display.flip()
-    clock.tick(FPS)
+    clock.tick(MENU_FPS if game_state in ("title", "settings", "paused", "game_over") else FPS)
 
 pg.quit()

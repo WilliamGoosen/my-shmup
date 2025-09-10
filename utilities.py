@@ -17,19 +17,54 @@ def load_or_create_file(file_path, default_value):
         f.write(str(default_value))
     return default_value  # Return the default value
 
+_text_cache = {}
+_font_cache = {}
+
 def draw_text(surf, text, size, x, y, font_name, colour=WHITE):
-    font = pg.font.Font(font_name, size)
-    text_surface = font.render(text, True, colour)
+    # --- 1. CACHE THE FONT OBJECT ---
+    # Create a key for the font (name + size)
+    font_key = (font_name, size)
+    if font_key not in _font_cache:
+        _font_cache[font_key] = pg.font.Font(font_name, size)
+    font = _font_cache[font_key]
+    
+    # --- 2. CACHE THE RENDERED TEXT SURFACE ---
+    # Create a key for the specific text (font key + text + color)
+    text_key = font_key + (text, colour)
+    if text_key not in _text_cache:
+        _text_cache[text_key] = font.render(text, True, colour)
+    text_surface = _text_cache[text_key]
+    
+    # --- 3. BLIT THE PRE-RENDERED SURFACE (This is fast) ---
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x, y)
     surf.blit(text_surface, text_rect)
 
 def draw_icon_text(surf, text, size, x, y, font_name, colour=WHITE):
-    font = pg.font.Font(font_name, size)
-    text_surface = font.render(text, True, colour)
+    # --- 1. CACHE THE FONT OBJECT ---
+    # Create a key for the font (name + size)
+    font_key = (font_name, size)
+    if font_key not in _font_cache:
+        _font_cache[font_key] = pg.font.Font(font_name, size)
+    font = _font_cache[font_key]
+    
+    # --- 2. CACHE THE RENDERED TEXT SURFACE ---
+    # Create a key for the specific text (font key + text + color)
+    text_key = font_key + (text, colour)
+    if text_key not in _text_cache:
+        _text_cache[text_key] = font.render(text, True, colour)
+    text_surface = _text_cache[text_key]
+    
+    # --- 3. BLIT THE PRE-RENDERED SURFACE (This is fast) ---
     text_rect = text_surface.get_rect()
     text_rect.midleft = (x, y)
     surf.blit(text_surface, text_rect)
+    
+def clear_text_caches():
+    """Call this if you need to reload fonts (e.g., on a resolution change)."""
+    global _font_cache, _text_cache
+    _font_cache.clear()
+    _text_cache.clear()
 
 def draw_icon(surf, image, x, y):
     """
