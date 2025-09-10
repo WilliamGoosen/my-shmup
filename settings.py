@@ -19,6 +19,7 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
+GRAY = (128, 128, 128)
 PAUSE_OVERLAY = (0, 0, 0, 128)
 CONFIRM_OVERLAY = (0, 0, 0, 192)
 
@@ -46,6 +47,43 @@ METEOROID_MAX_SPEED_Y = 7
 METEOROID_MIN_ROTATE_SPEED = -8
 METEOROID_MAX_ROTATE_SPEED = 8
 NUMBER_OF_METEOROIDS = 10
+
+# Meteoroid image filename
+ALL_METEOROID_FILES = [
+    'meteorBrown_big1.png',
+    'meteorBrown_big2.png',
+    'meteorBrown_big3.png',
+    'meteorBrown_big4.png',
+    'meteorBrown_mid1.png',
+    'meteorBrown_mid2.png',
+    'meteorBrown_mid3.png',
+    'meteorBrown_mid4.png',
+    'meteorBrown_med1.png',
+    'meteorBrown_med3.png',
+    'meteorBrown_small1.png',
+    'meteorBrown_small2.png',
+    'meteorBrown_tiny1.png',
+    'meteorBrown_tiny2.png'
+    ]
+
+MEDIUM_METEOROID_FILES = [
+    'meteorBrown_mid1.png',
+    'meteorBrown_mid2.png',
+    'meteorBrown_mid3.png',
+    'meteorBrown_mid4.png'
+    ]
+# Sound Files
+SOUND_CONFIG = {
+    "shoot": ("Laser_Shoot2.wav", 0.1),
+    "shield": ("pow4.wav", 0.2),
+    "power": ("pow5.wav", 0.2),
+    "explosion": (["Explosion1.wav", "Explosion2.wav"], 0.1),
+    "player_die": ("rumble1.ogg", 0.2)
+}
+
+MUSIC_CONFIG = {
+    "gameplay": {"file":"tgfcoder-FrozenJam-SeamlessLoop.ogg", "volume": 0.2, "loops": -1}
+}
 
 # Explosion attributes
 EXPLOSION_FRAME_RATE = 35
