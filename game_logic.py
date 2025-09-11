@@ -1,5 +1,6 @@
 import pygame as pg
 from sprites import Explosion, Powerup, Meteoroid
+from utilities import spawn_wave
 from random import random, randint
 from settings import *
 
@@ -15,6 +16,9 @@ def clear_game_objects(meteors_group, bullets_group, powerups_group):
         bullet.kill()
     for powerup in powerups_group:
         powerup.kill()
+
+def spawn_meteoroid_wave(meteor_images, width, height, all_sprites_group, meteors_group):
+    spawn_wave(new_meteroid, NUMBER_OF_METEOROIDS, meteor_images, width, height, all_sprites_group, meteors_group)
 
 def handle_bullet_meteoroid_collisions(meteors_group, bullets_group, current_score, sound_mgr,
                                        graphics_mgr, all_sprites_group, powerups_group, width, height):
@@ -71,4 +75,12 @@ def handle_player_powerup_collisions(player, powerups_group, sound_mgr):
         if power.type == "bolt_gold":
             player.powerup()
             sound_mgr.play("bolt_gold")
+
+
+def handle_player_respawn(player, graphics_mgr, width, height, all_sprites_group, meteors_group):
+    if player.just_respawned:        
+        spawn_meteoroid_wave(graphics_mgr.meteoroid_images, width, height, all_sprites_group, meteors_group)
+        player.rect.centerx = width / 2
+        player.rect.bottom = height - PLAYER_START_Y_OFFSET
+        player.just_respawned = False
     

@@ -4,7 +4,7 @@ from sys import exit
 from random import random, choice, randint, uniform
 from settings import *
 from sprites import Player, Starfield, Meteoroid, Explosion, Powerup
-from game_logic import new_meteroid, clear_game_objects, handle_bullet_meteoroid_collisions, handle_player_meteoroid_collisions, handle_player_powerup_collisions
+from game_logic import new_meteroid, clear_game_objects, handle_bullet_meteoroid_collisions, handle_player_meteoroid_collisions, handle_player_powerup_collisions, handle_player_respawn, spawn_meteoroid_wave
 from sound_manager import SoundManager
 from graphics_manager import GraphicsManager
 from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text, load_or_create_file
@@ -215,9 +215,6 @@ def new_star():
 def spawn_starfield():
     spawn_wave(new_star, NUMBER_OF_STARS)
 
-def spawn_meteoroid_wave(meteor_images):
-    spawn_wave(new_meteroid, NUMBER_OF_METEOROIDS, meteor_images, WIDTH, HEIGHT, all_sprites_group, meteors_group)
-
 def start_game():
     global score, game_state, life_gained, player
 
@@ -238,7 +235,7 @@ def start_game():
     players_group.add(player)
 
     spawn_starfield()
-    spawn_meteoroid_wave(graphics_manager.meteoroid_images)
+    spawn_meteoroid_wave(graphics_manager.meteoroid_images, WIDTH, HEIGHT, all_sprites_group, meteors_group)
 
 # Constants and initialisation
 config = load_config()
@@ -257,26 +254,7 @@ clock = pg.time.Clock()
 font_name = pg.font.match_font(FONT_NAME)
 
 # --- Load all game graphics ---
-
-
-# # --- STARFIELD INIT ---
-# star_layers = []
-# for _ in range(3):
-#     layer = []
-#     for _ in range(int(NUMBER_OF_STARS / 3)):
-#         star = {
-#             "y_pos" : uniform(0, HEIGHT),
-#             "speed" : uniform(0.5, 2.5),
-#             "shape" : choice(["pixel", "square", "circle"]),
-#             "radius" : randint(1, 2),
-#             "x_pos" : randint(0, WIDTH)
-#         }
-#         layer.append(star)
-#     star_layers.append(layer)
-# # --- END STARFIELD INIT ---
-
 graphics_manager = GraphicsManager(scale_factor)
-
 
 # --- Load all game sounds ---
 sound_manager = SoundManager()
@@ -433,18 +411,12 @@ while running:
             player.update_with_keystate(keystate, sound_enabled)
             all_sprites_group.update()
 
-            if player.just_respawned:        
-                spawn_meteoroid_wave(graphics_manager.meteoroid_images)
-                player.rect.centerx = WIDTH / 2
-                player.rect.bottom = HEIGHT - PLAYER_START_Y_OFFSET
-                player.just_respawned = False
-
-            # check to see if a bullet hit a meteoroid
-            score = handle_bullet_meteoroid_collisions(meteors_group, bullets_group, score, sound_manager, graphics_manager, all_sprites_group, powerups_group, WIDTH, HEIGHT)
+            handle_player_respawn(player, graphics_manager, WIDTH, HEIGHT, all_sprites_group, meteors_group)
             
+            # check to see if a bullet hit a meteoroid
+            score = handle_bullet_meteoroid_collisions(meteors_group, bullets_group, score, sound_manager, graphics_manager, all_sprites_group, powerups_group, WIDTH, HEIGHT)            
             # check to see if a meteoroid hits the player
             player_died = handle_player_meteoroid_collisions(player, meteors_group, bullets_group, powerups_group, all_sprites_group, sound_manager, graphics_manager, WIDTH, HEIGHT)
-
             # If the function says the player died, THEN we create the explosion here in main.py.
             if player_died:
                 death_explosion = Explosion(player.rect.center, 'player_explosion', graphics_manager.explosion_animations)
@@ -458,15 +430,7 @@ while running:
             if player.lives == 0 and death_explosion and not death_explosion.alive():
                 game_state = "game_over"
                 new_high_score_achieved = int(new_high_score_check())
-
-            # # Update starfield positions (only when game is active)
-            # for layer in star_layers:
-            #     for star in layer:
-            #         star["y_pos"] += star["speed"]
-            #         if star["y_pos"] > HEIGHT:
-            #             star["y_pos"] = 0
-            #             star["x_pos"] = randint(0, WIDTH)
-            # # --- END STARFIELD UPDATE ---
+            
 
         elif game_state == "paused":
             if show_confirmation:
