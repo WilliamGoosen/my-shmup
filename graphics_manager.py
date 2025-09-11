@@ -15,6 +15,7 @@ class GraphicsManager:
         self.arrows = {}
         self.powerup_icons = {}
         self.arrows_list = []
+        self.explosion_animations = {}
         self.highlight_index = 0
         self.last_highlight_time = 0
         self.highlight_delay = 600
@@ -30,6 +31,7 @@ class GraphicsManager:
         self.load_icons()
         self.load_arrows()
         self.load_powerup_icons()
+        self.load_explosion_animations()
         self.load_meteoroid_images(ALL_METEOROID_FILES, "meteoroid_images")
         self.load_meteoroid_images(MEDIUM_METEOROID_FILES, "meteoroid_images_medium")
 
@@ -108,4 +110,19 @@ class GraphicsManager:
         self.popup_bg = pg.Surface((popup_width, popup_height), pg.SRCALPHA)
         self.popup_bg.fill(RED)
         
+    def _load_explosion_variant(self, base_name, frame_count, target_scale, target_key):
+        frame_list = []
+        for i in range(frame_count):
+            filename = f"{base_name}0{i}.png" if i < 10 else f"{base_name}{i}.png"
+            img = pg.image.load(path.join("img", filename)).convert_alpha()
+            img.set_colorkey(BLACK)
+            scaled_img = pg.transform.scale_by(img, target_scale * self.ui_scale_factor)
+            frame_list.append(scaled_img)
+        self.explosion_animations[target_key] = frame_list
     
+    def load_explosion_animations(self):
+        self.explosion_animations = {}
+        self._load_explosion_variant('regularExplosion', 9, 0.5, 'large_explosion')
+        self._load_explosion_variant('regularExplosion', 9, 1 / 3.2, 'small_explosion')
+        self._load_explosion_variant('sonicExplosion', 9, 1.0, 'player_explosion')
+        self._load_explosion_variant('sonicExplosion', 9, 3.3, 'boss_explosion')

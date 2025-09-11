@@ -290,28 +290,8 @@ font_name = pg.font.match_font(FONT_NAME)
 
 graphics_manager = GraphicsManager(scale_factor)
 
-explosion_animation = {'large_explosion': [], 'small_explosion': [], 'player_explosion': [], 'boss_explosion': []}
-for _ in range(9):
-    filename = 'regularExplosion0{}.png'.format(_)
-    img = pg.image.load(path.join("img", filename)).convert_alpha()
-    img.set_colorkey(BLACK)
-    img_large = pg.transform.scale(img, (75, 75)).convert_alpha()
-    explosion_animation['large_explosion'].append(img_large)
-    img_small = pg.transform.scale(img, (60, 60)).convert_alpha()
-    explosion_animation['small_explosion'].append(img_small)
-    filename = 'sonicExplosion0{}.png'.format(_)
-    img = pg.image.load(path.join("img", filename)).convert_alpha()
-    img.set_colorkey(BLACK)
-    explosion_animation['player_explosion'].append(img)
-    img_boss_explode = pg.transform.scale(img, (298, 302))
-    explosion_animation['boss_explosion'].append(img_boss_explode)
 
-# powerup_images = {}
-# powerup_images['shield'] = pg.image.load(path.join("img", 'shield_gold.png')).convert_alpha()
-# powerup_images['gun'] = pg.image.load(path.join("img", 'bolt_gold.png')).convert_alpha()
-
-
-# Load all game sounds
+# --- Load all game sounds ---
 sound_manager = SoundManager()
 
 
@@ -477,7 +457,7 @@ while running:
             for meteor in meteor_is_hit:
                 score += 62 - meteor.radius
                 sound_manager.play("explosion")
-                explosion = Explosion(meteor.rect.center, 'large_explosion', explosion_animation)
+                explosion = Explosion(meteor.rect.center, 'large_explosion', graphics_manager.explosion_animations)
                 all_sprites_group.add(explosion)
                 if random() < POWERUP_DROP_CHANCE:
                     power = Powerup(graphics_manager.powerup_icons, meteor.rect.center, WIDTH, HEIGHT)
@@ -499,13 +479,13 @@ while running:
                 sound_manager.play("explosion")
                 player.power = 1
                 player.shield -= meteor.radius * 2
-                explosion = Explosion(meteor.rect.center, 'small_explosion', explosion_animation)
+                explosion = Explosion(meteor.rect.center, 'small_explosion', graphics_manager.explosion_animations)
                 all_sprites_group.add(explosion)
                 new_meteroid(graphics_manager.meteoroid_images)
 
                 if player.shield <= 0:
                     sound_manager.play("player_die")
-                    death_explosion = Explosion(player.rect.center, 'player_explosion', explosion_animation)
+                    death_explosion = Explosion(player.rect.center, 'player_explosion', graphics_manager.explosion_animations)
                     all_sprites_group.add(death_explosion)
                     player.hide()
                     clear_game_objects()
