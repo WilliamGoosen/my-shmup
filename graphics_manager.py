@@ -23,6 +23,8 @@ class GraphicsManager:
         self.load_background()
         self.load_player_image()
         self.load_bullet_image()
+        self.load_icons()
+        self.load_arrows()
         self.load_meteoroid_images(ALL_METEOROID_FILES, "meteoroid_images")
         self.load_meteoroid_images(MEDIUM_METEOROID_FILES, "meteoroid_images_medium")
 

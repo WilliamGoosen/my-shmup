@@ -296,9 +296,6 @@ popup_bg.fill(RED)
 
 graphics_manager = GraphicsManager(scale_factor)
 
-arrows = graphics_manager.load_arrows()
-icons = graphics_manager.load_icons()
-
 explosion_animation = {'large_explosion': [], 'small_explosion': [], 'player_explosion': [], 'boss_explosion': []}
 for _ in range(9):
     filename = 'regularExplosion0{}.png'.format(_)
