@@ -6,8 +6,8 @@ class GraphicsManager:
     """A class to manage the loading and storage of graphics assets."""
     def __init__(self, ui_scale_factor):
         self.ui_scale_factor = ui_scale_factor
-        self.meteoroid_images = self.load_meteoroid_images(ALL_METEOROID_FILES)
-        self.meteoroid_images_medium = self.load_meteoroid_images(MEDIUM_METEOROID_FILES)
+        self.meteoroid_images = None
+        self.meteoroid_images_medium = None
         self.player_image = None
         self.player_icon = None
         self.bullet_image = None
@@ -23,6 +23,8 @@ class GraphicsManager:
         self.load_background()
         self.load_player_image()
         self.load_bullet_image()
+        self.load_meteoroid_images(ALL_METEOROID_FILES, "meteoroid_images")
+        self.load_meteoroid_images(MEDIUM_METEOROID_FILES, "meteoroid_images_medium")
 
 
     def load_player_image(self):
@@ -35,15 +37,15 @@ class GraphicsManager:
         self.bullet_image = pg.transform.scale_by(bullet_image_original, self.ui_scale_factor)
         
 
-    def load_meteoroid_images(self, meteoroid_filenames):
+    def load_meteoroid_images(self, meteoroid_filenames, target_attribute):
         """Loads and returns a list of meteoroid image surfaces."""
         meteor_images = []
         for img in meteoroid_filenames:
             img_surface = pg.image.load(path.join("img", img)).convert_alpha()
             img_surface.set_colorkey(BLACK)
             meteor_images.append(img_surface)
-        return meteor_images
-    
+        setattr(self, target_attribute, meteor_images)
+        
     # --- NEW INTERNAL HELPER METHOD ---
     def _load_image_base(self, filename, default_scale, special_scales={}, scale_factor=1.0):
         """Helper method to load, scale, and return an image and its key."""
