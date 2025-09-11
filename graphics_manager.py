@@ -20,6 +20,9 @@ class GraphicsManager:
         self.base_height = BASE_HEIGHT
         self.base_width = BASE_WIDTH
         self.background_image = None
+        self.confirm_overlay = None
+        self.popup_bg = None
+        self.create_ui_surfaces()
         self.load_background()
         self.load_player_image()
         self.load_bullet_image()
@@ -83,3 +86,15 @@ class GraphicsManager:
     def load_background(self):
         background_image_original = pg.image.load(path.join("img", "starfield_576x720.png")).convert_alpha()
         self.background_image = pg.transform.smoothscale_by(background_image_original, self.ui_scale_factor)
+        
+        
+    def create_ui_surfaces(self):
+        screen_width = self.base_width * self.ui_scale_factor
+        screen_height = self.base_height * self.ui_scale_factor
+        self.confirm_overlay = pg.Surface((screen_width, screen_height), pg.SRCALPHA)
+        self.confirm_overlay.fill(CONFIRM_OVERLAY)
+        
+        popup_width = self.base_width * 0.4 * self.ui_scale_factor
+        popup_height = self.base_height * 0.2 * self.ui_scale_factor
+        self.popup_bg = pg.Surface((popup_width, popup_height), pg.SRCALPHA)
+        self.popup_bg.fill(RED)

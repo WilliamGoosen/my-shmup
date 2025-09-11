@@ -167,9 +167,9 @@ def draw_pause_menu():
 
 def draw_confirm_popup():    
 
-    screen.blit(confirm_overlay, (0, 0))
-    popup_rect = popup_bg.get_rect(center = (WIDTH // 2, HEIGHT // 2))
-    screen.blit(popup_bg, popup_rect.topleft)
+    screen.blit(graphics_manager.confirm_overlay, (0, 0))
+    popup_rect = graphics_manager.popup_bg.get_rect(center = (WIDTH // 2, HEIGHT // 2))
+    screen.blit(graphics_manager.popup_bg, popup_rect.topleft)
 
     draw_text(screen, "Are you sure?", 24, WIDTH * 0.5, HEIGHT * 0.45, font_name, WHITE)
 
@@ -269,14 +269,8 @@ clock = pg.time.Clock()
 
 font_name = pg.font.match_font(FONT_NAME)
 
-# Load all game graphics
+# --- Load all game graphics ---
 
-confirm_overlay = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA)
-confirm_overlay.fill(CONFIRM_OVERLAY)
-popup_width = WIDTH * 0.4
-popup_height = HEIGHT * 0.2
-popup_bg = pg.Surface((popup_width, popup_height), pg.SRCALPHA)
-popup_bg.fill(RED)
 
 # # --- STARFIELD INIT ---
 # star_layers = []
@@ -315,7 +309,6 @@ for _ in range(9):
 powerup_images = {}
 powerup_images['shield'] = pg.image.load(path.join("img", 'shield_gold.png')).convert_alpha()
 powerup_images['gun'] = pg.image.load(path.join("img", 'bolt_gold.png')).convert_alpha()
-
 
 
 # Load all game sounds
