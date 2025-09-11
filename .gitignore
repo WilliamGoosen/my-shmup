@@ -209,3 +209,6 @@ __marimo__/
 # Program generated files
 highscore.txt
 config.ini
+
+# Profiling data
+*.prof

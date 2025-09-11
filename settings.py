@@ -3,6 +3,7 @@ TITLE = "My Shmup!"
 BASE_WIDTH = 576
 BASE_HEIGHT = 720
 FPS = 60
+MENU_FPS = 60
 FONT_NAME = 'arial'
 HS_FILE = 'highscore.txt'
 CONFIG_FILE = "config.ini"
@@ -72,11 +73,45 @@ MEDIUM_METEOROID_FILES = [
     'meteorBrown_mid3.png',
     'meteorBrown_mid4.png'
     ]
+
+# Icon Files
+ICON_LIST = [
+        "enter_icon.png",
+        "spacebar_icon.png",
+        "spacebar_icon_2.png",
+        "esc_icon.png",
+        "minus_icon.png",
+        "plus_icon.png",
+        "m_icon.png",
+        "q_icon.png",
+        "r_icon.png",
+        "s_icon.png",
+        "y_icon.png",
+        "n_icon.png",
+        "up_icon.png",
+        "down_icon.png",
+        "left_icon.png",
+        "right_icon.png"
+    ]
+
+ARROW_LIST = [
+        "up_icon.png",
+        "right_icon.png",
+        "down_icon.png",
+        "left_icon.png"
+    ]
+
+POWERUP_LIST = [
+    "shield_gold.png",
+    "bolt_gold.png"
+]
+
+
 # Sound Files
 SOUND_CONFIG = {
     "shoot": ("Laser_Shoot2.wav", 0.1),
-    "shield": ("pow4.wav", 0.2),
-    "power": ("pow5.wav", 0.2),
+    "shield_gold": ("pow4.wav", 0.2),
+    "bolt_gold": ("pow5.wav", 0.2),
     "explosion": (["Explosion1.wav", "Explosion2.wav"], 0.1),
     "player_die": ("rumble1.ogg", 0.2)
 }
