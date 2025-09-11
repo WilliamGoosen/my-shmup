@@ -4,6 +4,7 @@ from sys import exit
 from random import random, choice, randint, uniform
 from settings import *
 from sprites import Player, Starfield, Meteoroid, Explosion, Powerup
+from game_logic import new_meteroid, handle_bullet_meteoroid_collisions
 from sound_manager import SoundManager
 from graphics_manager import GraphicsManager
 from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text, load_or_create_file
@@ -214,13 +215,8 @@ def new_star():
 def spawn_starfield():
     spawn_wave(new_star, NUMBER_OF_STARS)
 
-def new_meteroid(meteor_images, position = None, velocity = None, is_medium = False ):
-    m = Meteoroid(meteor_images, WIDTH, HEIGHT, position, velocity, is_medium)
-    all_sprites_group.add(m)
-    meteors_group.add(m)
-
 def spawn_meteoroid_wave(meteor_images):
-    spawn_wave(new_meteroid, NUMBER_OF_METEOROIDS, meteor_images)
+    spawn_wave(new_meteroid, NUMBER_OF_METEOROIDS, meteor_images, WIDTH, HEIGHT, all_sprites_group, meteors_group)
 
 def clear_game_objects():
     for meteoroid in meteors_group: 
@@ -448,31 +444,13 @@ while running:
 
             if player.just_respawned:        
                 spawn_meteoroid_wave(graphics_manager.meteoroid_images)
-                player.rect.centerx = WIDTH /2
+                player.rect.centerx = WIDTH / 2
                 player.rect.bottom = HEIGHT - PLAYER_START_Y_OFFSET
                 player.just_respawned = False
 
             # check to see if a bullet hit a meteoroid
-            meteor_is_hit = pg.sprite.groupcollide(meteors_group, bullets_group, True, True)
-            for meteor in meteor_is_hit:
-                score += 62 - meteor.radius
-                sound_manager.play("explosion")
-                explosion = Explosion(meteor.rect.center, 'large_explosion', graphics_manager.explosion_animations)
-                all_sprites_group.add(explosion)
-                if random() < POWERUP_DROP_CHANCE:
-                    power = Powerup(graphics_manager.powerup_icons, meteor.rect.center, WIDTH, HEIGHT)
-                    all_sprites_group.add(power)
-                    powerups_group.add(power)
-                if meteor.can_split():
-                    new_meteoroids = meteor.create_split_meteoroids(graphics_manager.meteoroid_images_medium)
-                    for new_meteor in new_meteoroids:
-                        all_sprites_group.add(new_meteor)
-                        meteors_group.add(new_meteor)
-                    meteor.kill()
-                else:
-                    if len(meteors_group) < NUMBER_OF_METEOROIDS:
-                        new_meteroid(graphics_manager.meteoroid_images)
-
+            score = handle_bullet_meteoroid_collisions(meteors_group, bullets_group, score, sound_manager, graphics_manager, all_sprites_group, powerups_group, WIDTH, HEIGHT)
+            
             # check to see if a meteoroid hits the player
             player_is_hit = pg.sprite.spritecollide(player, meteors_group, True, pg.sprite.collide_circle)
             for meteor in player_is_hit:
@@ -481,7 +459,7 @@ while running:
                 player.shield -= meteor.radius * 2
                 explosion = Explosion(meteor.rect.center, 'small_explosion', graphics_manager.explosion_animations)
                 all_sprites_group.add(explosion)
-                new_meteroid(graphics_manager.meteoroid_images)
+                new_meteroid(graphics_manager.meteoroid_images, WIDTH, HEIGHT, all_sprites_group, meteors_group)
 
                 if player.shield <= 0:
                     sound_manager.play("player_die")
