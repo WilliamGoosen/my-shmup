@@ -251,7 +251,7 @@ def start_game():
     players_group.add(player)
 
     spawn_starfield()
-    spawn_meteoroid_wave(meteor_images_list)
+    spawn_meteoroid_wave(graphics_manager.meteoroid_images)
 
 # Constants and initialisation
 config = load_config()
@@ -302,10 +302,8 @@ player_image = pg.transform.scale(player_image_original, (50, 38)) #pg.Surface((
 player_mini_image = pg.transform.scale(player_image, (25, 19))
 
 graphics_manager = GraphicsManager(scale_factor)
-meteor_images_list = graphics_manager.load_meteoroid_images(ALL_METEOROID_FILES)
-meteor_images_medium_list = graphics_manager.load_meteoroid_images(MEDIUM_METEOROID_FILES)
-
-game_background = graphics_manager.background_image
+# meteor_images_list = graphics_manager.meteoroid_images
+# meteor_images_medium_list = graphics_manager.meteoroid_images_medium
 
 arrows = graphics_manager.load_arrows()
 icons = graphics_manager.load_icons()
@@ -488,7 +486,7 @@ while running:
             all_sprites_group.update()
 
             if player.just_respawned:        
-                spawn_meteoroid_wave(meteor_images_list)
+                spawn_meteoroid_wave(graphics_manager.meteoroid_images)
                 player.rect.centerx = WIDTH /2
                 player.rect.bottom = HEIGHT - PLAYER_START_Y_OFFSET
                 player.just_respawned = False
@@ -505,14 +503,14 @@ while running:
                     all_sprites_group.add(power)
                     powerups_group.add(power)
                 if meteor.can_split():
-                    new_meteoroids = meteor.create_split_meteoroids(meteor_images_medium_list)
+                    new_meteoroids = meteor.create_split_meteoroids(graphics_manager.meteoroid_images_medium)
                     for new_meteor in new_meteoroids:
                         all_sprites_group.add(new_meteor)
                         meteors_group.add(new_meteor)
                     meteor.kill()
                 else:
                     if len(meteors_group) < NUMBER_OF_METEOROIDS:
-                        new_meteroid(meteor_images_list)
+                        new_meteroid(graphics_manager.meteoroid_images)
 
             # check to see if a meteoroid hits the player
             player_is_hit = pg.sprite.spritecollide(player, meteors_group, True, pg.sprite.collide_circle)
@@ -522,7 +520,7 @@ while running:
                 player.shield -= meteor.radius * 2
                 explosion = Explosion(meteor.rect.center, 'small_explosion', explosion_animation)
                 all_sprites_group.add(explosion)
-                new_meteroid(meteor_images_list)
+                new_meteroid(graphics_manager.meteoroid_images)
 
                 if player.shield <= 0:
                     sound_manager.play("player_die")
