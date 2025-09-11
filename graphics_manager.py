@@ -10,6 +10,7 @@ class GraphicsManager:
         self.meteoroid_images_medium = self.load_meteoroid_images(MEDIUM_METEOROID_FILES)
         self.player_image = None
         self.player_icon = None
+        self.bullet_image = None
         self.icons = {}
         self.arrows = {}
         self.arrows_list = []
@@ -21,12 +22,17 @@ class GraphicsManager:
         self.background_image = None
         self.load_background()
         self.load_player_image()
+        self.load_bullet_image()
 
 
     def load_player_image(self):
         player_image_original = pg.image.load(path.join("img", "playerShip1_orange.png")).convert_alpha()
         self.player_image = pg.transform.scale_by(player_image_original, 0.5 * self.ui_scale_factor)
         self.player_icon = pg.transform.scale_by(player_image_original, 0.25 * self.ui_scale_factor)
+        
+    def load_bullet_image(self):
+        bullet_image_original = pg.image.load(path.join("img", "laserRed16.png")).convert_alpha()
+        self.bullet_image = pg.transform.scale_by(bullet_image_original, self.ui_scale_factor)
         
 
     def load_meteoroid_images(self, meteoroid_filenames):

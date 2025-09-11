@@ -246,7 +246,7 @@ def start_game():
     clear_game_objects()
 
     player = Player(all_sprites_group, bullets_group, WIDTH, HEIGHT, sound_manager, graphics_manager.player_image)
-    player.bullet_image = bullet_image
+    player.bullet_image = graphics_manager.bullet_image
     all_sprites_group.add(player)
     players_group.add(player)
 
@@ -294,20 +294,8 @@ popup_bg.fill(RED)
 #     star_layers.append(layer)
 # # --- END STARFIELD INIT ---
 
-bullet_image_original = pg.image.load(path.join("img", "laserRed16.png")).convert_alpha()
-bullet_image = pg.transform.scale_by(bullet_image_original, scale_factor)
-
-# player_image_original = pg.image.load(path.join("img", "playerShip1_orange.png")).convert_alpha()
-# player_image = pg.transform.scale_by(player_image_original, 0.5 * scale_factor) #pg.Surface((50, 40))
-# player_image_original = pg.image.load(path.join("img", "playerShip1_orange.png")).convert_alpha()
-# player_mini_image = pg.transform.scale_by(player_image_original, 0.25 * scale_factor)
-
-
 graphics_manager = GraphicsManager(scale_factor)
-# meteor_images_list = graphics_manager.meteoroid_images
-# meteor_images_medium_list = graphics_manager.meteoroid_images_medium
-# player_image = graphics_manager.player_image
-# player_mini_image = graphics_manager.player_icon
+
 arrows = graphics_manager.load_arrows()
 icons = graphics_manager.load_icons()
 
