@@ -1,6 +1,6 @@
 import pygame as pg
 from sprites import Explosion, Powerup, Meteoroid
-from random import random
+from random import random, randint
 from settings import *
 
 def new_meteroid(meteor_images, width, height, all_sprites_group, meteors_group, position = None, velocity = None, is_medium = False):
@@ -58,4 +58,17 @@ def handle_player_meteoroid_collisions(player, meteors_group, bullets_group, pow
         
     # Return False if the player didn't die in this collision
     return False
+
+
+def handle_player_powerup_collisions(player, powerups_group, sound_mgr):
+    powerup_is_hit = pg.sprite.spritecollide(player, powerups_group, True)
+    for power in powerup_is_hit:
+        if power.type == "shield_gold":
+            player.shield += randint(10, 30)
+            sound_mgr.play("shield_gold")
+            if player.shield >= 100:
+                player.shield = 100
+        if power.type == "bolt_gold":
+            player.powerup()
+            sound_mgr.play("bolt_gold")
     

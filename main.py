@@ -4,7 +4,7 @@ from sys import exit
 from random import random, choice, randint, uniform
 from settings import *
 from sprites import Player, Starfield, Meteoroid, Explosion, Powerup
-from game_logic import new_meteroid, clear_game_objects, handle_bullet_meteoroid_collisions, handle_player_meteoroid_collisions
+from game_logic import new_meteroid, clear_game_objects, handle_bullet_meteoroid_collisions, handle_player_meteoroid_collisions, handle_player_powerup_collisions
 from sound_manager import SoundManager
 from graphics_manager import GraphicsManager
 from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text, load_or_create_file
@@ -452,16 +452,7 @@ while running:
                 player.hide()            
 
             # check to see if player hit a powerup
-            powerup_is_hit = pg.sprite.spritecollide(player, powerups_group, True)
-            for power in powerup_is_hit:
-                if power.type == "shield_gold":
-                    player.shield += randint(10, 30)
-                    sound_manager.play("shield_gold")
-                    if player.shield >= 100:
-                        player.shield = 100
-                if power.type == "bolt_gold":
-                    player.powerup()
-                    sound_manager.play("bolt_gold")
+            handle_player_powerup_collisions(player, powerups_group, sound_manager)            
 
             # if the player died and the explosion has finished playing            
             if player.lives == 0 and death_explosion and not death_explosion.alive():
