@@ -306,9 +306,9 @@ for _ in range(9):
     img_boss_explode = pg.transform.scale(img, (298, 302))
     explosion_animation['boss_explosion'].append(img_boss_explode)
 
-powerup_images = {}
-powerup_images['shield'] = pg.image.load(path.join("img", 'shield_gold.png')).convert_alpha()
-powerup_images['gun'] = pg.image.load(path.join("img", 'bolt_gold.png')).convert_alpha()
+# powerup_images = {}
+# powerup_images['shield'] = pg.image.load(path.join("img", 'shield_gold.png')).convert_alpha()
+# powerup_images['gun'] = pg.image.load(path.join("img", 'bolt_gold.png')).convert_alpha()
 
 
 # Load all game sounds
@@ -480,7 +480,7 @@ while running:
                 explosion = Explosion(meteor.rect.center, 'large_explosion', explosion_animation)
                 all_sprites_group.add(explosion)
                 if random() < POWERUP_DROP_CHANCE:
-                    power = Powerup(powerup_images, meteor.rect.center, WIDTH, HEIGHT)
+                    power = Powerup(graphics_manager.powerup_icons, meteor.rect.center, WIDTH, HEIGHT)
                     all_sprites_group.add(power)
                     powerups_group.add(power)
                 if meteor.can_split():
@@ -515,14 +515,14 @@ while running:
             # check to see if player hit a powerup
             powerup_is_hit = pg.sprite.spritecollide(player, powerups_group, True)
             for power in powerup_is_hit:
-                if power.type == 'shield':
-                    player.shield += randint(10, 30)                    
-                    sound_manager.play("shield")
+                if power.type == "shield_gold":
+                    player.shield += randint(10, 30)
+                    sound_manager.play("shield_gold")
                     if player.shield >= 100:
                         player.shield = 100
-                if power.type == 'gun':
-                    player.powerup()                    
-                    sound_manager.play("power")
+                if power.type == "bolt_gold":
+                    player.powerup()
+                    sound_manager.play("bolt_gold")
 
             # if the player died and the explosion has finished playing
             if player.lives == 0 and not death_explosion.alive():

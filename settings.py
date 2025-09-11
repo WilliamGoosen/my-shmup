@@ -101,12 +101,17 @@ ARROW_LIST = [
         "left_icon.png"
     ]
 
+POWERUP_LIST = [
+    "shield_gold.png",
+    "bolt_gold.png"
+]
+
 
 # Sound Files
 SOUND_CONFIG = {
     "shoot": ("Laser_Shoot2.wav", 0.1),
-    "shield": ("pow4.wav", 0.2),
-    "power": ("pow5.wav", 0.2),
+    "shield_gold": ("pow4.wav", 0.2),
+    "bolt_gold": ("pow5.wav", 0.2),
     "explosion": (["Explosion1.wav", "Explosion2.wav"], 0.1),
     "player_die": ("rumble1.ogg", 0.2)
 }

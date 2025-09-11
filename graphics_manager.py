@@ -13,6 +13,7 @@ class GraphicsManager:
         self.bullet_image = None
         self.icons = {}
         self.arrows = {}
+        self.powerup_icons = {}
         self.arrows_list = []
         self.highlight_index = 0
         self.last_highlight_time = 0
@@ -28,6 +29,7 @@ class GraphicsManager:
         self.load_bullet_image()
         self.load_icons()
         self.load_arrows()
+        self.load_powerup_icons()
         self.load_meteoroid_images(ALL_METEOROID_FILES, "meteoroid_images")
         self.load_meteoroid_images(MEDIUM_METEOROID_FILES, "meteoroid_images_medium")
 
@@ -82,6 +84,13 @@ class GraphicsManager:
 
         self.arrows_list = [self.arrows["up_icon"], self.arrows["down_icon"], self.arrows["left_icon"], self.arrows["right_icon"]]
         
+    def load_powerup_icons(self):
+        self.powerup_icons = {}
+        icon_list = POWERUP_LIST # Your full icon list
+        
+        for file in icon_list:
+            key, loaded_icon = self._load_image_base(file, default_scale=1, scale_factor=self.ui_scale_factor)
+            self.powerup_icons[key] = loaded_icon
         
     def load_background(self):
         background_image_original = pg.image.load(path.join("img", "starfield_576x720.png")).convert_alpha()
@@ -98,3 +107,5 @@ class GraphicsManager:
         popup_height = self.base_height * 0.2 * self.ui_scale_factor
         self.popup_bg = pg.Surface((popup_width, popup_height), pg.SRCALPHA)
         self.popup_bg.fill(RED)
+        
+    
