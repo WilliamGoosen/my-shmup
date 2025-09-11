@@ -8,15 +8,16 @@ def new_meteroid(meteor_images, width, height, all_sprites_group, meteors_group,
     all_sprites_group.add(m)
     meteors_group.add(m)
 
-def handle_bullet_meteoroid_collisions(meteors_group,
-                                       bullets_group,
-                                       current_score,
-                                       sound_mgr,
-                                       graphics_mgr,
-                                       all_sprites_group,
-                                       powerups_group,
-                                       width,
-                                       height):
+def clear_game_objects(meteors_group, bullets_group, powerups_group):
+    for meteoroid in meteors_group: 
+        meteoroid.kill()
+    for bullet in bullets_group:
+        bullet.kill()
+    for powerup in powerups_group:
+        powerup.kill()
+
+def handle_bullet_meteoroid_collisions(meteors_group, bullets_group, current_score, sound_mgr,
+                                       graphics_mgr, all_sprites_group, powerups_group, width, height):
     meteoroid_is_hit = pg.sprite.groupcollide(meteors_group, bullets_group, True, True)
     for meteor in meteoroid_is_hit:
         current_score += 62 - meteor.radius
@@ -37,3 +38,24 @@ def handle_bullet_meteoroid_collisions(meteors_group,
             if len(meteors_group) < NUMBER_OF_METEOROIDS:
                 new_meteroid(graphics_mgr.meteoroid_images, width, height, all_sprites_group, meteors_group)
     return current_score
+
+def handle_player_meteoroid_collisions(player, meteors_group, bullets_group, powerups_group, all_sprites_group, sound_mgr, graphics_mgr, width, height):
+    player_is_hit = pg.sprite.spritecollide(player, meteors_group, True, pg.sprite.collide_circle)    
+    for meteor in player_is_hit:
+        sound_mgr.play("explosion")
+        player.power = 1
+        player.shield -= meteor.radius * 2
+        explosion = Explosion(meteor.rect.center, 'small_explosion', graphics_mgr.explosion_animations)
+        all_sprites_group.add(explosion)
+        new_meteroid(graphics_mgr.meteoroid_images, width, height, all_sprites_group, meteors_group)        
+        if player.shield <= 0:
+            sound_mgr.play("player_die")            
+            clear_game_objects(meteors_group, bullets_group, powerups_group)
+            player.lives -= 1
+            player.shield = 100
+            # Return True to signal that the main loop should create the death explosion
+            return True
+        
+    # Return False if the player didn't die in this collision
+    return False
+    

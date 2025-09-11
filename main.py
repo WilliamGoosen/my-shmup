@@ -4,7 +4,7 @@ from sys import exit
 from random import random, choice, randint, uniform
 from settings import *
 from sprites import Player, Starfield, Meteoroid, Explosion, Powerup
-from game_logic import new_meteroid, handle_bullet_meteoroid_collisions
+from game_logic import new_meteroid, clear_game_objects, handle_bullet_meteoroid_collisions, handle_player_meteoroid_collisions
 from sound_manager import SoundManager
 from graphics_manager import GraphicsManager
 from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text, load_or_create_file
@@ -218,15 +218,6 @@ def spawn_starfield():
 def spawn_meteoroid_wave(meteor_images):
     spawn_wave(new_meteroid, NUMBER_OF_METEOROIDS, meteor_images, WIDTH, HEIGHT, all_sprites_group, meteors_group)
 
-def clear_game_objects():
-    for meteoroid in meteors_group: 
-        meteoroid.kill()
-    for bullet in bullets_group:
-        bullet.kill()
-    for powerup in powerups_group:
-        powerup.kill()
-
-
 def start_game():
     global score, game_state, life_gained, player
 
@@ -239,7 +230,7 @@ def start_game():
     players_group.empty()
     stars_group.empty()
 
-    clear_game_objects()
+    clear_game_objects(meteors_group, bullets_group, powerups_group)
 
     player = Player(all_sprites_group, bullets_group, WIDTH, HEIGHT, sound_manager, graphics_manager.player_image)
     player.bullet_image = graphics_manager.bullet_image
@@ -452,23 +443,13 @@ while running:
             score = handle_bullet_meteoroid_collisions(meteors_group, bullets_group, score, sound_manager, graphics_manager, all_sprites_group, powerups_group, WIDTH, HEIGHT)
             
             # check to see if a meteoroid hits the player
-            player_is_hit = pg.sprite.spritecollide(player, meteors_group, True, pg.sprite.collide_circle)
-            for meteor in player_is_hit:
-                sound_manager.play("explosion")
-                player.power = 1
-                player.shield -= meteor.radius * 2
-                explosion = Explosion(meteor.rect.center, 'small_explosion', graphics_manager.explosion_animations)
-                all_sprites_group.add(explosion)
-                new_meteroid(graphics_manager.meteoroid_images, WIDTH, HEIGHT, all_sprites_group, meteors_group)
+            player_died = handle_player_meteoroid_collisions(player, meteors_group, bullets_group, powerups_group, all_sprites_group, sound_manager, graphics_manager, WIDTH, HEIGHT)
 
-                if player.shield <= 0:
-                    sound_manager.play("player_die")
-                    death_explosion = Explosion(player.rect.center, 'player_explosion', graphics_manager.explosion_animations)
-                    all_sprites_group.add(death_explosion)
-                    player.hide()
-                    clear_game_objects()
-                    player.lives -= 1
-                    player.shield = 100
+            # If the function says the player died, THEN we create the explosion here in main.py.
+            if player_died:
+                death_explosion = Explosion(player.rect.center, 'player_explosion', graphics_manager.explosion_animations)
+                all_sprites_group.add(death_explosion)
+                player.hide()            
 
             # check to see if player hit a powerup
             powerup_is_hit = pg.sprite.spritecollide(player, powerups_group, True)
@@ -482,8 +463,8 @@ while running:
                     player.powerup()
                     sound_manager.play("bolt_gold")
 
-            # if the player died and the explosion has finished playing
-            if player.lives == 0 and not death_explosion.alive():
+            # if the player died and the explosion has finished playing            
+            if player.lives == 0 and death_explosion and not death_explosion.alive():
                 game_state = "game_over"
                 new_high_score_achieved = int(new_high_score_check())
 
