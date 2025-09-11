@@ -278,23 +278,6 @@ popup_height = HEIGHT * 0.2
 popup_bg = pg.Surface((popup_width, popup_height), pg.SRCALPHA)
 popup_bg.fill(RED)
 
-
-def scale_background(WIDTH, HEIGHT):
-    game_background_original = pg.image.load(path.join("img", "starfield.png")).convert_alpha()
-    scale_factor = HEIGHT / game_background_original.get_height()
-    new_width = int(game_background_original.get_height() * scale_factor)
-    new_height = int(game_background_original.get_height() * scale_factor)
-    game_background_scaled = pg.transform.smoothscale(game_background_original, (new_width, new_height))
-
-    if new_width > WIDTH:
-        crop_x = (new_width - WIDTH) // 2
-        game_background = game_background_scaled.subsurface((crop_x, 0, WIDTH, HEIGHT))
-    else:
-        game_background = game_background_scaled
-    return game_background
-
-game_background = scale_background(WIDTH, HEIGHT)
-
 # # --- STARFIELD INIT ---
 # star_layers = []
 # for _ in range(3):
@@ -321,6 +304,8 @@ player_mini_image = pg.transform.scale(player_image, (25, 19))
 graphics_manager = GraphicsManager(scale_factor)
 meteor_images_list = graphics_manager.load_meteoroid_images(ALL_METEOROID_FILES)
 meteor_images_medium_list = graphics_manager.load_meteoroid_images(MEDIUM_METEOROID_FILES)
+
+game_background = graphics_manager.background_image
 
 arrows = graphics_manager.load_arrows()
 icons = graphics_manager.load_icons()
@@ -612,9 +597,9 @@ while running:
     # --- DRAWING SECTION ---
 
     if game_state in ("title", "settings", "game_over"):
-        screen.blit(game_background, (0, 0))
+        screen.blit(graphics_manager.background_image, (0, 0))
     # elif game_state == "game_over":
-    #     screen.blit(game_background, (0, 0))
+    #     screen.blit(graphics_manager.background_image, (0, 0))
     else:
         screen.fill(BG_COLOUR)
         # --- DRAW THE STARFIELD (Only in playing/paused state) ---

@@ -13,6 +13,10 @@ class GraphicsManager:
         self.highlight_index = 0
         self.last_highlight_time = 0
         self.highlight_delay = 600
+        self.base_height = BASE_HEIGHT
+        self.base_width = BASE_WIDTH
+        self.background_image = None
+        self.load_background()
 
 
     def load_meteoroid_images(self, meteoroid_filenames):
@@ -54,3 +58,8 @@ class GraphicsManager:
             self.arrows[key] = loaded_arrow
 
         self.arrows_list = [self.arrows["up_icon"], self.arrows["down_icon"], self.arrows["left_icon"], self.arrows["right_icon"]]
+        
+        
+    def load_background(self):
+        background_image_original = pg.image.load(path.join("img", "starfield_576x720.png")).convert_alpha()
+        self.background_image = pg.transform.smoothscale_by(background_image_original, self.ui_scale_factor)
