@@ -245,7 +245,7 @@ def start_game():
 
     clear_game_objects()
 
-    player = Player(all_sprites_group, bullets_group, WIDTH, HEIGHT, sound_manager, player_image)
+    player = Player(all_sprites_group, bullets_group, WIDTH, HEIGHT, sound_manager, graphics_manager.player_image)
     player.bullet_image = bullet_image
     all_sprites_group.add(player)
     players_group.add(player)
@@ -297,14 +297,17 @@ popup_bg.fill(RED)
 bullet_image_original = pg.image.load(path.join("img", "laserRed16.png")).convert_alpha()
 bullet_image = pg.transform.scale_by(bullet_image_original, scale_factor)
 
-player_image_original = pg.image.load(path.join("img", "playerShip1_orange.png")).convert_alpha()
-player_image = pg.transform.scale(player_image_original, (50, 38)) #pg.Surface((50, 40))
-player_mini_image = pg.transform.scale(player_image, (25, 19))
+# player_image_original = pg.image.load(path.join("img", "playerShip1_orange.png")).convert_alpha()
+# player_image = pg.transform.scale_by(player_image_original, 0.5 * scale_factor) #pg.Surface((50, 40))
+# player_image_original = pg.image.load(path.join("img", "playerShip1_orange.png")).convert_alpha()
+# player_mini_image = pg.transform.scale_by(player_image_original, 0.25 * scale_factor)
+
 
 graphics_manager = GraphicsManager(scale_factor)
 # meteor_images_list = graphics_manager.meteoroid_images
 # meteor_images_medium_list = graphics_manager.meteoroid_images_medium
-
+# player_image = graphics_manager.player_image
+# player_mini_image = graphics_manager.player_icon
 arrows = graphics_manager.load_arrows()
 icons = graphics_manager.load_icons()
 
@@ -626,7 +629,7 @@ while running:
 
     if game_state == "playing":
         draw_text(screen, "Score: " + str(score), 22, WIDTH / 2, HEIGHT * 0.01, font_name, WHITE)
-        draw_lives(screen, 5, 5, player.lives, player_mini_image)
+        draw_lives(screen, 5, 5, player.lives, graphics_manager.player_icon)
         draw_shield_bar(screen, WIDTH - BAR_LENGTH - 5, 5, player.shield)
         
     if game_state == "paused":
@@ -634,7 +637,7 @@ while running:
         overlay.fill(PAUSE_OVERLAY)
         screen.blit(overlay, (0, 0))
         draw_text(screen, "Score: " + str(score), 22, WIDTH / 2, HEIGHT * 0.01, font_name, WHITE)
-        draw_lives(screen, 5, 5, player.lives, player_mini_image)
+        draw_lives(screen, 5, 5, player.lives, graphics_manager.player_icon)
         draw_shield_bar(screen, WIDTH - BAR_LENGTH - 5, 5, player.shield)
         draw_pause_menu()
         if show_confirmation:

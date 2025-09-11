@@ -8,6 +8,8 @@ class GraphicsManager:
         self.ui_scale_factor = ui_scale_factor
         self.meteoroid_images = self.load_meteoroid_images(ALL_METEOROID_FILES)
         self.meteoroid_images_medium = self.load_meteoroid_images(MEDIUM_METEOROID_FILES)
+        self.player_image = None
+        self.player_icon = None
         self.icons = {}
         self.arrows = {}
         self.arrows_list = []
@@ -18,7 +20,14 @@ class GraphicsManager:
         self.base_width = BASE_WIDTH
         self.background_image = None
         self.load_background()
+        self.load_player_image()
 
+
+    def load_player_image(self):
+        player_image_original = pg.image.load(path.join("img", "playerShip1_orange.png")).convert_alpha()
+        self.player_image = pg.transform.scale_by(player_image_original, 0.5 * self.ui_scale_factor)
+        self.player_icon = pg.transform.scale_by(player_image_original, 0.25 * self.ui_scale_factor)
+        
 
     def load_meteoroid_images(self, meteoroid_filenames):
         """Loads and returns a list of meteoroid image surfaces."""
