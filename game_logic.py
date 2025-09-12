@@ -44,16 +44,16 @@ def handle_bullet_meteoroid_collisions(meteors_group, bullets_group, current_sco
     return current_score
 
 def handle_player_meteoroid_collisions(player, meteors_group, bullets_group, powerups_group, all_sprites_group, sound_mgr, graphics_mgr, width, height):
-    player_is_hit = pg.sprite.spritecollide(player, meteors_group, True, pg.sprite.collide_circle)    
+    player_is_hit = pg.sprite.spritecollide(player, meteors_group, True, pg.sprite.collide_circle)
     for meteor in player_is_hit:
         sound_mgr.play("explosion")
         player.power = 1
         player.shield -= meteor.radius * 2
         explosion = Explosion(meteor.rect.center, 'small_explosion', graphics_mgr.explosion_animations)
         all_sprites_group.add(explosion)
-        new_meteroid(graphics_mgr.meteoroid_images, width, height, all_sprites_group, meteors_group)        
+        new_meteroid(graphics_mgr.meteoroid_images, width, height, all_sprites_group, meteors_group)
         if player.shield <= 0:
-            sound_mgr.play("player_die")            
+            sound_mgr.play("player_die")
             clear_game_objects(meteors_group, bullets_group, powerups_group)
             player.lives -= 1
             player.shield = 100
@@ -83,4 +83,3 @@ def handle_player_respawn(player, graphics_mgr, width, height, all_sprites_group
         player.rect.centerx = width / 2
         player.rect.bottom = height - PLAYER_START_Y_OFFSET
         player.just_respawned = False
-    

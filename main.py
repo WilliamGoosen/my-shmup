@@ -1,10 +1,8 @@
 import pygame as pg
 from os import path
-from sys import exit
-from random import random, choice, randint, uniform
 from settings import *
-from sprites import Player, Starfield, Meteoroid, Explosion, Powerup
-from game_logic import new_meteroid, clear_game_objects, handle_bullet_meteoroid_collisions, handle_player_meteoroid_collisions, handle_player_powerup_collisions, handle_player_respawn, spawn_meteoroid_wave
+from sprites import Player, Starfield, Explosion
+from game_logic import clear_game_objects, handle_bullet_meteoroid_collisions, handle_player_meteoroid_collisions, handle_player_powerup_collisions, handle_player_respawn, spawn_meteoroid_wave
 from sound_manager import SoundManager
 from graphics_manager import GraphicsManager
 from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text, load_or_create_file
@@ -21,7 +19,6 @@ def load_config():
 
 def new_high_score_check():
     global high_score
-    # new_high score_achieved = False
     if score > high_score:
         high_score = score
         new_high_score_achieved = True
@@ -49,7 +46,6 @@ def draw_start_title():
     icon_y = HEIGHT * 0.7
     icon_text_padding_y = 0.026
     text_y = icon_y + WIDTH * icon_text_padding_y
-    y_increment = 40
 
     draw_text(screen, "High Score: " + str(high_score), 22, WIDTH * 0.5, HEIGHT * 0.02, font_name)
     draw_text(screen, "SHMUP!", 64, WIDTH / 2, HEIGHT / 4, font_name)
@@ -61,7 +57,7 @@ def draw_start_title():
     draw_icon_text(screen, "Settings", 18, WIDTH * 0.78, HEIGHT * 0.940, font_name) 
 
     draw_icon(screen, graphics_manager.icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)
-    draw_icon_text(screen, "Quit Game", 18, WIDTH * 0.11, HEIGHT * 0.940, font_name)    
+    draw_icon_text(screen, "Quit Game", 18, WIDTH * 0.11, HEIGHT * 0.940, font_name)
 
 
 def draw_settings_menu():
@@ -124,14 +120,14 @@ def draw_settings_menu():
         pg.draw.rect(screen, color, block_rect)
         start_x += block_width + block_spacing
 
-    
+
     draw_icon(screen, graphics_manager.icons["left_icon"], minus_x, HEIGHT * 3.2 / 5)
     draw_icon(screen, graphics_manager.icons["right_icon"], plus_x, HEIGHT * 3.2 / 5)
     
     draw_icon(screen, graphics_manager.icons["down_icon"], down_x, HEIGHT * 3.8 / 5)
     draw_icon(screen, graphics_manager.icons["up_icon"], up_x, HEIGHT * 3.8 / 5)
 
-    draw_icon(screen, graphics_manager.icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)    
+    draw_icon(screen, graphics_manager.icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)
     draw_icon_text(screen, "Back", 18, WIDTH * 0.11, HEIGHT * 0.940, font_name)
 
     draw_icon(screen, graphics_manager.icons["spacebar_icon"], WIDTH * 0.92, HEIGHT * 0.92)
@@ -153,20 +149,19 @@ def draw_pause_menu():
     icon_y = HEIGHT * 0.7
     icon_text_padding_y = 0.026
     text_y = icon_y + WIDTH * icon_text_padding_y
-    y_increment = 40
 
     draw_text(screen, "PAUSED", 48, WIDTH / 2, HEIGHT / 4, font_name)
 
     draw_icon(screen, graphics_manager.icons["spacebar_icon"], icon_x, icon_y + icon_text_padding_y)
     draw_icon_text(screen, "Resume", 22, text_x, text_y, font_name)
-    
+
     draw_icon(screen, graphics_manager.icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)
     draw_icon_text(screen, "Quit to Title", 18, WIDTH * 0.11, HEIGHT * 0.940, font_name)
 
     draw_icon(screen, graphics_manager.icons["enter_icon"], WIDTH * 0.92, HEIGHT * 0.915)
     draw_icon_text(screen, "Settings", 18, WIDTH * 0.78, HEIGHT * 0.940, font_name)
 
-def draw_confirm_popup():    
+def draw_confirm_popup():
 
     screen.blit(graphics_manager.confirm_overlay, (0, 0))
     popup_rect = graphics_manager.popup_bg.get_rect(center = (WIDTH // 2, HEIGHT // 2))
@@ -187,20 +182,20 @@ def draw_game_over_title(new_high_score_achieved):
     text_x = icon_x + WIDTH * icon_text_padding_x
     icon_y = HEIGHT * 0.7
     icon_text_padding_y = 0.026
-    text_y = icon_y + WIDTH * icon_text_padding_y    
+    text_y = icon_y + WIDTH * icon_text_padding_y
     y_increment = 40
 
     draw_text(screen, "High Score: " + str(high_score), 22, WIDTH / 2, 15, font_name)
     draw_text(screen, "GAME OVER", 48, WIDTH / 2, HEIGHT / 4, font_name)
     draw_text(screen, "Score: " + str(score), 30, WIDTH / 2, HEIGHT * 2 / 5 + y_increment, font_name)
-        
+
     if new_high_score_achieved:
         draw_text(screen, "NEW HIGH SCORE!", 30, WIDTH / 2, HEIGHT * 2 / 5, font_name, GREEN)
 
     draw_icon(screen, graphics_manager.icons["spacebar_icon"], icon_x, icon_y + icon_text_padding_y)
     draw_icon_text(screen, "Try Again", 22, text_x, text_y, font_name)   
 
-    draw_icon(screen, graphics_manager.icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)    
+    draw_icon(screen, graphics_manager.icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)
     draw_icon_text(screen, "Quit to Title", 18, WIDTH * 0.11, HEIGHT * 0.940, font_name)
 
     draw_icon(screen, graphics_manager.icons["q_icon"], WIDTH * 0.93, HEIGHT * 0.92)
@@ -281,7 +276,7 @@ pending_action = None
 
 running = True
 while running:
-    # frame_start_time = pg.time.get_ticks() # Get the start time in milliseconds
+
     # --- EVENT HANDLING ---
     quit_event = False
     space_key_pressed = False
@@ -402,35 +397,34 @@ while running:
                 now = pg.time.get_ticks()
                 if now - message_timer > MESSAGE_DISPLAY_TIME:
                     high_score_reset_message = False  # Hide the message
-            # clock.tick(10)
 
         elif game_state == "playing":
             if esc_key_pressed:
                 game_state = "paused"
             keystate = pg.key.get_pressed()
-            player.update_with_keystate(keystate, sound_enabled)
+            player.update_with_keystate(keystate)
             all_sprites_group.update()
 
             handle_player_respawn(player, graphics_manager, WIDTH, HEIGHT, all_sprites_group, meteors_group)
             
             # check to see if a bullet hit a meteoroid
-            score = handle_bullet_meteoroid_collisions(meteors_group, bullets_group, score, sound_manager, graphics_manager, all_sprites_group, powerups_group, WIDTH, HEIGHT)            
+            score = handle_bullet_meteoroid_collisions(meteors_group, bullets_group, score, sound_manager, graphics_manager, all_sprites_group, powerups_group, WIDTH, HEIGHT)
             # check to see if a meteoroid hits the player
             player_died = handle_player_meteoroid_collisions(player, meteors_group, bullets_group, powerups_group, all_sprites_group, sound_manager, graphics_manager, WIDTH, HEIGHT)
             # If the function says the player died, THEN we create the explosion here in main.py.
             if player_died:
                 death_explosion = Explosion(player.rect.center, 'player_explosion', graphics_manager.explosion_animations)
                 all_sprites_group.add(death_explosion)
-                player.hide()            
+                player.hide()
 
             # check to see if player hit a powerup
-            handle_player_powerup_collisions(player, powerups_group, sound_manager)            
+            handle_player_powerup_collisions(player, powerups_group, sound_manager)
 
-            # if the player died and the explosion has finished playing            
+            # if the player died and the explosion has finished playing
             if player.lives == 0 and death_explosion and not death_explosion.alive():
                 game_state = "game_over"
                 new_high_score_achieved = int(new_high_score_check())
-            
+
 
         elif game_state == "paused":
             if show_confirmation:
@@ -454,7 +448,6 @@ while running:
                     previous_state = game_state
                     game_state = "settings"
                 all_sprites_group.draw(screen)
-                # clock.tick(10)
 
         elif game_state == "game_over":
             if space_key_pressed:
@@ -465,29 +458,14 @@ while running:
                 show_confirmation = True
             if esc_key_pressed:
                 game_state = "title"
-            # clock.tick(10)
 
     # --- DRAWING SECTION ---
 
     if game_state in ("title", "settings", "game_over"):
         screen.blit(graphics_manager.background_image, (0, 0))
-    # elif game_state == "game_over":
-    #     screen.blit(graphics_manager.background_image, (0, 0))
     else:
         screen.fill(BG_COLOUR)
-        # --- DRAW THE STARFIELD (Only in playing/paused state) ---
-        # for layer in star_layers:
-        #     for star in layer:
-        #         y = int(star["y_pos"])
-        #         x = star["x_pos"]
-        #         if star["shape"] == "pixel":
-        #             screen.set_at((x, y), WHITE)
-        #         elif star["shape"] == "square":
-        #             pg.draw.rect(screen, WHITE, (x, y, 2, 2))
-        #         elif star["shape"] == "circle":
-        #             pg.draw.circle(screen, WHITE, (x, y), star["radius"])
-        # --- END STARFIELD DRAW ---
-    
+
     if game_state not in ("title", "settings", "game_over"):
         all_sprites_group.draw(screen)
 
@@ -522,8 +500,6 @@ while running:
 
     pg.display.flip()
 
-    # frame_time = pg.time.get_ticks() - frame_start_time # Calculate time spent
-    # print(f"Frame time: {frame_time} FPS") # Print it out
     clock.tick(MENU_FPS if game_state in ("title", "settings", "paused", "game_over") else FPS)
 
 pg.quit()

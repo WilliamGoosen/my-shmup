@@ -1,6 +1,6 @@
 import pygame as pg
 import math
-from random import random, randrange, uniform, choice, randint
+from random import randrange, uniform, choice, randint
 from settings import *
 from typing import TYPE_CHECKING
 
@@ -38,7 +38,7 @@ class Player(pg.sprite.Sprite):
         if not self.hidden:
             if self.power >= 2 and pg.time.get_ticks() - self.power_time > POWERUP_TIME:
                 self.power -= 1
-                self.power_time = pg.time.get_ticks()        
+                self.power_time = pg.time.get_ticks()
 
             if self.speedx != 0 and self.speedy != 0:
                 self.speedx = self.speedx / math.sqrt(2)
@@ -63,11 +63,11 @@ class Player(pg.sprite.Sprite):
                 self.hidden = False
                 self.just_respawned = True
 
-    def update_with_keystate(self, keystate, sound_enabled):
+    def update_with_keystate(self, keystate):
         if self.hidden:
             return
-                    
-        if keystate[pg.K_SPACE]:            
+
+        if keystate[pg.K_SPACE]:
             self.shoot(self.sound_manager)
 
         self.speedx = 0
@@ -77,7 +77,7 @@ class Player(pg.sprite.Sprite):
             self.speedx = PLAYER_SPEED
         else:
             self.speedx = 0
-        
+
         self.speedy = 0
         if keystate[pg.K_UP] and not keystate[pg.K_DOWN]:
             self.speedy = -PLAYER_SPEED
@@ -94,7 +94,7 @@ class Player(pg.sprite.Sprite):
     def shoot(self, sound_manager):
         if not self.hidden:
             now = pg.time.get_ticks()
-            if now - self.last_shot > self.shoot_delay:            
+            if now - self.last_shot > self.shoot_delay:
                 self.last_shot = now
                 bullet_locations = []
                 if self.power == 1:
@@ -124,7 +124,6 @@ class Bullet(pg.sprite.Sprite):
     def __init__(self, x, y, bullet_image):
         pg.sprite.Sprite.__init__(self)
         self.image = bullet_image
-        # self.image.set_colorkey(BLACK)    #self.image.fill(RED)
         self.rect = self.image.get_rect()
         self.rect.bottom = y
         self.rect.centerx = x
