@@ -401,8 +401,6 @@ while running:
         elif game_state == "playing":
             if esc_key_pressed:
                 game_state = "paused"
-            keystate = pg.key.get_pressed()
-            player.update_with_keystate(keystate)
             all_sprites_group.update()
 
             handle_player_respawn(player, graphics_manager, WIDTH, HEIGHT, all_sprites_group, meteors_group)
