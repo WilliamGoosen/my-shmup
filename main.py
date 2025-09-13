@@ -2,7 +2,7 @@ import pygame as pg
 from os import path
 from settings import *
 from sprites import Player, Starfield, Explosion
-from game_logic import clear_game_objects, handle_bullet_meteoroid_collisions, handle_player_meteoroid_collisions, handle_player_powerup_collisions, handle_player_respawn, spawn_meteoroid_wave
+from game_logic import clear_game_objects, handle_bullet_meteoroid_collisions, handle_player_meteoroid_collisions, handle_player_powerup_collisions, handle_player_respawn, spawn_meteoroid_wave, new_high_score_check
 from sound_manager import SoundManager
 from graphics_manager import GraphicsManager
 from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text, load_or_create_file
@@ -18,22 +18,13 @@ def load_config():
             config_dict[key] = value
     return config_dict
 
-def new_high_score_check():
-    global high_score
-    if score > high_score:
-        high_score = score
-        new_high_score_achieved = True
-        with open(HS_FILE, "w") as f:
-            f.write(str(score))
-    else:
-        new_high_score_achieved = False
-    return new_high_score_achieved
 
-def reset_high_score():
-    global high_score, high_score_reset_message, message_timer
-    high_score = 0
-    with open(HS_FILE, 'w') as f:
-        f.write('0')
+
+# def reset_high_score():
+#     global high_score, high_score_reset_message, message_timer
+#     high_score = 0
+#     with open(HS_FILE, 'w') as f:
+#         f.write('0')
     
     # Activate the message and set the timer
     high_score_reset_message = True
@@ -439,7 +430,7 @@ while running:
             # if the player died and the explosion has finished playing
             if player.lives == 0 and death_explosion and not death_explosion.alive():
                 game_state = "game_over"
-                new_high_score_achieved = int(new_high_score_check())
+                new_high_score_achieved = new_high_score_check(game)
 
 
         elif game_state == "paused":
