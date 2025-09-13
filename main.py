@@ -169,7 +169,7 @@ def draw_game_over_title(new_high_score_achieved):
 
     draw_text(screen, "High Score: " + str(game.high_score), 22, WIDTH / 2, 15, font_name)
     draw_text(screen, "GAME OVER", 48, WIDTH / 2, HEIGHT / 4, font_name)
-    draw_text(screen, "Score: " + str(score), 30, WIDTH / 2, HEIGHT * 2 / 5 + y_increment, font_name)
+    draw_text(screen, "Score: " + str(game.score), 30, WIDTH / 2, HEIGHT * 2 / 5 + y_increment, font_name)
 
     if new_high_score_achieved:
         draw_text(screen, "NEW HIGH SCORE!", 30, WIDTH / 2, HEIGHT * 2 / 5, font_name, GREEN)
@@ -335,14 +335,16 @@ while running:
 
             if game.current_state is not None:
                 game.current_state.get_event(event)
-                game.current_state.update(dt)
 
-                if game.current_state.done:
-                    if game.current_state.next_state == "Game_OVER":
-                        game_state = "game_over"
-                    elif game.current_state.next_state == "PAUSE":
-                        game_state = "paused"
-                    game.current_state = None
+    if game.current_state is not None:        
+        game.current_state.update(dt)
+
+        if game.current_state.done:
+            if game.current_state.next_state == "GAME_OVER":
+                game_state = "game_over"
+            elif game.current_state.next_state == "PAUSE":
+                game_state = "paused"
+            game.current_state = None
 
     if quit_event:
         running = False
@@ -484,12 +486,7 @@ while running:
         if game_state == "settings":
             draw_settings_menu()
             if show_confirmation:
-                draw_confirm_popup()
-
-        if game_state == "playing":
-            draw_text(screen, "Score: " + str(score), 22, WIDTH / 2, HEIGHT * 0.01, font_name, WHITE)
-            draw_lives(screen, 5, 5, player.lives, graphics_manager.player_icon)
-            draw_shield_bar(screen, WIDTH - BAR_LENGTH - 5, 5, player.shield)
+                draw_confirm_popup()        
 
         if game_state == "paused":
             overlay = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA)
