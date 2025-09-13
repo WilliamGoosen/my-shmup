@@ -7,6 +7,8 @@ from sound_manager import SoundManager
 from graphics_manager import GraphicsManager
 from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text, load_or_create_file, reset_high_score
 from game import Game
+from play_state import PlayState
+
 
 def load_config():
     config_dict = {}
@@ -271,8 +273,12 @@ game.font_name = font_name
 game.high_score = high_score
 
 
+previous_time = pg.time.get_ticks()
 running = True
 while running:
+    current_time = pg.time.get_ticks()
+    dt = (current_time - previous_time) / 1000.0
+    previous_time = current_time
 
     # --- EVENT HANDLING ---
     quit_event = False
@@ -296,32 +302,36 @@ while running:
         if event.type == pg.QUIT:
             quit_event = True
         if event.type == pg.KEYDOWN:
-            if event.key == pg.K_SPACE:
-                space_key_pressed = True
-            if event.key == pg.K_ESCAPE:
-                esc_key_pressed = True
-            if event.key == pg.K_q:
-                q_key_pressed = True
-            if event.key == pg.K_s:
-                s_key_pressed = True
-            if event.key == pg.K_m:
-                m_key_pressed = True
-            if event.key == pg.K_RETURN:
-                enter_key_pressed = True
-            if event.key == pg.K_r:
-                r_key_pressed = True
-            if event.key == pg.K_y:
-                y_key_pressed = True
-            if event.key == pg.K_n:
-                n_key_pressed = True
-            if event.key == pg.K_RIGHT:
-                right_key_pressed = True
-            if event.key == pg.K_LEFT:
-                left_key_pressed = True
-            if event.key == pg.K_UP:
-                up_key_pressed = True
-            if event.key == pg.K_DOWN:
-                down_key_pressed = True
+            if game.current_state is None:
+                if event.key == pg.K_SPACE:
+                    space_key_pressed = True
+                if event.key == pg.K_ESCAPE:
+                    esc_key_pressed = True
+                if event.key == pg.K_q:
+                    q_key_pressed = True
+                if event.key == pg.K_s:
+                    s_key_pressed = True
+                if event.key == pg.K_m:
+                    m_key_pressed = True
+                if event.key == pg.K_RETURN:
+                    enter_key_pressed = True
+                if event.key == pg.K_r:
+                    r_key_pressed = True
+                if event.key == pg.K_y:
+                    y_key_pressed = True
+                if event.key == pg.K_n:
+                    n_key_pressed = True
+                if event.key == pg.K_RIGHT:
+                    right_key_pressed = True
+                if event.key == pg.K_LEFT:
+                    left_key_pressed = True
+                if event.key == pg.K_UP:
+                    up_key_pressed = True
+                if event.key == pg.K_DOWN:
+                    down_key_pressed = True
+
+            if game.current_state is not None:
+                game.current_state.get_event(event)
 
     if quit_event:
         running = False
@@ -350,12 +360,18 @@ while running:
             if space_key_pressed:
                 start_game()
                 game_state = "playing"
+                # 1. Create a new PlayState, passing it the real game object
+                new_play_state = PlayState(game)
+                # 2. Initialize it for a new game
+                new_play_state.startup()
+                # 3. THIS IS THE KEY: Set the game's state to the new PlayState.
+                #    This will be the signal for your main loop to use it.
+                game.current_state = new_play_state
             if enter_key_pressed:
                 previous_state = game_state
                 game_state = "settings"
             if esc_key_pressed:
                 running = False
-            # clock.tick(10)
 
         elif game_state == "settings":
             if right_key_pressed and current_volume_step < 10:
@@ -456,44 +472,55 @@ while running:
             if esc_key_pressed:
                 game_state = "title"
 
+    # This is the NEW STATE MACHINE LOGIC
+    if game.current_state is not None:
+        # Let the current state update itself
+        game.current_state.update(dt)
+    # --- END NEW CODE ---
+
     # --- DRAWING SECTION ---
 
     if game_state in ("title", "settings", "game_over"):
         screen.blit(graphics_manager.background_image, (0, 0))
     else:
         screen.fill(BG_COLOUR)
-
-    if game_state not in ("title", "settings", "game_over"):
-        all_sprites_group.draw(screen)
-
-    if game_state == "title":
-        draw_start_title()
-
-    if game_state == "settings":
-        draw_settings_menu()
-        if show_confirmation:
-            draw_confirm_popup()
-
-    if game_state == "playing":
-        draw_text(screen, "Score: " + str(score), 22, WIDTH / 2, HEIGHT * 0.01, font_name, WHITE)
-        draw_lives(screen, 5, 5, player.lives, graphics_manager.player_icon)
-        draw_shield_bar(screen, WIDTH - BAR_LENGTH - 5, 5, player.shield)
         
-    if game_state == "paused":
-        overlay = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA)
-        overlay.fill(PAUSE_OVERLAY)
-        screen.blit(overlay, (0, 0))
-        draw_text(screen, "Score: " + str(score), 22, WIDTH / 2, HEIGHT * 0.01, font_name, WHITE)
-        draw_lives(screen, 5, 5, player.lives, graphics_manager.player_icon)
-        draw_shield_bar(screen, WIDTH - BAR_LENGTH - 5, 5, player.shield)
-        draw_pause_menu()
-        if show_confirmation:
-            draw_confirm_popup()
+    # --- MORE NEW CODE: Add this block here in the drawing section ---
+    if game.current_state is not None:
+        # Let the current state draw itself
+        game.current_state.draw(screen)
+    else:
+        if game_state not in ("title", "settings", "game_over"):
+            all_sprites_group.draw(screen)
 
-    if game_state == "game_over":
-        draw_game_over_title(new_high_score_achieved)
-        if show_confirmation:
-            draw_confirm_popup()
+        if game_state == "title":
+            draw_start_title()
+
+        if game_state == "settings":
+            draw_settings_menu()
+            if show_confirmation:
+                draw_confirm_popup()
+
+        if game_state == "playing":
+            draw_text(screen, "Score: " + str(score), 22, WIDTH / 2, HEIGHT * 0.01, font_name, WHITE)
+            draw_lives(screen, 5, 5, player.lives, graphics_manager.player_icon)
+            draw_shield_bar(screen, WIDTH - BAR_LENGTH - 5, 5, player.shield)
+
+        if game_state == "paused":
+            overlay = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA)
+            overlay.fill(PAUSE_OVERLAY)
+            screen.blit(overlay, (0, 0))
+            draw_text(screen, "Score: " + str(score), 22, WIDTH / 2, HEIGHT * 0.01, font_name, WHITE)
+            draw_lives(screen, 5, 5, player.lives, graphics_manager.player_icon)
+            draw_shield_bar(screen, WIDTH - BAR_LENGTH - 5, 5, player.shield)
+            draw_pause_menu()
+            if show_confirmation:
+                draw_confirm_popup()
+
+        if game_state == "game_over":
+            draw_game_over_title(new_high_score_achieved)
+            if show_confirmation:
+                draw_confirm_popup()
 
     pg.display.flip()
 
