@@ -282,10 +282,10 @@ game.high_score = high_score
 
 running = True
 while running:
-    dt = clock.tick(FPS) / 1000.0  # Returns milliseconds, convert to seconds
+    dt = clock.tick(FPS) / 1000.0  # Returns milliseconds, convert to seconds    
     # --- EVENT HANDLING ---
     quit_event = False
-    space_key_pressed = False
+    space_key_pressed = False 
     esc_key_pressed = False
     q_key_pressed = False
     r_key_pressed = False
@@ -498,5 +498,5 @@ while running:
             if show_confirmation:
                 draw_confirm_popup()
 
-    pg.display.flip()    
+    pg.display.flip()
 pg.quit()
