@@ -6,6 +6,7 @@ from game_logic import clear_game_objects, handle_bullet_meteoroid_collisions, h
 from sound_manager import SoundManager
 from graphics_manager import GraphicsManager
 from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text, load_or_create_file
+from game import Game
 
 def load_config():
     config_dict = {}
@@ -273,6 +274,23 @@ message_timer = 0
 high_score = int(load_or_create_file(HS_FILE, 0))
 show_confirmation = False
 pending_action = None
+
+# --- Create the Game object and populate it ---
+game = Game()
+game.graphics_manager = graphics_manager
+game.sound_manager = sound_manager
+game.all_sprites_group = all_sprites_group
+game.bullets_group = bullets_group
+game.stars_group = stars_group
+game.meteors_group = meteors_group
+game.powerups_group = powerups_group
+game.players_group = players_group
+game.WIDTH = WIDTH
+game.HEIGHT = HEIGHT
+game.BG_COLOUR = BG_COLOUR
+game.font_name = font_name
+game.high_score = high_score
+
 
 running = True
 while running:
