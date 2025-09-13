@@ -5,7 +5,7 @@ from sprites import Player, Starfield, Explosion
 from game_logic import clear_game_objects, handle_bullet_meteoroid_collisions, handle_player_meteoroid_collisions, handle_player_powerup_collisions, handle_player_respawn, spawn_meteoroid_wave, new_high_score_check
 from sound_manager import SoundManager
 from graphics_manager import GraphicsManager
-from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text, load_or_create_file
+from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text, load_or_create_file, reset_high_score
 from game import Game
 
 def load_config():
@@ -19,18 +19,6 @@ def load_config():
     return config_dict
 
 
-
-# def reset_high_score():
-#     global high_score, high_score_reset_message, message_timer
-#     high_score = 0
-#     with open(HS_FILE, 'w') as f:
-#         f.write('0')
-    
-    # Activate the message and set the timer
-    high_score_reset_message = True
-    message_timer = pg.time.get_ticks()  # Record the current time
-
-
 def draw_start_title():
     icon_x = WIDTH * 0.40
     icon_text_padding_x = 0.06
@@ -39,7 +27,7 @@ def draw_start_title():
     icon_text_padding_y = 0.026
     text_y = icon_y + WIDTH * icon_text_padding_y
 
-    draw_text(screen, "High Score: " + str(high_score), 22, WIDTH * 0.5, HEIGHT * 0.02, font_name)
+    draw_text(screen, "High Score: " + str(game.high_score), 22, WIDTH * 0.5, HEIGHT * 0.02, font_name)
     draw_text(screen, "SHMUP!", 64, WIDTH / 2, HEIGHT / 4, font_name)
 
     draw_icon(screen, graphics_manager.icons["spacebar_icon"], icon_x, icon_y + icon_text_padding_y)
@@ -61,7 +49,7 @@ def draw_settings_menu():
     text_y = icon_y + WIDTH * icon_text_padding_y
     y_increment = 40
 
-    draw_text(screen, "High Score: " + str(high_score), 22, WIDTH * 0.5, HEIGHT * 0.02, font_name) 
+    draw_text(screen, "High Score: " + str(game.high_score), 22, WIDTH * 0.5, HEIGHT * 0.02, font_name) 
     draw_text(screen, "SETTINGS", 48, WIDTH * 0.5, HEIGHT * 0.25, font_name)
 
     draw_icon(screen, graphics_manager.icons["s_icon"], icon_x, icon_y + icon_text_padding_y)
@@ -177,7 +165,7 @@ def draw_game_over_title(new_high_score_achieved):
     text_y = icon_y + WIDTH * icon_text_padding_y
     y_increment = 40
 
-    draw_text(screen, "High Score: " + str(high_score), 22, WIDTH / 2, 15, font_name)
+    draw_text(screen, "High Score: " + str(game.high_score), 22, WIDTH / 2, 15, font_name)
     draw_text(screen, "GAME OVER", 48, WIDTH / 2, HEIGHT / 4, font_name)
     draw_text(screen, "Score: " + str(score), 30, WIDTH / 2, HEIGHT * 2 / 5 + y_increment, font_name)
 
@@ -343,7 +331,9 @@ while running:
                 if pending_action == "quit_to_title":
                     game_state = "title"
                 elif pending_action == "reset_high_score":
-                    reset_high_score()
+                    reset_high_score(game)
+                    high_score_reset_message = True
+                    message_timer = pg.time.get_ticks()
                 elif pending_action == "quit_game":
                     running = False
 
