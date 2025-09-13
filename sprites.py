@@ -22,7 +22,7 @@ class Player(pg.sprite.Sprite):
         self.speedy = 0
         self.shield = PLAYER_MAX_SHIELD
         self.shoot_delay = PLAYER_SHOOT_DELAY
-        self.last_shot = pg.time.get_ticks()
+        self.bullet_frame_time = 0
         self.lives = PLAYER_START_LIVES
         self.hidden = False
         self.all_sprites = all_sprite_group
@@ -32,11 +32,11 @@ class Player(pg.sprite.Sprite):
         self.power_time = pg.time.get_ticks()
         self.sound_manager = sound_manager
 
-    def update(self):
+    def update(self, dt):
         if not self.hidden:
             keystate= pg.key.get_pressed()
             if keystate[pg.K_SPACE]:
-                self.shoot(self.sound_manager)
+                self.shoot(self.sound_manager, dt)
 
             self.speedx = 0
             if keystate[pg.K_LEFT] and not keystate[pg.K_RIGHT]:
@@ -62,8 +62,8 @@ class Player(pg.sprite.Sprite):
                 self.speedx = self.speedx / math.sqrt(2)
                 self.speedy = self.speedy / math.sqrt(2)
 
-            self.rect.x += self.speedx
-            self.rect.y += self.speedy
+            self.rect.x += self.speedx * dt
+            self.rect.y += self.speedy * dt
 
             if self.rect.right > self.screen_width:
                 self.rect.right = self.screen_width
@@ -85,11 +85,11 @@ class Player(pg.sprite.Sprite):
         self.power += 1
         self.power_time = pg.time.get_ticks()
 
-    def shoot(self, sound_manager):
+    def shoot(self, sound_manager, dt):
         if not self.hidden:
-            now = pg.time.get_ticks()
-            if now - self.last_shot > self.shoot_delay:
-                self.last_shot = now
+            self.bullet_frame_time += dt * 1000
+            if self.bullet_frame_time > self.shoot_delay:
+                self.bullet_frame_time = 0
                 bullet_locations = []
                 if self.power == 1:
                     bullet_locations = [(self.rect.centerx, self.rect.top)]
@@ -120,10 +120,10 @@ class Bullet(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.bottom = y
         self.rect.centerx = x
-        self.speedy = -10
+        self.speedy = BULLET_SPEED
 
-    def update(self):
-        self.rect.y += self.speedy
+    def update(self, dt):
+        self.rect.y += self.speedy * dt
         if self.rect.bottom < 0:
             self.kill()
 
@@ -138,8 +138,15 @@ class Meteoroid(pg.sprite.Sprite):
         self.is_medium = is_medium
         
         # Initialize state
-        self.last_update = pg.time.get_ticks()
         self.initialize_meteoroid(position, velocity)
+
+    def update(self, dt):        
+        self.rotate(dt)
+        self.rect.x += self.speedx * dt
+        self.rect.y += self.speedy * dt
+
+        if self.is_off_screen():
+            self.initialize_meteoroid()  # Full reset
 
     def initialize_meteoroid(self, position=None, velocity=None):
         """Initialize or reset meteoroid with optional position/velocity"""
@@ -165,6 +172,7 @@ class Meteoroid(pg.sprite.Sprite):
 
         # Rotation
         self.rot = 0
+        self.frame_time = 0
         self.rot_speed = randint(METEOROID_MIN_ROTATE_SPEED, METEOROID_MAX_ROTATE_SPEED)
 
     def can_split(self):
@@ -185,10 +193,10 @@ class Meteoroid(pg.sprite.Sprite):
                      position=right_pos, velocity=right_velocity, is_medium=True)
         ]
 
-    def rotate(self):
-        now = pg.time.get_ticks()
-        if now - self.last_update > 50:
-            self.last_update = now
+    def rotate(self, dt):
+        self.frame_time += dt * 1000
+        if self.frame_time > 50:
+            self.frame_time = 0
             self.rot = (self.rot + self.rot_speed) % 360
             new_image = pg.transform.rotate(self.image_orig, self.rot).convert_alpha()
             old_center = self.rect.center
@@ -201,14 +209,6 @@ class Meteoroid(pg.sprite.Sprite):
                 self.rect.left < -self.rect.width or 
                 self.rect.right > self.screen_width + self.rect.width)
 
-    def update(self):
-        self.rotate()
-        self.rect.x += self.speedx
-        self.rect.y += self.speedy
-
-        if self.is_off_screen():
-            self.initialize_meteoroid()  # Full reset
-
 
 class Starfield(pg.sprite.Sprite):
     def __init__(self, screen_width, screen_height):
@@ -217,7 +217,7 @@ class Starfield(pg.sprite.Sprite):
         self.screen_height = screen_height
         self.radius = randint(1, STAR_MAX_RADIUS)
         self.pos_y = uniform(0, screen_height)
-        self.speedy = uniform(0.1, STAR_MAX_SPEED + 1)
+        self.speedy = uniform(STAR_MIN_SPEED, STAR_MAX_SPEED + 1)
         shapes = ['pixel', 'square', 'circle']
         shape = choice(shapes)
 
@@ -237,8 +237,8 @@ class Starfield(pg.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.rect.x = randint(0, self.screen_width - self.rect.width)
 
-    def update(self):
-        self.pos_y += self.speedy
+    def update(self, dt):
+        self.pos_y += self.speedy * dt
         self.rect.y = int(self.pos_y)
         if self.rect.top > self.screen_height:
             self.pos_y = -self.rect.height
@@ -257,8 +257,8 @@ class Powerup(pg.sprite.Sprite):
         self.rect.center = center
         self.speedy = POWERUP_SPEED
 
-    def update(self):
-        self.rect.y += self.speedy
+    def update(self, dt):
+        self.rect.y += self.speedy * dt
         if self.rect.top > self.screen_height:
             self.kill()
 
@@ -272,13 +272,13 @@ class Explosion(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = center
         self.frame = 0
-        self.last_update = pg.time.get_ticks()
+        self.frame_time = 0
         self.frame_rate = EXPLOSION_FRAME_RATE
 
-    def update(self):
-        now = pg.time.get_ticks()
-        if now - self.last_update > self.frame_rate:
-            self.last_update = now
+    def update(self, dt):
+        self.frame_time += dt * 1000
+        if self.frame_time > self.frame_rate:
+            self.frame_time = 0          
             self.frame += 1
         if self.frame == len(self.explosion_animation[self.size]):
             self.kill()

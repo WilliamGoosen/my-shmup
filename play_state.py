@@ -20,7 +20,7 @@ class PlayState(BaseState):
                   self.next_state = "PAUSE"
 
     def update(self, dt):
-        self.game.all_sprites_group.update()
+        self.game.all_sprites_group.update(dt)
 
         handle_player_respawn(
             self.game.player,
