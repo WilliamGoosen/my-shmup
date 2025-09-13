@@ -273,13 +273,9 @@ game.font_name = font_name
 game.high_score = high_score
 
 
-previous_time = pg.time.get_ticks()
 running = True
 while running:
-    current_time = pg.time.get_ticks()
-    dt = (current_time - previous_time) / 1000.0
-    previous_time = current_time
-
+    dt = clock.tick(FPS) / 1000.0  # Returns milliseconds, convert to seconds
     # --- EVENT HANDLING ---
     quit_event = False
     space_key_pressed = False
@@ -522,8 +518,5 @@ while running:
             if show_confirmation:
                 draw_confirm_popup()
 
-    pg.display.flip()
-
-    clock.tick(MENU_FPS if game_state in ("title", "settings", "paused", "game_over") else FPS)
-
+    pg.display.flip()    
 pg.quit()
