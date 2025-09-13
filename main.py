@@ -2,10 +2,13 @@ import pygame as pg
 from os import path
 from settings import *
 from sprites import Player, Starfield, Explosion
-from game_logic import clear_game_objects, handle_bullet_meteoroid_collisions, handle_player_meteoroid_collisions, handle_player_powerup_collisions, handle_player_respawn, spawn_meteoroid_wave
+from game_logic import clear_game_objects, handle_bullet_meteoroid_collisions, handle_player_meteoroid_collisions, handle_player_powerup_collisions, handle_player_respawn, spawn_meteoroid_wave, new_high_score_check
 from sound_manager import SoundManager
 from graphics_manager import GraphicsManager
-from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text, load_or_create_file
+from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text, load_or_create_file, reset_high_score
+from game import Game
+from play_state import PlayState
+
 
 def load_config():
     config_dict = {}
@@ -17,27 +20,6 @@ def load_config():
             config_dict[key] = value
     return config_dict
 
-def new_high_score_check():
-    global high_score
-    if score > high_score:
-        high_score = score
-        new_high_score_achieved = True
-        with open(HS_FILE, "w") as f:
-            f.write(str(score))
-    else:
-        new_high_score_achieved = False
-    return new_high_score_achieved
-
-def reset_high_score():
-    global high_score, high_score_reset_message, message_timer
-    high_score = 0
-    with open(HS_FILE, 'w') as f:
-        f.write('0')
-    
-    # Activate the message and set the timer
-    high_score_reset_message = True
-    message_timer = pg.time.get_ticks()  # Record the current time
-
 
 def draw_start_title():
     icon_x = WIDTH * 0.40
@@ -47,7 +29,7 @@ def draw_start_title():
     icon_text_padding_y = 0.026
     text_y = icon_y + WIDTH * icon_text_padding_y
 
-    draw_text(screen, "High Score: " + str(high_score), 22, WIDTH * 0.5, HEIGHT * 0.02, font_name)
+    draw_text(screen, "High Score: " + str(game.high_score), 22, WIDTH * 0.5, HEIGHT * 0.02, font_name)
     draw_text(screen, "SHMUP!", 64, WIDTH / 2, HEIGHT / 4, font_name)
 
     draw_icon(screen, graphics_manager.icons["spacebar_icon"], icon_x, icon_y + icon_text_padding_y)
@@ -69,7 +51,7 @@ def draw_settings_menu():
     text_y = icon_y + WIDTH * icon_text_padding_y
     y_increment = 40
 
-    draw_text(screen, "High Score: " + str(high_score), 22, WIDTH * 0.5, HEIGHT * 0.02, font_name) 
+    draw_text(screen, "High Score: " + str(game.high_score), 22, WIDTH * 0.5, HEIGHT * 0.02, font_name) 
     draw_text(screen, "SETTINGS", 48, WIDTH * 0.5, HEIGHT * 0.25, font_name)
 
     draw_icon(screen, graphics_manager.icons["s_icon"], icon_x, icon_y + icon_text_padding_y)
@@ -185,9 +167,9 @@ def draw_game_over_title(new_high_score_achieved):
     text_y = icon_y + WIDTH * icon_text_padding_y
     y_increment = 40
 
-    draw_text(screen, "High Score: " + str(high_score), 22, WIDTH / 2, 15, font_name)
+    draw_text(screen, "High Score: " + str(game.high_score), 22, WIDTH / 2, 15, font_name)
     draw_text(screen, "GAME OVER", 48, WIDTH / 2, HEIGHT / 4, font_name)
-    draw_text(screen, "Score: " + str(score), 30, WIDTH / 2, HEIGHT * 2 / 5 + y_increment, font_name)
+    draw_text(screen, "Score: " + str(game.score), 30, WIDTH / 2, HEIGHT * 2 / 5 + y_increment, font_name)
 
     if new_high_score_achieved:
         draw_text(screen, "NEW HIGH SCORE!", 30, WIDTH / 2, HEIGHT * 2 / 5, font_name, GREEN)
@@ -224,7 +206,14 @@ def start_game():
 
     clear_game_objects(meteors_group, bullets_group, powerups_group)
 
-    player = Player(all_sprites_group, bullets_group, WIDTH, HEIGHT, sound_manager, graphics_manager.player_image)
+    player = Player(
+        all_sprites_group,
+        bullets_group,
+        WIDTH,
+        HEIGHT,
+        sound_manager,
+        graphics_manager.player_image)
+    game.player = player
     player.bullet_image = graphics_manager.bullet_image
     all_sprites_group.add(player)
     players_group.add(player)
@@ -274,9 +263,26 @@ high_score = int(load_or_create_file(HS_FILE, 0))
 show_confirmation = False
 pending_action = None
 
+# --- Create the Game object and populate it ---
+game = Game()
+game.graphics_manager = graphics_manager
+game.sound_manager = sound_manager
+game.all_sprites_group = all_sprites_group
+game.bullets_group = bullets_group
+game.stars_group = stars_group
+game.meteors_group = meteors_group
+game.powerups_group = powerups_group
+game.players_group = players_group
+game.WIDTH = WIDTH
+game.HEIGHT = HEIGHT
+game.BG_COLOUR = BG_COLOUR
+game.font_name = font_name
+game.high_score = high_score
+
+
 running = True
 while running:
-
+    dt = clock.tick(FPS) / 1000.0  # Returns milliseconds, convert to seconds
     # --- EVENT HANDLING ---
     quit_event = False
     space_key_pressed = False
@@ -299,32 +305,46 @@ while running:
         if event.type == pg.QUIT:
             quit_event = True
         if event.type == pg.KEYDOWN:
-            if event.key == pg.K_SPACE:
-                space_key_pressed = True
-            if event.key == pg.K_ESCAPE:
-                esc_key_pressed = True
-            if event.key == pg.K_q:
-                q_key_pressed = True
-            if event.key == pg.K_s:
-                s_key_pressed = True
-            if event.key == pg.K_m:
-                m_key_pressed = True
-            if event.key == pg.K_RETURN:
-                enter_key_pressed = True
-            if event.key == pg.K_r:
-                r_key_pressed = True
-            if event.key == pg.K_y:
-                y_key_pressed = True
-            if event.key == pg.K_n:
-                n_key_pressed = True
-            if event.key == pg.K_RIGHT:
-                right_key_pressed = True
-            if event.key == pg.K_LEFT:
-                left_key_pressed = True
-            if event.key == pg.K_UP:
-                up_key_pressed = True
-            if event.key == pg.K_DOWN:
-                down_key_pressed = True
+            if game.current_state is None:
+                if event.key == pg.K_SPACE:
+                    space_key_pressed = True
+                if event.key == pg.K_ESCAPE:
+                    esc_key_pressed = True
+                if event.key == pg.K_q:
+                    q_key_pressed = True
+                if event.key == pg.K_s:
+                    s_key_pressed = True
+                if event.key == pg.K_m:
+                    m_key_pressed = True
+                if event.key == pg.K_RETURN:
+                    enter_key_pressed = True
+                if event.key == pg.K_r:
+                    r_key_pressed = True
+                if event.key == pg.K_y:
+                    y_key_pressed = True
+                if event.key == pg.K_n:
+                    n_key_pressed = True
+                if event.key == pg.K_RIGHT:
+                    right_key_pressed = True
+                if event.key == pg.K_LEFT:
+                    left_key_pressed = True
+                if event.key == pg.K_UP:
+                    up_key_pressed = True
+                if event.key == pg.K_DOWN:
+                    down_key_pressed = True
+
+            if game.current_state is not None:
+                game.current_state.get_event(event)
+
+    if game.current_state is not None:        
+        game.current_state.update(dt)
+
+        if game.current_state.done:
+            if game.current_state.next_state == "GAME_OVER":
+                game_state = "game_over"
+            elif game.current_state.next_state == "PAUSE":
+                game_state = "paused"
+            game.current_state = None
 
     if quit_event:
         running = False
@@ -334,7 +354,9 @@ while running:
                 if pending_action == "quit_to_title":
                     game_state = "title"
                 elif pending_action == "reset_high_score":
-                    reset_high_score()
+                    reset_high_score(game)
+                    high_score_reset_message = True
+                    message_timer = pg.time.get_ticks()
                 elif pending_action == "quit_game":
                     running = False
 
@@ -351,12 +373,18 @@ while running:
             if space_key_pressed:
                 start_game()
                 game_state = "playing"
+                # 1. Create a new PlayState, passing it the real game object
+                new_play_state = PlayState(game)
+                # 2. Initialize it for a new game
+                new_play_state.startup()
+                # 3. THIS IS THE KEY: Set the game's state to the new PlayState.
+                #    This will be the signal for your main loop to use it.
+                game.current_state = new_play_state
             if enter_key_pressed:
                 previous_state = game_state
                 game_state = "settings"
             if esc_key_pressed:
                 running = False
-            # clock.tick(10)
 
         elif game_state == "settings":
             if right_key_pressed and current_volume_step < 10:
@@ -397,33 +425,7 @@ while running:
                 now = pg.time.get_ticks()
                 if now - message_timer > MESSAGE_DISPLAY_TIME:
                     high_score_reset_message = False  # Hide the message
-
-        elif game_state == "playing":
-            if esc_key_pressed:
-                game_state = "paused"
-            all_sprites_group.update()
-
-            handle_player_respawn(player, graphics_manager, WIDTH, HEIGHT, all_sprites_group, meteors_group)
-            
-            # check to see if a bullet hit a meteoroid
-            score = handle_bullet_meteoroid_collisions(meteors_group, bullets_group, score, sound_manager, graphics_manager, all_sprites_group, powerups_group, WIDTH, HEIGHT)
-            # check to see if a meteoroid hits the player
-            player_died = handle_player_meteoroid_collisions(player, meteors_group, bullets_group, powerups_group, all_sprites_group, sound_manager, graphics_manager, WIDTH, HEIGHT)
-            # If the function says the player died, THEN we create the explosion here in main.py.
-            if player_died:
-                death_explosion = Explosion(player.rect.center, 'player_explosion', graphics_manager.explosion_animations)
-                all_sprites_group.add(death_explosion)
-                player.hide()
-
-            # check to see if player hit a powerup
-            handle_player_powerup_collisions(player, powerups_group, sound_manager)
-
-            # if the player died and the explosion has finished playing
-            if player.lives == 0 and death_explosion and not death_explosion.alive():
-                game_state = "game_over"
-                new_high_score_achieved = int(new_high_score_check())
-
-
+        
         elif game_state == "paused":
             if show_confirmation:
                 if y_key_pressed:
@@ -455,7 +457,7 @@ while running:
                 pending_action = "quit_game"
                 show_confirmation = True
             if esc_key_pressed:
-                game_state = "title"
+                game_state = "title"    
 
     # --- DRAWING SECTION ---
 
@@ -463,41 +465,38 @@ while running:
         screen.blit(graphics_manager.background_image, (0, 0))
     else:
         screen.fill(BG_COLOUR)
-
-    if game_state not in ("title", "settings", "game_over"):
-        all_sprites_group.draw(screen)
-
-    if game_state == "title":
-        draw_start_title()
-
-    if game_state == "settings":
-        draw_settings_menu()
-        if show_confirmation:
-            draw_confirm_popup()
-
-    if game_state == "playing":
-        draw_text(screen, "Score: " + str(score), 22, WIDTH / 2, HEIGHT * 0.01, font_name, WHITE)
-        draw_lives(screen, 5, 5, player.lives, graphics_manager.player_icon)
-        draw_shield_bar(screen, WIDTH - BAR_LENGTH - 5, 5, player.shield)
         
-    if game_state == "paused":
-        overlay = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA)
-        overlay.fill(PAUSE_OVERLAY)
-        screen.blit(overlay, (0, 0))
-        draw_text(screen, "Score: " + str(score), 22, WIDTH / 2, HEIGHT * 0.01, font_name, WHITE)
-        draw_lives(screen, 5, 5, player.lives, graphics_manager.player_icon)
-        draw_shield_bar(screen, WIDTH - BAR_LENGTH - 5, 5, player.shield)
-        draw_pause_menu()
-        if show_confirmation:
-            draw_confirm_popup()
+    # --- MORE NEW CODE: Add this block here in the drawing section ---
+    if game.current_state is not None:
+        # Let the current state draw itself
+        game.current_state.draw(screen)
+    else:
+        if game_state not in ("title", "settings", "game_over"):
+            all_sprites_group.draw(screen)
 
-    if game_state == "game_over":
-        draw_game_over_title(new_high_score_achieved)
-        if show_confirmation:
-            draw_confirm_popup()
+        if game_state == "title":
+            draw_start_title()
 
-    pg.display.flip()
+        if game_state == "settings":
+            draw_settings_menu()
+            if show_confirmation:
+                draw_confirm_popup()        
 
-    clock.tick(MENU_FPS if game_state in ("title", "settings", "paused", "game_over") else FPS)
+        if game_state == "paused":
+            overlay = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA)
+            overlay.fill(PAUSE_OVERLAY)
+            screen.blit(overlay, (0, 0))
+            draw_text(screen, "Score: " + str(score), 22, WIDTH / 2, HEIGHT * 0.01, font_name, WHITE)
+            draw_lives(screen, 5, 5, player.lives, graphics_manager.player_icon)
+            draw_shield_bar(screen, WIDTH - BAR_LENGTH - 5, 5, player.shield)
+            draw_pause_menu()
+            if show_confirmation:
+                draw_confirm_popup()
 
+        if game_state == "game_over":
+            draw_game_over_title(game.new_high_score_achieved)
+            if show_confirmation:
+                draw_confirm_popup()
+
+    pg.display.flip()    
 pg.quit()

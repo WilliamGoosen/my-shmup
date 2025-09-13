@@ -4,6 +4,16 @@ from utilities import spawn_wave
 from random import random, randint
 from settings import *
 
+def new_high_score_check(game):
+    
+    if game.score > game.high_score:
+        game.high_score = game.score        
+        with open(HS_FILE, "w") as f:
+            f.write(str(game.score))
+        return True
+    else:
+        return False    
+
 def new_meteroid(meteor_images, width, height, all_sprites_group, meteors_group, position = None, velocity = None, is_medium = False):
     m = Meteoroid(meteor_images, width, height, position, velocity, is_medium)
     all_sprites_group.add(m)

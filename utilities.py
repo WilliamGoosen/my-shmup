@@ -2,6 +2,11 @@ import pygame as pg
 from settings import *
 from os import path
 
+def reset_high_score(game):    
+    game.high_score = 0
+    with open(HS_FILE, 'w') as f:
+        f.write('0')    
+
 def load_or_create_file(file_path, default_value):
     # Check if the file exists first
     if path.exists(file_path):
