@@ -457,13 +457,7 @@ while running:
                 pending_action = "quit_game"
                 show_confirmation = True
             if esc_key_pressed:
-                game_state = "title"
-
-    # This is the NEW STATE MACHINE LOGIC
-    if game.current_state is not None:
-        # Let the current state update itself
-        game.current_state.update(dt)
-    # --- END NEW CODE ---
+                game_state = "title"    
 
     # --- DRAWING SECTION ---
 
