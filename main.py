@@ -206,7 +206,14 @@ def start_game():
 
     clear_game_objects(meteors_group, bullets_group, powerups_group)
 
-    player = Player(all_sprites_group, bullets_group, WIDTH, HEIGHT, sound_manager, graphics_manager.player_image)
+    player = Player(
+        all_sprites_group,
+        bullets_group,
+        WIDTH,
+        HEIGHT,
+        sound_manager,
+        graphics_manager.player_image)
+    game.player = player
     player.bullet_image = graphics_manager.bullet_image
     all_sprites_group.add(player)
     players_group.add(player)
@@ -328,6 +335,14 @@ while running:
 
             if game.current_state is not None:
                 game.current_state.get_event(event)
+                game.current_state.update(dt)
+
+                if game.current_state.done:
+                    if game.current_state.next_state == "Game_OVER":
+                        game_state = "game_over"
+                    elif game.current_state.next_state == "PAUSE":
+                        game_state = "paused"
+                    game.current_state = None
 
     if quit_event:
         running = False
@@ -408,33 +423,7 @@ while running:
                 now = pg.time.get_ticks()
                 if now - message_timer > MESSAGE_DISPLAY_TIME:
                     high_score_reset_message = False  # Hide the message
-
-        elif game_state == "playing":
-            if esc_key_pressed:
-                game_state = "paused"
-            all_sprites_group.update()
-
-            handle_player_respawn(player, graphics_manager, WIDTH, HEIGHT, all_sprites_group, meteors_group)
-            
-            # check to see if a bullet hit a meteoroid
-            score = handle_bullet_meteoroid_collisions(meteors_group, bullets_group, score, sound_manager, graphics_manager, all_sprites_group, powerups_group, WIDTH, HEIGHT)
-            # check to see if a meteoroid hits the player
-            player_died = handle_player_meteoroid_collisions(player, meteors_group, bullets_group, powerups_group, all_sprites_group, sound_manager, graphics_manager, WIDTH, HEIGHT)
-            # If the function says the player died, THEN we create the explosion here in main.py.
-            if player_died:
-                death_explosion = Explosion(player.rect.center, 'player_explosion', graphics_manager.explosion_animations)
-                all_sprites_group.add(death_explosion)
-                player.hide()
-
-            # check to see if player hit a powerup
-            handle_player_powerup_collisions(player, powerups_group, sound_manager)
-
-            # if the player died and the explosion has finished playing
-            if player.lives == 0 and death_explosion and not death_explosion.alive():
-                game_state = "game_over"
-                new_high_score_achieved = new_high_score_check(game)
-
-
+        
         elif game_state == "paused":
             if show_confirmation:
                 if y_key_pressed:
@@ -514,7 +503,7 @@ while running:
                 draw_confirm_popup()
 
         if game_state == "game_over":
-            draw_game_over_title(new_high_score_achieved)
+            draw_game_over_title(game.new_high_score_achieved)
             if show_confirmation:
                 draw_confirm_popup()
 

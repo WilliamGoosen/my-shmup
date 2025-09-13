@@ -25,6 +25,8 @@ class Game:
         self.current_state = None
 
         # Other important variables from main.py
+        self.player = None
         self.score = 0
         self.high_score = 0
+        self.new_high_score_achieved = False
         self.font_name = None
