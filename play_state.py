@@ -11,7 +11,7 @@ class PlayState(BaseState):
         self.death_explosion = None     
 
     def startup(self):
-         pass
+        super().startup()
         
     def get_event(self, event):        
         if event.type == pg.KEYDOWN:
