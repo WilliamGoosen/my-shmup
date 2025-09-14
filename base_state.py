@@ -12,6 +12,8 @@ class BaseState:
         self.next_state = None
         # Flag to indicate the game should quit entirely
         self.quit = False
+        # State to return to after special transitions
+        self.return_state = None
 
     def startup(self):
         """
