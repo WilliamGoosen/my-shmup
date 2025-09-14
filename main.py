@@ -8,6 +8,7 @@ from graphics_manager import GraphicsManager
 from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text, load_or_create_file, reset_high_score
 from game import Game
 from play_state import PlayState
+from pause_state import PauseState
 
 
 def load_config():
@@ -332,6 +333,8 @@ while running:
                     up_key_pressed = True
                 if event.key == pg.K_DOWN:
                     down_key_pressed = True
+            else:
+                pass
 
             if game.current_state is not None:
                 game.current_state.get_event(event)
@@ -340,11 +343,43 @@ while running:
         game.current_state.update(dt)
 
         if game.current_state.done:
+            return_state = game.current_state.return_state
+
             if game.current_state.next_state == "GAME_OVER":
                 game_state = "game_over"
+                game.current_state = None
+
             elif game.current_state.next_state == "PAUSE":
+                # game_state = "paused"
+                game.current_state = PauseState(game)
+                game.current_state.startup()
                 game_state = "paused"
-            game.current_state = None
+
+            elif game.current_state.next_state == "PLAY":
+                game.current_state = PlayState(game)
+                game.current_state.startup()
+
+            elif game.current_state.next_state == "TITLE":
+                game_state = "title"
+                game.current_state = None           
+
+            elif game.current_state.next_state == "SETTINGS":
+                game.current_state = None
+                game_state = "settings"
+                if return_state == "PAUSE":
+                    previous_state = "paused"
+                elif return_state == "TITLE":
+                    previous_state = "title"                                   
+                
+            elif game.current_state.next_state == "RETURN_FROM_SETTINGS":                
+                if previous_state == "paused":
+                    game.current_state = PauseState(game)
+                    game.current_state.startup()
+                    game_state = "paused"
+                elif game.previous_state == "TITLE":                    
+                    pass
+                game.current_state.startup()
+                game_state = game.previous_state            
 
     if quit_event:
         running = False
@@ -405,6 +440,11 @@ while running:
                 sound_manager.set_sound_volume(new_sound_volume)
             if esc_key_pressed:
                 game_state = previous_state
+
+                if previous_state == "paused":
+                    game.current_state = PauseState(game)
+                    game.current_state.startup()
+                                    
             if s_key_pressed:
                 sound_enabled = not sound_enabled
                 sound_manager.set_sound_volume(1.0 if sound_enabled else 0.0)
@@ -424,30 +464,7 @@ while running:
             if high_score_reset_message:
                 now = pg.time.get_ticks()
                 if now - message_timer > MESSAGE_DISPLAY_TIME:
-                    high_score_reset_message = False  # Hide the message
-        
-        elif game_state == "paused":
-            if show_confirmation:
-                if y_key_pressed:
-                    if pending_action == "quit_to_title":
-                        game_state = "title"
-                    show_confirmation = False
-                    pending_action = None
-
-                elif n_key_pressed or esc_key_pressed:
-                    show_confirmation = False
-                    pending_action = None
-
-            else:
-                if space_key_pressed:
-                    game_state = "playing"
-                if esc_key_pressed:
-                    pending_action = "quit_to_title"
-                    show_confirmation = True
-                if enter_key_pressed:
-                    previous_state = game_state
-                    game_state = "settings"
-                all_sprites_group.draw(screen)
+                    high_score_reset_message = False  # Hide the message       
 
         elif game_state == "game_over":
             if space_key_pressed:
@@ -467,7 +484,7 @@ while running:
         screen.fill(BG_COLOUR)
         
     # --- MORE NEW CODE: Add this block here in the drawing section ---
-    if game.current_state is not None:
+    if game.current_state is not None:        
         # Let the current state draw itself
         game.current_state.draw(screen)
     else:
@@ -480,18 +497,7 @@ while running:
         if game_state == "settings":
             draw_settings_menu()
             if show_confirmation:
-                draw_confirm_popup()        
-
-        if game_state == "paused":
-            overlay = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA)
-            overlay.fill(PAUSE_OVERLAY)
-            screen.blit(overlay, (0, 0))
-            draw_text(screen, "Score: " + str(score), 22, WIDTH / 2, HEIGHT * 0.01, font_name, WHITE)
-            draw_lives(screen, 5, 5, player.lives, graphics_manager.player_icon)
-            draw_shield_bar(screen, WIDTH - BAR_LENGTH - 5, 5, player.shield)
-            draw_pause_menu()
-            if show_confirmation:
-                draw_confirm_popup()
+                draw_confirm_popup()       
 
         if game_state == "game_over":
             draw_game_over_title(game.new_high_score_achieved)

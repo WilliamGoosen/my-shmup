@@ -23,6 +23,7 @@ class Game:
 
         # State
         self.current_state = None
+        self.previous_state = None
 
         # Other important variables from main.py
         self.player = None
