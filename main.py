@@ -247,7 +247,8 @@ game.BG_COLOUR = BG_COLOUR
 game.font_name = font_name
 game.high_score = high_score
 
-
+game.current_state = TitleState(game)
+# game.current_state.startup()
 running = True
 while running:
     dt = clock.tick(FPS) / 1000.0  # Returns milliseconds, convert to seconds    
@@ -272,8 +273,9 @@ while running:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             quit_event = True
-        if event.type == pg.KEYDOWN:
-            if game.current_state is None:
+        if game.current_state is None:
+            if event.type == pg.KEYDOWN:
+            
                 if event.key == pg.K_SPACE:
                     space_key_pressed = True
                 if event.key == pg.K_ESCAPE:
@@ -300,8 +302,8 @@ while running:
                     up_key_pressed = True
                 if event.key == pg.K_DOWN:
                     down_key_pressed = True
-            else:
-                pass
+        else:
+            pass
 
             if game.current_state is not None:
                 game.current_state.get_event(event)
@@ -310,6 +312,9 @@ while running:
         game.current_state.update(dt)
 
         if game.current_state.done:
+            if game.current_state.quit:
+                running = False
+                continue
             return_state = game.current_state.return_state
 
             if game.current_state.next_state == "GAME_OVER":
@@ -319,16 +324,23 @@ while running:
             elif game.current_state.next_state == "PAUSE":
                 # game_state = "paused"
                 game.current_state = PauseState(game)
-                game.current_state.startup()
+                # game.current_state.startup()
                 game_state = "paused"
 
             elif game.current_state.next_state == "PLAY":
-                game.current_state = PlayState(game)
-                game.current_state.startup()
+                if game.current_state.return_state == "RESUME_GAME":
+                    game.current_state = PlayState(game)
+                    # game.current_state.startup()
+                else:
+                    start_game()
+                    game.current_state = PlayState(game)
+                    # game.current_state.startup()
 
             elif game.current_state.next_state == "TITLE":
+                game.current_state = TitleState(game)
+                # game.current_state.startup()
                 game_state = "title"
-                game.current_state = None           
+                # game.current_state = None
 
             elif game.current_state.next_state == "SETTINGS":
                 game.current_state = None
@@ -338,15 +350,17 @@ while running:
                 elif return_state == "TITLE":
                     previous_state = "title"                                   
                 
-            elif game.current_state.next_state == "RETURN_FROM_SETTINGS":                
-                if previous_state == "paused":
-                    game.current_state = PauseState(game)
-                    game.current_state.startup()
-                    game_state = "paused"
-                elif game.previous_state == "TITLE":                    
-                    pass
-                game.current_state.startup()
-                game_state = game.previous_state            
+            # elif game.current_state.next_state == "RETURN_FROM_SETTINGS":                
+            #     if previous_state == "paused":
+            #         game.current_state = PauseState(game)
+            #         game.current_state.startup()
+            #         game_state = "paused"
+            #     elif game.previous_state == "TITLE":                    
+            #         game.current_state = TitleState(game)
+            #         game.current_state.startup()
+            #         game_state = "title"
+            #     game.current_state.startup()
+            #     game_state = game.previous_state            
 
     if quit_event:
         running = False
@@ -371,24 +385,7 @@ while running:
 
     # --- GAME LOGIC & STATE UPDATES ---
     else:
-        if game_state == "title":
-            if space_key_pressed:
-                start_game()
-                game_state = "playing"
-                # 1. Create a new PlayState, passing it the real game object
-                new_play_state = PlayState(game)
-                # 2. Initialize it for a new game
-                new_play_state.startup()
-                # 3. THIS IS THE KEY: Set the game's state to the new PlayState.
-                #    This will be the signal for your main loop to use it.
-                game.current_state = new_play_state
-            if enter_key_pressed:
-                previous_state = game_state
-                game_state = "settings"
-            if esc_key_pressed:
-                running = False
-
-        elif game_state == "settings":
+        if game_state == "settings":
             if right_key_pressed and current_volume_step < 10:
                 current_volume_step += 1
                 new_volume = current_volume_step / 10
@@ -410,7 +407,10 @@ while running:
 
                 if previous_state == "paused":
                     game.current_state = PauseState(game)
-                    game.current_state.startup()
+                    # game.current_state.startup()
+                elif previous_state == "title":
+                    game.current_state = TitleState(game)
+                    # game.current_state.startup()
                                     
             if s_key_pressed:
                 sound_enabled = not sound_enabled
@@ -438,16 +438,18 @@ while running:
                 start_game()
                 game_state = "playing"
                 game.current_state = PlayState(game)
-                game.current_state.startup()
+                # game.current_state.startup()
             if q_key_pressed:
                 pending_action = "quit_game"
                 show_confirmation = True
             if esc_key_pressed:
-                game_state = "title"    
+                game_state = "title"
+                game.current_state = TitleState(game)
+                # game.current_state.startup()
 
     # --- DRAWING SECTION ---
 
-    if game_state in ("title", "settings", "game_over"):
+    if game_state in ("settings", "game_over"):
         screen.blit(graphics_manager.background_image, (0, 0))
     else:
         screen.fill(BG_COLOUR)
@@ -458,10 +460,7 @@ while running:
         game.current_state.draw(screen)
     else:
         if game_state not in ("title", "settings", "game_over"):
-            all_sprites_group.draw(screen)
-
-        if game_state == "title":
-            draw_title_menu()
+            all_sprites_group.draw(screen)        
 
         if game_state == "settings":
             draw_settings_menu()

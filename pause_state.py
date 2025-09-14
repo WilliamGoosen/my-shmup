@@ -33,6 +33,7 @@ class PauseState(BaseState):
                 if event.key == pg.K_SPACE:
                     self.done = True
                     self.next_state = "PLAY"
+                    self.return_state = "RESUME_GAME"
                 elif event.key == pg.K_ESCAPE:
                     self.pending_action = "quit_to_title"
                     self.show_confirmation = True
