@@ -109,3 +109,17 @@ def spawn_wave(function_to_call, count, *args):
     """
     for _ in range(count):
         function_to_call(*args)
+
+def draw_confirm_popup(surface, game):
+
+    surface.blit(game.graphics_manager.confirm_overlay, (0, 0))
+    popup_rect = game.graphics_manager.popup_bg.get_rect(center = (game.WIDTH // 2, game.HEIGHT // 2))
+    surface.blit(game.graphics_manager.popup_bg, popup_rect.topleft)
+
+    draw_text(surface, "Are you sure?", 24, game.WIDTH * 0.5, game.HEIGHT * 0.45, game.font_name, WHITE)
+
+    draw_icon(surface, game.graphics_manager.icons["y_icon"], game.WIDTH * 0.4, game.HEIGHT * 0.497)
+    draw_text(surface, "Yes", 22, game.WIDTH * 0.45, game.HEIGHT * 0.5, game.font_name, WHITE)
+
+    draw_icon(surface, game.graphics_manager.icons["n_icon"], game.WIDTH * 0.55, game.HEIGHT * 0.497)
+    draw_text(surface, "No", 22, game.WIDTH * 0.60, game.HEIGHT * 0.5, game.font_name, WHITE)
