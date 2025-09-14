@@ -162,6 +162,7 @@ def start_game():
     global score, game_state, life_gained, player
 
     score = 0
+    game.score = 0
     life_gained = 0
 
     all_sprites_group.empty()
@@ -435,6 +436,8 @@ while running:
             if space_key_pressed:
                 start_game()
                 game_state = "playing"
+                game.current_state = PlayState(game)
+                game.current_state.startup()
             if q_key_pressed:
                 pending_action = "quit_game"
                 show_confirmation = True
