@@ -124,26 +124,6 @@ def draw_settings_menu():
     draw_icon(screen, graphics_manager.arrows["down_icon"], arrow_x - 16, arrow_y - 16)
     draw_icon_text(screen, "Move", 18, WIDTH * 0.78, HEIGHT * 0.89, font_name)
 
-
-def draw_pause_menu():
-    icon_x = WIDTH * 0.42
-    icon_text_padding_x = 0.06
-    text_x = icon_x + WIDTH * icon_text_padding_x
-    icon_y = HEIGHT * 0.7
-    icon_text_padding_y = 0.026
-    text_y = icon_y + WIDTH * icon_text_padding_y
-
-    draw_text(screen, "PAUSED", 48, WIDTH / 2, HEIGHT / 4, font_name)
-
-    draw_icon(screen, graphics_manager.icons["spacebar_icon"], icon_x, icon_y + icon_text_padding_y)
-    draw_icon_text(screen, "Resume", 22, text_x, text_y, font_name)
-
-    draw_icon(screen, graphics_manager.icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)
-    draw_icon_text(screen, "Quit to Title", 18, WIDTH * 0.11, HEIGHT * 0.940, font_name)
-
-    draw_icon(screen, graphics_manager.icons["enter_icon"], WIDTH * 0.92, HEIGHT * 0.915)
-    draw_icon_text(screen, "Settings", 18, WIDTH * 0.78, HEIGHT * 0.940, font_name)
-
 def draw_game_over_title(new_high_score_achieved):
     icon_x = WIDTH * 0.42
     icon_text_padding_x = 0.06
