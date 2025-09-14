@@ -9,6 +9,7 @@ from utilities import draw_text, spawn_wave, draw_icon, draw_icon_text, load_or_
 from game import Game
 from play_state import PlayState
 from pause_state import PauseState
+from title_state import TitleState
 
 
 def load_config():
@@ -22,7 +23,7 @@ def load_config():
     return config_dict
 
 
-def draw_start_title():
+def draw_title_menu():
     icon_x = WIDTH * 0.40
     icon_text_padding_x = 0.06
     text_x = icon_x + WIDTH * icon_text_padding_x
@@ -460,7 +461,7 @@ while running:
             all_sprites_group.draw(screen)
 
         if game_state == "title":
-            draw_start_title()
+            draw_title_menu()
 
         if game_state == "settings":
             draw_settings_menu()
