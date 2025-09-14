@@ -1,11 +1,11 @@
 import pygame as pg
 from os import path
 from settings import *
-from sprites import Player, Starfield, Explosion
-from game_logic import clear_game_objects, handle_bullet_meteoroid_collisions, handle_player_meteoroid_collisions, handle_player_powerup_collisions, handle_player_respawn, spawn_meteoroid_wave, new_high_score_check
+from sprites import Player, Starfield
+from game_logic import clear_game_objects, spawn_meteoroid_wave
 from sound_manager import SoundManager
 from graphics_manager import GraphicsManager
-from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text, load_or_create_file, reset_high_score, draw_confirm_popup
+from utilities import draw_text, spawn_wave, draw_icon, draw_icon_text, load_or_create_file, reset_high_score, draw_confirm_popup
 from game import Game
 from play_state import PlayState
 from pause_state import PauseState
