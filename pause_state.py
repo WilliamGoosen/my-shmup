@@ -1,6 +1,6 @@
 import pygame as pg
 from base_state import BaseState
-from utilities import draw_text, draw_lives, draw_shield_bar, draw_icon, draw_icon_text
+from utilities import draw_text, draw_lives, draw_shield_bar, draw_icon, draw_icon_text, draw_confirm_popup
 from settings import *
 
 class PauseState(BaseState):
@@ -77,18 +77,7 @@ class PauseState(BaseState):
         
         self.draw_pause_menu(surface)
         if self.show_confirmation:
-            self.draw_confirm_popup(surface)
-
-
-    def draw_confirm_popup(self, surface):
-        surface.blit(self.game.graphics_manager.confirm_overlay, (0, 0))
-        popup_rect = self.game.graphics_manager.popup_bg.get_rect(center = (self.game.WIDTH // 2, self.game.HEIGHT // 2))
-        surface.blit(self.game.graphics_manager.popup_bg, popup_rect.topleft)
-        draw_text(surface, "Are you sure?", 24, self.game.WIDTH * 0.5, self.game.HEIGHT * 0.45, self.game.font_name, WHITE)
-        draw_icon(surface, self.game.graphics_manager.icons["y_icon"], self.game.WIDTH * 0.4, self.game.HEIGHT * 0.497)
-        draw_text(surface, "Yes", 22, self.game.WIDTH * 0.45, self.game.HEIGHT * 0.5, self.game.font_name, WHITE)
-        draw_icon(surface, self.game.graphics_manager.icons["n_icon"], self.game.WIDTH * 0.55, self.game.HEIGHT * 0.497)
-        draw_text(surface, "No", 22, self.game.WIDTH * 0.60, self.game.HEIGHT * 0.5, self.game.font_name, WHITE)
+            draw_confirm_popup(surface, self.game)    
 
     def draw_pause_menu(self, surface):
         icon_x = self.game.WIDTH * 0.42

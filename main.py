@@ -5,7 +5,7 @@ from sprites import Player, Starfield, Explosion
 from game_logic import clear_game_objects, handle_bullet_meteoroid_collisions, handle_player_meteoroid_collisions, handle_player_powerup_collisions, handle_player_respawn, spawn_meteoroid_wave, new_high_score_check
 from sound_manager import SoundManager
 from graphics_manager import GraphicsManager
-from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text, load_or_create_file, reset_high_score
+from utilities import draw_text, draw_lives, draw_shield_bar, spawn_wave, draw_icon, draw_icon_text, load_or_create_file, reset_high_score, draw_confirm_popup
 from game import Game
 from play_state import PlayState
 from pause_state import PauseState
@@ -143,21 +143,6 @@ def draw_pause_menu():
 
     draw_icon(screen, graphics_manager.icons["enter_icon"], WIDTH * 0.92, HEIGHT * 0.915)
     draw_icon_text(screen, "Settings", 18, WIDTH * 0.78, HEIGHT * 0.940, font_name)
-
-def draw_confirm_popup():
-
-    screen.blit(graphics_manager.confirm_overlay, (0, 0))
-    popup_rect = graphics_manager.popup_bg.get_rect(center = (WIDTH // 2, HEIGHT // 2))
-    screen.blit(graphics_manager.popup_bg, popup_rect.topleft)
-
-    draw_text(screen, "Are you sure?", 24, WIDTH * 0.5, HEIGHT * 0.45, font_name, WHITE)
-
-    draw_icon(screen, graphics_manager.icons["y_icon"], WIDTH * 0.4, HEIGHT * 0.497)
-    draw_text(screen, "Yes", 22, WIDTH * 0.45, HEIGHT * 0.5, font_name, WHITE)
-
-    draw_icon(screen, graphics_manager.icons["n_icon"], WIDTH * 0.55, HEIGHT * 0.497)
-    draw_text(screen, "No", 22, WIDTH * 0.60, HEIGHT * 0.5, font_name, WHITE)
-
 
 def draw_game_over_title(new_high_score_achieved):
     icon_x = WIDTH * 0.42
@@ -497,12 +482,12 @@ while running:
         if game_state == "settings":
             draw_settings_menu()
             if show_confirmation:
-                draw_confirm_popup()       
+                draw_confirm_popup(screen, game)       
 
         if game_state == "game_over":
             draw_game_over_title(game.new_high_score_achieved)
             if show_confirmation:
-                draw_confirm_popup()
+                draw_confirm_popup(screen, game)
 
     pg.display.flip()
 pg.quit()
