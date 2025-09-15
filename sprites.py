@@ -136,14 +136,18 @@ class Meteoroid(pg.sprite.Sprite):
         self.screen_height = screen_height
         self.meteor_images = meteor_images
         self.is_medium = is_medium
+        self.pos = pg.math.Vector2(0, 0) # Float position tracking
         
         # Initialize state
         self.initialize_meteoroid(position, velocity)
 
-    def update(self, dt):        
+    def update(self, dt):
         self.rotate(dt)
-        self.rect.x += self.speedx * dt
-        self.rect.y += self.speedy * dt
+        self.pos.x += self.speedx * dt
+        self.pos.y += self.speedy * dt
+        
+        # Update integer rect for drawing/collision
+        self.rect.center = (int(self.pos.x), int(self.pos.y))
 
         if self.is_off_screen():
             self.initialize_meteoroid()  # Full reset
@@ -162,6 +166,9 @@ class Meteoroid(pg.sprite.Sprite):
         else:
             self.rect.centerx = randrange(self.screen_width - self.rect.width)
             self.rect.bottom = randrange(-METEOROID_SPAWN_Y_MAX, -METEOROID_SPAWN_Y_MIN)
+        
+        self.pos.x = self.rect.centerx
+        self.pos.y = self.rect.centery
 
         # Set velocity
         if velocity:
@@ -196,10 +203,11 @@ class Meteoroid(pg.sprite.Sprite):
     def rotate(self, dt):
             self.rot = (self.rot + self.rot_speed * dt) % 360
             new_image = pg.transform.rotate(self.image_orig, self.rot).convert_alpha()
-            old_center = self.rect.center
+            current_pos = self.pos.copy()
             self.image = new_image
             self.rect = self.image.get_rect()
-            self.rect.center = old_center
+            self.pos = current_pos
+            self.rect.center = (int(self.pos.x), int(self.pos.y))
 
     def is_off_screen(self):
         return (self.rect.top > self.screen_height + self.rect.height or 
