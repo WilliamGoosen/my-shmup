@@ -194,10 +194,7 @@ class Meteoroid(pg.sprite.Sprite):
         ]
 
     def rotate(self, dt):
-        self.frame_time += dt * 1000
-        if self.frame_time > 50:
-            self.frame_time = 0
-            self.rot = (self.rot + self.rot_speed) % 360
+            self.rot = (self.rot + self.rot_speed * dt) % 360
             new_image = pg.transform.rotate(self.image_orig, self.rot).convert_alpha()
             old_center = self.rect.center
             self.image = new_image
