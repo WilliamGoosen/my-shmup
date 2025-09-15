@@ -158,10 +158,10 @@ class Meteoroid(pg.sprite.Sprite):
 
         # Set position
         if position:
-            self.rect.center = position
+            self.rect.centerx, self.rect.bottom = position
         else:
-            self.rect.x = randrange(self.screen_width - self.rect.width)
-            self.rect.y = randrange(-150, -100)
+            self.rect.centerx = randrange(self.screen_width - self.rect.width)
+            self.rect.bottom = randrange(-METEOROID_SPAWN_Y_MAX, -METEOROID_SPAWN_Y_MIN)
 
         # Set velocity
         if velocity:
@@ -183,8 +183,8 @@ class Meteoroid(pg.sprite.Sprite):
         left_pos = (self.rect.centerx, self.rect.centery)
         right_pos = (self.rect.centerx, self.rect.centery)
         
-        left_velocity = (self.speedx - 1, self.speedy)
-        right_velocity = (self.speedx + 1, self.speedy)
+        left_velocity = (self.speedx - METEOROID_SPLIT_SPEED_BOOST, self.speedy)
+        right_velocity = (self.speedx + METEOROID_SPLIT_SPEED_BOOST, self.speedy)
 
         return [
             Meteoroid(meteor_images_medium, self.screen_width, self.screen_height,
@@ -194,10 +194,7 @@ class Meteoroid(pg.sprite.Sprite):
         ]
 
     def rotate(self, dt):
-        self.frame_time += dt * 1000
-        if self.frame_time > 50:
-            self.frame_time = 0
-            self.rot = (self.rot + self.rot_speed) % 360
+            self.rot = (self.rot + self.rot_speed * dt) % 360
             new_image = pg.transform.rotate(self.image_orig, self.rot).convert_alpha()
             old_center = self.rect.center
             self.image = new_image
