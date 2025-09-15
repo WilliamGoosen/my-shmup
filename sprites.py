@@ -158,10 +158,10 @@ class Meteoroid(pg.sprite.Sprite):
 
         # Set position
         if position:
-            self.rect.center = position
+            self.rect.centerx, self.rect.bottom = position
         else:
-            self.rect.x = randrange(self.screen_width - self.rect.width)
-            self.rect.y = randrange(-150, -100)
+            self.rect.centerx = randrange(self.screen_width - self.rect.width)
+            self.rect.bottom = randrange(-METEOROID_SPAWN_Y_MAX, -METEOROID_SPAWN_Y_MIN)
 
         # Set velocity
         if velocity:
