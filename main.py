@@ -273,9 +273,9 @@ while running:
     for event in pg.event.get():
         if event.type == pg.QUIT:
             quit_event = True
+            
         if game.current_state is None:
             if event.type == pg.KEYDOWN:
-            
                 if event.key == pg.K_SPACE:
                     space_key_pressed = True
                 if event.key == pg.K_ESCAPE:
@@ -303,12 +303,9 @@ while running:
                 if event.key == pg.K_DOWN:
                     down_key_pressed = True
         else:
-            pass
+            game.current_state.get_event(event)
 
-            if game.current_state is not None:
-                game.current_state.get_event(event)
-
-    if game.current_state is not None:        
+    if game.current_state is not None:
         game.current_state.update(dt)
 
         if game.current_state.done:

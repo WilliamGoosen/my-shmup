@@ -23,6 +23,7 @@ class Player(pg.sprite.Sprite):
         self.shield = PLAYER_MAX_SHIELD
         self.shoot_delay = PLAYER_SHOOT_DELAY
         self.bullet_frame_time = 0
+        self.space_was_pressed = False
         self.lives = PLAYER_START_LIVES
         self.hidden = False
         self.all_sprites = all_sprite_group
@@ -36,7 +37,12 @@ class Player(pg.sprite.Sprite):
         if not self.hidden:
             keystate= pg.key.get_pressed()
             if keystate[pg.K_SPACE]:
+                if not self.space_was_pressed:
+                    self.bullet_frame_time = self.shoot_delay
+                    self.space_was_pressed = True
                 self.shoot(self.sound_manager, dt)
+            else:
+                self.space_was_pressed = False
 
             self.speedx = 0
             if keystate[pg.K_LEFT] and not keystate[pg.K_RIGHT]:
