@@ -40,7 +40,7 @@ class PauseState(BaseState):
                 elif event.key == pg.K_RETURN:
                     self.done = True                    
                     self.next_state = "SETTINGS"
-                    self.return_state = "PAUSE"
+                    self.game.previous_state = "PAUSE"                    
 
     def update(self, dt):
         """Update pause state logic."""

@@ -19,7 +19,7 @@ class TitleState(BaseState):
             elif event.key == pg.K_RETURN:
                 self.done = True
                 self.next_state = "SETTINGS"
-                self.return_state = "TITLE"
+                self.game.previous_state = "TITLE"
             elif event.key == pg.K_ESCAPE:
                 self.quit = True
                 self.done = True
