@@ -6,7 +6,7 @@ from player import Player
 from systems import SoundManager, GraphicsManager, game_logic
 from utilities import draw_text, spawn_wave, draw_icon, draw_icon_text, load_or_create_file, reset_high_score, draw_confirm_popup
 from game import Game
-from states import PlayState, PauseState, TitleState, GameOverState
+from states import PlayState, PauseState, TitleState, GameOverState, SettingsState
 
 def load_config():
     config_dict = {}
