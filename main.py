@@ -11,7 +11,6 @@ from play_state import PlayState
 from pause_state import PauseState
 from title_state import TitleState
 
-
 def load_config():
     config_dict = {}
     config_lines = load_or_create_file(CONFIG_FILE, 'scale_factor=1.0').splitlines()
@@ -21,28 +20,6 @@ def load_config():
             key, value = line.split("=", 1)
             config_dict[key] = value
     return config_dict
-
-
-def draw_title_menu():
-    icon_x = WIDTH * 0.40
-    icon_text_padding_x = 0.06
-    text_x = icon_x + WIDTH * icon_text_padding_x
-    icon_y = HEIGHT * 0.7
-    icon_text_padding_y = 0.026
-    text_y = icon_y + WIDTH * icon_text_padding_y
-
-    draw_text(screen, "High Score: " + str(game.high_score), 22, WIDTH * 0.5, HEIGHT * 0.02, font_name)
-    draw_text(screen, "SHMUP!", 64, WIDTH / 2, HEIGHT / 4, font_name)
-
-    draw_icon(screen, graphics_manager.icons["spacebar_icon"], icon_x, icon_y + icon_text_padding_y)
-    draw_icon_text(screen, "Start Game", 22, text_x, text_y, font_name)
-
-    draw_icon(screen, graphics_manager.icons["enter_icon"], WIDTH * 0.92, HEIGHT * 0.915)
-    draw_icon_text(screen, "Settings", 18, WIDTH * 0.78, HEIGHT * 0.940, font_name) 
-
-    draw_icon(screen, graphics_manager.icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)
-    draw_icon_text(screen, "Quit Game", 18, WIDTH * 0.11, HEIGHT * 0.940, font_name)
-
 
 def draw_settings_menu():
     icon_x = WIDTH * 0.37
