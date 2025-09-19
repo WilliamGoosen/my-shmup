@@ -1,6 +1,6 @@
 import pygame as pg
 from states.base_state import BaseState
-from utilities import draw_text, draw_icon_text, draw_icon
+from utilities import draw_text, draw_icon_text, draw_icon, draw_confirm_popup
 from settings import *
 
 class GameOverState(BaseState):
@@ -28,17 +28,18 @@ class GameOverState(BaseState):
                     
             else:
                 if event.key == pg.K_SPACE:
-                        # start_game()
-                        self.done = True
-                        self.next_state = "PLAY"
+                    # start_game()
+                    self.done = True
+                    self.next_state = "PLAY"
                         # game.current_state = PlayState(game)
                         # game.current_state.startup()
-                if event.key == pg.K_q:
+                elif event.key == pg.K_q:
                     self.pending_action = "quit_game"
                     self.show_confirmation = True
 
-                if event.key == pg.K_ESCAPE:
-                        self.next_state = "TITLE"
+                elif event.key == pg.K_ESCAPE:
+                    self.done = True
+                    self.next_state = "TITLE"
                         # game.current_state = TitleState(game)
                         # game.current_state.startup()
     
@@ -49,6 +50,8 @@ class GameOverState(BaseState):
     def draw(self, surface):
         surface.blit(self.game.graphics_manager.background_image, (0, 0))
         self.draw_game_over_title(surface)
+        if self.show_confirmation:
+            draw_confirm_popup(surface, self.game)
     
     def draw_game_over_title(self, surface):
         icon_x = self.game.WIDTH * 0.42
