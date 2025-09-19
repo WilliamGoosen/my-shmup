@@ -151,13 +151,7 @@ def start_game():
 
     clear_game_objects(meteors_group, bullets_group, powerups_group)
 
-    player = Player(
-        all_sprites_group,
-        bullets_group,
-        WIDTH,
-        HEIGHT,
-        sound_manager,
-        graphics_manager.player_image)
+    player = Player(game)
     game.player = player
     player.bullet_image = graphics_manager.bullet_image
     all_sprites_group.add(player)

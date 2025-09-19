@@ -2,22 +2,18 @@ import pygame as pg
 import math
 from random import randrange, uniform, choice, randint
 from settings import *
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from sound_manager import SoundManager  # Only imported by linters/IDEs, not at runtime
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, all_sprite_group, bullets_group, screen_width, screen_height, sound_manager: "SoundManager", player_image):
+    def __init__(self, game):
         pg.sprite.Sprite.__init__(self)
-        self.image = player_image
+        self.image = game.graphics_manager.player_image
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.bullet_image = None
-        self.screen_width = screen_width
-        self.screen_height = screen_height
-        self.rect.centerx = screen_width / 2
-        self.rect.bottom = screen_height - PLAYER_START_Y_OFFSET
+        self.screen_width = game.WIDTH
+        self.screen_height = game.HEIGHT
+        self.rect.centerx = game.WIDTH / 2
+        self.rect.bottom = game.HEIGHT - PLAYER_START_Y_OFFSET
         self.speedx = 0
         self.speedy = 0
         self.shield = PLAYER_MAX_SHIELD
@@ -26,12 +22,12 @@ class Player(pg.sprite.Sprite):
         self.space_was_pressed = False
         self.lives = PLAYER_START_LIVES
         self.hidden = False
-        self.all_sprites = all_sprite_group
-        self.bullets = bullets_group
+        self.all_sprites = game.all_sprites_group
+        self.bullets = game.bullets_group
         self.power = PLAYER_START_POWER
         self.just_respawned = False
         self.power_time = pg.time.get_ticks()
-        self.sound_manager = sound_manager
+        self.sound_manager = game.sound_manager
 
     def update(self, dt):
         if not self.hidden:
