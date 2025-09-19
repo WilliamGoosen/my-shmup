@@ -6,7 +6,7 @@ from player import Player
 from systems import SoundManager, GraphicsManager, game_logic
 from utilities import draw_text, spawn_wave, draw_icon, draw_icon_text, load_or_create_file, reset_high_score, draw_confirm_popup
 from game import Game
-from states import PlayState, PauseState, TitleState
+from states import PlayState, PauseState, TitleState, GameOverState
 
 def load_config():
     config_dict = {}
@@ -98,32 +98,6 @@ def draw_settings_menu():
     draw_icon(screen, graphics_manager.arrows["up_icon"], arrow_x - 16, arrow_y - 2 * 16)
     draw_icon(screen, graphics_manager.arrows["down_icon"], arrow_x - 16, arrow_y - 16)
     draw_icon_text(screen, "Move", 18, WIDTH * 0.78, HEIGHT * 0.89, font_name)
-
-def draw_game_over_title(new_high_score_achieved):
-    icon_x = WIDTH * 0.42
-    icon_text_padding_x = 0.06
-    text_x = icon_x + WIDTH * icon_text_padding_x
-    icon_y = HEIGHT * 0.7
-    icon_text_padding_y = 0.026
-    text_y = icon_y + WIDTH * icon_text_padding_y
-    y_increment = 40
-
-    draw_text(screen, "High Score: " + str(game.high_score), 22, WIDTH / 2, 15, font_name)
-    draw_text(screen, "GAME OVER", 48, WIDTH / 2, HEIGHT / 4, font_name)
-    draw_text(screen, "Score: " + str(game.score), 30, WIDTH / 2, HEIGHT * 2 / 5 + y_increment, font_name)
-
-    if new_high_score_achieved:
-        draw_text(screen, "NEW HIGH SCORE!", 30, WIDTH / 2, HEIGHT * 2 / 5, font_name, GREEN)
-
-    draw_icon(screen, graphics_manager.icons["spacebar_icon"], icon_x, icon_y + icon_text_padding_y)
-    draw_icon_text(screen, "Try Again", 22, text_x, text_y, font_name)   
-
-    draw_icon(screen, graphics_manager.icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)
-    draw_icon_text(screen, "Quit to Title", 18, WIDTH * 0.11, HEIGHT * 0.940, font_name)
-
-    draw_icon(screen, graphics_manager.icons["q_icon"], WIDTH * 0.93, HEIGHT * 0.92)
-    draw_icon_text(screen, "Quit Game", 18, WIDTH * 0.770, HEIGHT * 0.940, font_name)
-
 
 def new_star():
     s = Starfield(WIDTH, HEIGHT)
@@ -283,8 +257,9 @@ while running:
             return_state = game.current_state.return_state
 
             if game.current_state.next_state == "GAME_OVER":
-                game_state = "game_over"
-                game.current_state = None
+                # game_state = "game_over"
+                game.current_state = GameOverState(game)
+                # game.current_state = None
 
             elif game.current_state.next_state == "PAUSE":
                 # game_state = "paused"
@@ -398,29 +373,14 @@ while running:
                 if now - message_timer > MESSAGE_DISPLAY_TIME:
                     high_score_reset_message = False  # Hide the message       
 
-        elif game_state == "game_over":
-            if space_key_pressed:
-                start_game()
-                game_state = "playing"
-                game.current_state = PlayState(game)
-                # game.current_state.startup()
-            if q_key_pressed:
-                pending_action = "quit_game"
-                show_confirmation = True
-            if esc_key_pressed:
-                game_state = "title"
-                game.current_state = TitleState(game)
-                # game.current_state.startup()
-
     # --- DRAWING SECTION ---
 
-    if game_state in ("settings", "game_over"):
+    if game_state in ("settings"):
         screen.blit(graphics_manager.background_image, (0, 0))
     else:
         screen.fill(BG_COLOUR)
         
-    # --- MORE NEW CODE: Add this block here in the drawing section ---
-    if game.current_state is not None:        
+    if game.current_state is not None:
         # Let the current state draw itself
         game.current_state.draw(screen)
     else:
@@ -429,11 +389,6 @@ while running:
 
         if game_state == "settings":
             draw_settings_menu()
-            if show_confirmation:
-                draw_confirm_popup(screen, game)       
-
-        if game_state == "game_over":
-            draw_game_over_title(game.new_high_score_achieved)
             if show_confirmation:
                 draw_confirm_popup(screen, game)
 
