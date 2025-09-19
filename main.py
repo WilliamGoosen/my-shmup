@@ -1,7 +1,8 @@
 import pygame as pg
 from os import path
 from settings import *
-from sprites import Player, Starfield
+from sprites import Starfield
+from player import Player
 from game_logic import clear_game_objects, spawn_meteoroid_wave
 from sound_manager import SoundManager
 from graphics_manager import GraphicsManager
