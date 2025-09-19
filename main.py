@@ -8,9 +8,7 @@ from sound_manager import SoundManager
 from graphics_manager import GraphicsManager
 from utilities import draw_text, spawn_wave, draw_icon, draw_icon_text, load_or_create_file, reset_high_score, draw_confirm_popup
 from game import Game
-from play_state import PlayState
-from pause_state import PauseState
-from title_state import TitleState
+from states import PlayState, PauseState, TitleState
 
 def load_config():
     config_dict = {}

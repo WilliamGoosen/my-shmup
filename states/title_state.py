@@ -1,5 +1,5 @@
 import pygame as pg
-from base_state import BaseState
+from states.base_state import BaseState
 from utilities import draw_icon, draw_icon_text, draw_text
 
 class TitleState(BaseState):
