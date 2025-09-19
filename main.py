@@ -3,9 +3,7 @@ from os import path
 from settings import *
 from sprites import Starfield
 from player import Player
-from game_logic import clear_game_objects, spawn_meteoroid_wave
-from sound_manager import SoundManager
-from graphics_manager import GraphicsManager
+from systems import SoundManager, GraphicsManager, game_logic
 from utilities import draw_text, spawn_wave, draw_icon, draw_icon_text, load_or_create_file, reset_high_score, draw_confirm_popup
 from game import Game
 from states import PlayState, PauseState, TitleState
@@ -148,7 +146,7 @@ def start_game():
     players_group.empty()
     stars_group.empty()
 
-    clear_game_objects(meteors_group, bullets_group, powerups_group)
+    game_logic.clear_game_objects(meteors_group, bullets_group, powerups_group)
 
     player = Player(game)
     game.player = player
@@ -157,7 +155,7 @@ def start_game():
     players_group.add(player)
 
     spawn_starfield()
-    spawn_meteoroid_wave(graphics_manager.meteoroid_images, WIDTH, HEIGHT, all_sprites_group, meteors_group)
+    game_logic.spawn_meteoroid_wave(graphics_manager.meteoroid_images, WIDTH, HEIGHT, all_sprites_group, meteors_group)
 
 # Constants and initialisation
 config = load_config()

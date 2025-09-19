@@ -1,6 +1,6 @@
 import pygame as pg
 from states.base_state import BaseState
-from game_logic import handle_bullet_meteoroid_collisions, handle_player_meteoroid_collisions, handle_player_powerup_collisions, handle_player_respawn, new_high_score_check
+from systems import game_logic
 from sprites import Explosion
 from utilities import draw_lives, draw_shield_bar, draw_text
 from settings import *
@@ -8,12 +8,12 @@ from settings import *
 class PlayState(BaseState):
     def __init__(self, game):
         super().__init__(game)
-        self.death_explosion = None     
+        self.death_explosion = None
 
     def startup(self):
         super().startup()
         
-    def get_event(self, event):        
+    def get_event(self, event):
         if event.type == pg.KEYDOWN:
              if event.key == pg.K_ESCAPE:
                   self.done = True
@@ -22,7 +22,7 @@ class PlayState(BaseState):
     def update(self, dt):
         self.game.all_sprites_group.update(dt)
 
-        handle_player_respawn(
+        game_logic.handle_player_respawn(
             self.game.player,
             self.game.graphics_manager,
             self.game.WIDTH,
@@ -32,7 +32,7 @@ class PlayState(BaseState):
         )
             
         # check to see if a bullet hit a meteoroid
-        self.game.score = handle_bullet_meteoroid_collisions(
+        self.game.score = game_logic.handle_bullet_meteoroid_collisions(
             self.game.meteors_group,
             self.game.bullets_group,
             self.game.score,
@@ -45,7 +45,7 @@ class PlayState(BaseState):
         )
 
         # check to see if a meteoroid hits the player
-        player_died = handle_player_meteoroid_collisions(
+        player_died = game_logic.handle_player_meteoroid_collisions(
             self.game.player,
             self.game.meteors_group,
             self.game.bullets_group,
@@ -67,7 +67,7 @@ class PlayState(BaseState):
             self.game.player.hide()
 
         # check to see if player hit a powerup
-        handle_player_powerup_collisions(
+        game_logic.handle_player_powerup_collisions(
             self.game.player,
             self.game.powerups_group,
             self.game.sound_manager) 
@@ -75,7 +75,7 @@ class PlayState(BaseState):
         if self.game.player.lives == 0 and self.death_explosion and not self.death_explosion.alive():
                 self.done = True
                 self.next_state = "GAME_OVER"
-                self.game.new_high_score_achieved = new_high_score_check(self.game)        
+                self.game.new_high_score_achieved = game_logic.new_high_score_check(self.game)        
 
     def draw(self, surface):
         self.game.all_sprites_group.draw(surface)

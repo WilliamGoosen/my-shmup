@@ -7,7 +7,7 @@ from settings import *
 def new_high_score_check(game):
     
     if game.score > game.high_score:
-        game.high_score = game.score        
+        game.high_score = game.score
         with open(HS_FILE, "w") as f:
             f.write(str(game.score))
         return True
