@@ -1,7 +1,8 @@
 import pygame as pg
 from os import path
 from settings import *
-from sprites import Player, Starfield
+from sprites import Starfield
+from player import Player
 from game_logic import clear_game_objects, spawn_meteoroid_wave
 from sound_manager import SoundManager
 from graphics_manager import GraphicsManager
@@ -151,13 +152,7 @@ def start_game():
 
     clear_game_objects(meteors_group, bullets_group, powerups_group)
 
-    player = Player(
-        all_sprites_group,
-        bullets_group,
-        WIDTH,
-        HEIGHT,
-        sound_manager,
-        graphics_manager.player_image)
+    player = Player(game)
     game.player = player
     player.bullet_image = graphics_manager.bullet_image
     all_sprites_group.add(player)
