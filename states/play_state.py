@@ -1,5 +1,5 @@
 import pygame as pg
-from base_state import BaseState
+from states.base_state import BaseState
 from game_logic import handle_bullet_meteoroid_collisions, handle_player_meteoroid_collisions, handle_player_powerup_collisions, handle_player_respawn, new_high_score_check
 from sprites import Explosion
 from utilities import draw_lives, draw_shield_bar, draw_text

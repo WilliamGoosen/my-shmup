@@ -1,5 +1,5 @@
 import pygame as pg
-from base_state import BaseState
+from states.base_state import BaseState
 from utilities import draw_text, draw_lives, draw_shield_bar, draw_icon, draw_icon_text, draw_confirm_popup
 from settings import *
 
