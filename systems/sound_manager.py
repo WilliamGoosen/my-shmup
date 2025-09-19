@@ -11,6 +11,7 @@ class SoundManager:
         self.music_volume = 0.4
         self.current_track = None
         self.music_enabled = True
+        self.sound_enabled = True
         self.play_music("gameplay")
         for sound_name, sound_data in SOUND_CONFIG.items():
             filename, base_volume = sound_data

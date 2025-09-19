@@ -4,9 +4,9 @@ from settings import *
 from sprites import Starfield
 from player import Player
 from systems import SoundManager, GraphicsManager, game_logic
-from utilities import draw_text, spawn_wave, draw_icon, draw_icon_text, load_or_create_file, reset_high_score, draw_confirm_popup
+from utilities import spawn_wave, load_or_create_file
 from game import Game
-from states import PlayState, PauseState, TitleState, GameOverState
+from states import PlayState, PauseState, TitleState, GameOverState, SettingsState
 
 def load_config():
     config_dict = {}
@@ -18,91 +18,10 @@ def load_config():
             config_dict[key] = value
     return config_dict
 
-def draw_settings_menu():
-    icon_x = WIDTH * 0.37
-    icon_text_padding_x = 0.05
-    text_x = icon_x + WIDTH * icon_text_padding_x
-    icon_y = HEIGHT * 2 / 5
-    icon_text_padding_y = 0.026
-    text_y = icon_y + WIDTH * icon_text_padding_y
-    y_increment = 40
-
-    draw_text(screen, "High Score: " + str(game.high_score), 22, WIDTH * 0.5, HEIGHT * 0.02, font_name) 
-    draw_text(screen, "SETTINGS", 48, WIDTH * 0.5, HEIGHT * 0.25, font_name)
-
-    draw_icon(screen, graphics_manager.icons["s_icon"], icon_x, icon_y + icon_text_padding_y)
-    draw_icon_text(screen, f"Sound: {"ON" if sound_enabled else "OFF"}", 22, text_x, text_y, font_name) 
-
-    draw_icon(screen, graphics_manager.icons["m_icon"], icon_x, icon_y + icon_text_padding_y + y_increment)
-    draw_icon_text(screen, f"Music: {"ON" if music_enabled else "OFF"}", 22, text_x, text_y + y_increment, font_name)
-
-    draw_icon(screen, graphics_manager.icons["r_icon"], icon_x, icon_y + icon_text_padding_y + 2 * y_increment)
-    draw_icon_text(screen, "Reset High Score", 22, text_x, text_y + 2 * y_increment, font_name)
-    if high_score_reset_message:
-        draw_text(screen, "High Score Reset!", 22, WIDTH / 2, HEIGHT * 0.68, font_name, GREEN)
-
-    draw_text(screen, f"Music Volume: {current_volume_step}", 22, WIDTH // 2, HEIGHT * 3 / 5, font_name)
-    draw_text(screen, f"Sound Volume: {current_sound_volume_step}", 22, WIDTH // 2, HEIGHT * 3.6 / 5, font_name)
-    
-    block_width = int(15 / 576 * WIDTH)
-    block_height = 15 / 720 * HEIGHT
-    block_spacing = 0
-    icon_spacing = 5 / 576 * WIDTH
-    start_x = WIDTH // 2 - (10 * (block_width + block_spacing)) // 2  # Center the row
-    last_block_x = start_x + (11 * (block_width + block_spacing)) - 1.5 * block_spacing
-    plus_x = last_block_x + 1.6 * icon_spacing
-    minus_x = start_x - (block_width + icon_spacing)
-
-    for i in range(1, 11):
-        if i <= current_volume_step:
-            color = GREEN  # Filled block for active volume
-        else:
-            color = GRAY   # Empty block for inactive
-        # Draw a rectangle for each block
-        block_rect = pg.Rect(start_x, HEIGHT * 3.25 / 5, block_width, block_height)
-        pg.draw.rect(screen, color, block_rect)
-        start_x += block_width + block_spacing
-        
-    start_x = WIDTH // 2 - (10 * (block_width + block_spacing)) // 2  # Center the row
-    last_sound_block_x = start_x + (11 * (block_width + block_spacing)) - 1.5 * block_spacing
-    up_x = last_sound_block_x + 1.6 * icon_spacing
-    down_x = start_x - (block_width + icon_spacing)
-        
-    for i in range(1, 11):
-        if i <= current_sound_volume_step:
-            color = GREEN  # Filled block for active volume
-        else:
-            color = GRAY   # Empty block for inactive
-        # Draw a rectangle for each block
-        block_rect = pg.Rect(start_x, HEIGHT * 3.85 / 5, block_width, block_height)
-        pg.draw.rect(screen, color, block_rect)
-        start_x += block_width + block_spacing
-
-
-    draw_icon(screen, graphics_manager.icons["left_icon"], minus_x, HEIGHT * 3.2 / 5)
-    draw_icon(screen, graphics_manager.icons["right_icon"], plus_x, HEIGHT * 3.2 / 5)
-    
-    draw_icon(screen, graphics_manager.icons["down_icon"], down_x, HEIGHT * 3.8 / 5)
-    draw_icon(screen, graphics_manager.icons["up_icon"], up_x, HEIGHT * 3.8 / 5)
-
-    draw_icon(screen, graphics_manager.icons["esc_icon"], WIDTH * 0.07, HEIGHT * 0.92)
-    draw_icon_text(screen, "Back", 18, WIDTH * 0.11, HEIGHT * 0.940, font_name)
-
-    draw_icon(screen, graphics_manager.icons["spacebar_icon"], WIDTH * 0.92, HEIGHT * 0.92)
-    draw_icon_text(screen, "Shoot", 18, WIDTH * 0.78, HEIGHT * 0.940, font_name)
-
-    arrow_x = WIDTH * 0.945
-    arrow_y = HEIGHT * 0.90
-    draw_icon(screen, graphics_manager.arrows["right_icon"], arrow_x, arrow_y - 16)
-    draw_icon(screen, graphics_manager.arrows["left_icon"], arrow_x - 2 * 16, arrow_y - 16)
-    draw_icon(screen, graphics_manager.arrows["up_icon"], arrow_x - 16, arrow_y - 2 * 16)
-    draw_icon(screen, graphics_manager.arrows["down_icon"], arrow_x - 16, arrow_y - 16)
-    draw_icon_text(screen, "Move", 18, WIDTH * 0.78, HEIGHT * 0.89, font_name)
-
 def new_star():
     s = Starfield(WIDTH, HEIGHT)
-    all_sprites_group.add(s)
-    stars_group.add(s)
+    game.all_sprites_group.add(s)
+    game.stars_group.add(s)
 
 def spawn_starfield():
     spawn_wave(new_star, NUMBER_OF_STARS)
@@ -114,22 +33,22 @@ def start_game():
     game.score = 0
     life_gained = 0
 
-    all_sprites_group.empty()
-    bullets_group.empty()
-    meteors_group.empty()
-    players_group.empty()
-    stars_group.empty()
+    game.all_sprites_group.empty()
+    game.bullets_group.empty()
+    game.meteors_group.empty()
+    game.players_group.empty()
+    game.stars_group.empty()
 
-    game_logic.clear_game_objects(meteors_group, bullets_group, powerups_group)
+    game_logic.clear_game_objects(game.meteors_group, game.bullets_group, game.powerups_group)
 
-    player = Player(game)
-    game.player = player
-    player.bullet_image = graphics_manager.bullet_image
-    all_sprites_group.add(player)
-    players_group.add(player)
+    # player = Player(game)
+    game.player = Player(game)
+    game.player.bullet_image = game.graphics_manager.bullet_image
+    game.all_sprites_group.add(game.player)
+    game.players_group.add(game.player)
 
     spawn_starfield()
-    game_logic.spawn_meteoroid_wave(graphics_manager.meteoroid_images, WIDTH, HEIGHT, all_sprites_group, meteors_group)
+    game_logic.spawn_meteoroid_wave(game.graphics_manager.meteoroid_images, WIDTH, HEIGHT, game.all_sprites_group, game.meteors_group)
 
 # Constants and initialisation
 config = load_config()
@@ -145,252 +64,73 @@ screen = pg.display.set_mode((WIDTH, HEIGHT))
 pg.display.set_caption(TITLE)
 clock = pg.time.Clock()
 
-font_name = pg.font.match_font(FONT_NAME)
-
-# --- Load all game graphics ---
-graphics_manager = GraphicsManager(scale_factor)
-
-# --- Load all game sounds ---
-sound_manager = SoundManager()
-
-
-all_sprites_group = pg.sprite.Group()
-bullets_group = pg.sprite.Group()
-stars_group = pg.sprite.Group()
-meteors_group = pg.sprite.Group()
-powerups_group = pg.sprite.Group()
-players_group = pg.sprite.Group()
-
-sound_enabled = True
-music_enabled = True
-current_volume_step = int(sound_manager.music_volume * 10)
-current_sound_volume_step = int(sound_manager.sound_volume * 10)
-game_state = "title"
-previous_state = None
-high_score_reset_message = False
-message_timer = 0
-high_score = int(load_or_create_file(HS_FILE, 0))
-show_confirmation = False
-pending_action = None
 
 # --- Create the Game object and populate it ---
 game = Game()
-game.graphics_manager = graphics_manager
-game.sound_manager = sound_manager
-game.all_sprites_group = all_sprites_group
-game.bullets_group = bullets_group
-game.stars_group = stars_group
-game.meteors_group = meteors_group
-game.powerups_group = powerups_group
-game.players_group = players_group
+game.graphics_manager = GraphicsManager(scale_factor)
+game.sound_manager = SoundManager()
+game.all_sprites_group = pg.sprite.Group()
+game.bullets_group = pg.sprite.Group()
+game.stars_group = pg.sprite.Group()
+game.meteors_group = pg.sprite.Group() 
+game.powerups_group = pg.sprite.Group()
+game.players_group = pg.sprite.Group()
 game.WIDTH = WIDTH
 game.HEIGHT = HEIGHT
 game.BG_COLOUR = BG_COLOUR
-game.font_name = font_name
-game.high_score = high_score
-
+game.font_name = pg.font.match_font(FONT_NAME)
+game.high_score = int(load_or_create_file(HS_FILE, 0))
 game.current_state = TitleState(game)
-# game.current_state.startup()
+
 running = True
 while running:
-    dt = clock.tick(FPS) / 1000.0  # Returns milliseconds, convert to seconds    
-    # --- EVENT HANDLING ---
-    quit_event = False
-    space_key_pressed = False 
-    esc_key_pressed = False
-    q_key_pressed = False
-    r_key_pressed = False
-    s_key_pressed = False
-    m_key_pressed = False
-    enter_key_pressed = False
-    y_key_pressed = False
-    n_key_pressed = False
-    plus_key_pressed = False
-    minus_key_pressed = False
-    up_key_pressed = False
-    down_key_pressed = False
-    left_key_pressed = False
-    right_key_pressed = False
+    dt = clock.tick(FPS) / 1000.0  # Returns milliseconds, convert to seconds
 
+    # --- EVENT HANDLING ---
     for event in pg.event.get():
         if event.type == pg.QUIT:
-            quit_event = True
-            
-        if game.current_state is None:
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_SPACE:
-                    space_key_pressed = True
-                if event.key == pg.K_ESCAPE:
-                    esc_key_pressed = True
-                if event.key == pg.K_q:
-                    q_key_pressed = True
-                if event.key == pg.K_s:
-                    s_key_pressed = True
-                if event.key == pg.K_m:
-                    m_key_pressed = True
-                if event.key == pg.K_RETURN:
-                    enter_key_pressed = True
-                if event.key == pg.K_r:
-                    r_key_pressed = True
-                if event.key == pg.K_y:
-                    y_key_pressed = True
-                if event.key == pg.K_n:
-                    n_key_pressed = True
-                if event.key == pg.K_RIGHT:
-                    right_key_pressed = True
-                if event.key == pg.K_LEFT:
-                    left_key_pressed = True
-                if event.key == pg.K_UP:
-                    up_key_pressed = True
-                if event.key == pg.K_DOWN:
-                    down_key_pressed = True
-        else:
-            game.current_state.get_event(event)
+           
+            running = False
+ 
+        game.current_state.get_event(event)
 
-    if game.current_state is not None:
-        game.current_state.update(dt)
+   
+    game.current_state.update(dt)
 
-        if game.current_state.done:
-            if game.current_state.quit:
-                running = False
-                continue
-            return_state = game.current_state.return_state
-
-            if game.current_state.next_state == "GAME_OVER":
-                # game_state = "game_over"
-                game.current_state = GameOverState(game)
-                # game.current_state = None
-
-            elif game.current_state.next_state == "PAUSE":
-                # game_state = "paused"
-                game.current_state = PauseState(game)
-                # game.current_state.startup()
-                game_state = "paused"
-
-            elif game.current_state.next_state == "PLAY":
-                if game.current_state.return_state == "RESUME_GAME":
-                    game.current_state = PlayState(game)
-                    # game.current_state.startup()
-                else:
-                    start_game()
-                    game.current_state = PlayState(game)
-                    # game.current_state.startup()
-
-            elif game.current_state.next_state == "TITLE":
+    if game.current_state.done:
+        if game.current_state.quit:
+            running = False
+            continue
+        return_state = game.current_state.return_state
+        if game.current_state.next_state == "GAME_OVER":
+            game.current_state = GameOverState(game)
+        elif game.current_state.next_state == "PAUSE":
+            game.current_state = PauseState(game)
+            game_state = "paused"
+        elif game.current_state.next_state == "PLAY":
+            if game.current_state.return_state == "RESUME_GAME":
+                game.current_state = PlayState(game)                    
+            else:
+                start_game()
+                game.current_state = PlayState(game)                    
+        elif game.current_state.next_state == "TITLE":
+            if game.current_state.return_state == "RESUME_GAME":
                 game.current_state = TitleState(game)
-                # game.current_state.startup()
-                game_state = "title"
-                # game.current_state = None
-
-            elif game.current_state.next_state == "SETTINGS":
-                game.current_state = None
-                game_state = "settings"
-                if return_state == "PAUSE":
-                    previous_state = "paused"
-                elif return_state == "TITLE":
-                    previous_state = "title"                                   
-                
-            # elif game.current_state.next_state == "RETURN_FROM_SETTINGS":                
-            #     if previous_state == "paused":
-            #         game.current_state = PauseState(game)
-            #         game.current_state.startup()
-            #         game_state = "paused"
-            #     elif game.previous_state == "TITLE":                    
-            #         game.current_state = TitleState(game)
-            #         game.current_state.startup()
-            #         game_state = "title"
-            #     game.current_state.startup()
-            #     game_state = game.previous_state            
-
-    if quit_event:
-        running = False
-
-    if show_confirmation:
-            if y_key_pressed:
-                if pending_action == "quit_to_title":
-                    game_state = "title"
-                elif pending_action == "reset_high_score":
-                    reset_high_score(game)
-                    high_score_reset_message = True
-                    message_timer = pg.time.get_ticks()
-                elif pending_action == "quit_game":
-                    running = False
-
-                show_confirmation = False
-                pending_action = None
-
-            elif n_key_pressed or esc_key_pressed:
-                show_confirmation = False
-                pending_action = None
-
-    # --- GAME LOGIC & STATE UPDATES ---
-    else:
-        if game_state == "settings":
-            if right_key_pressed and current_volume_step < 10:
-                current_volume_step += 1
-                new_volume = current_volume_step / 10
-                sound_manager.set_music_volume(new_volume)
-            if left_key_pressed and current_volume_step > 0:
-                current_volume_step -= 1
-                new_volume = current_volume_step / 10
-                sound_manager.set_music_volume(new_volume)
-            if up_key_pressed and current_sound_volume_step < 10:
-                current_sound_volume_step += 1
-                new_sound_volume = current_sound_volume_step / 10
-                sound_manager.set_sound_volume(new_sound_volume)
-            if down_key_pressed and current_sound_volume_step > 0:
-                current_sound_volume_step -= 1
-                new_sound_volume = current_sound_volume_step / 10
-                sound_manager.set_sound_volume(new_sound_volume)
-            if esc_key_pressed:
-                game_state = previous_state
-
-                if previous_state == "paused":
-                    game.current_state = PauseState(game)
-                    # game.current_state.startup()
-                elif previous_state == "title":
-                    game.current_state = TitleState(game)
-                    # game.current_state.startup()
-                                    
-            if s_key_pressed:
-                sound_enabled = not sound_enabled
-                sound_manager.set_sound_volume(1.0 if sound_enabled else 0.0)
-            if m_key_pressed:
-                music_enabled = sound_manager.toggle_music()
-            if r_key_pressed:
-                pending_action = "reset_high_score"
-                show_confirmation = True
-            now = pg.time.get_ticks()
-            if now - graphics_manager.last_highlight_time > graphics_manager.highlight_delay:
-                graphics_manager.last_highlight_time = now
-                for icon in graphics_manager.arrows_list:
-                    icon.set_alpha(150)
-                graphics_manager.arrows_list[graphics_manager.highlight_index].set_alpha(255)
-                graphics_manager.highlight_index = (graphics_manager.highlight_index + 1) % 4
-            # Check if the message timer has expired
-            if high_score_reset_message:
-                now = pg.time.get_ticks()
-                if now - message_timer > MESSAGE_DISPLAY_TIME:
-                    high_score_reset_message = False  # Hide the message       
+            else:
+                game.current_state = TitleState(game)
+        elif game.current_state.next_state == "SETTINGS":                
+            if game.current_state.return_state == "PAUSE":
+                game.current_state = PauseState(game)
+            elif game.current_state.return_state == "TITLE":
+                game.current_state = TitleState(game)                    
+            else:
+                game.current_state = SettingsState(game)
 
     # --- DRAWING SECTION ---
 
-    if game_state in ("settings"):
-        screen.blit(graphics_manager.background_image, (0, 0))
-    else:
-        screen.fill(BG_COLOUR)
-        
-    if game.current_state is not None:
-        # Let the current state draw itself
-        game.current_state.draw(screen)
-    else:
-        if game_state not in ("title", "settings", "game_over"):
-            all_sprites_group.draw(screen)        
-
-        if game_state == "settings":
-            draw_settings_menu()
-            if show_confirmation:
-                draw_confirm_popup(screen, game)
+    screen.fill(BG_COLOUR)
+    game.current_state.draw(screen)
+    
 
     pg.display.flip()
 pg.quit()
