@@ -106,25 +106,16 @@ while running:
             game.current_state = GameOverState(game)
         elif game.current_state.next_state == "PAUSE":
             game.current_state = PauseState(game)
-            game_state = "paused"
         elif game.current_state.next_state == "PLAY":
             if game.current_state.return_state == "RESUME_GAME":
-                game.current_state = PlayState(game)                    
+                game.current_state = PlayState(game)
             else:
                 start_game()
-                game.current_state = PlayState(game)                    
+                game.current_state = PlayState(game)
         elif game.current_state.next_state == "TITLE":
-            if game.current_state.return_state == "RESUME_GAME":
-                game.current_state = TitleState(game)
-            else:
-                game.current_state = TitleState(game)
-        elif game.current_state.next_state == "SETTINGS":                
-            if game.current_state.return_state == "PAUSE":
-                game.current_state = PauseState(game)
-            elif game.current_state.return_state == "TITLE":
-                game.current_state = TitleState(game)                    
-            else:
-                game.current_state = SettingsState(game)
+            game.current_state = TitleState(game)
+        elif game.current_state.next_state == "SETTINGS":
+            game.current_state = SettingsState(game)
 
     # --- DRAWING SECTION ---
 
