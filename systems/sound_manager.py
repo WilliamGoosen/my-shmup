@@ -33,7 +33,7 @@ class SoundManager:
             self.update_sound_volume(name)
 
     def update_sound_volume(self, name):
-        final_volume = self.volumes[name] * self.sound_volume
+        final_volume = self.volumes[name] * self.sound_volume * self.sound_enabled
         sound_obj = self.sounds[name]
         if isinstance(sound_obj, list):
             for sound in sound_obj:
@@ -79,3 +79,10 @@ class SoundManager:
         else:
             pg.mixer.music.pause()
         return self.music_enabled
+    
+    def toggle_sound(self):        
+        self.sound_enabled = not self.sound_enabled           
+        self.set_sound_volume(self.sound_volume)
+        
+
+
