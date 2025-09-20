@@ -1,6 +1,6 @@
 # My Shmup: A PyGame Architecture Project
 
-A shoot-'em-up game built with Pygame, focusing on clean code architecture and best practices.
+A shoot-'em-up game built with Pygame Community Edition (pygame-ce), focusing on clean code architecture and best practices.
 
 This project began as an implementation of the ["Shmup" tutorial series](https://www.youtube.com/playlist?list=PLsk-HSGFjnaH5yghzu7PcOzm9NhsW0Urw) by [KidsCanCode](https://github.com/kidscancode) but has since evolved into my own personal codebase for exploring game structure, refactoring, and feature development.
 
@@ -60,6 +60,8 @@ This game can be packaged into a standalone application using [PyInstaller](htt
     
 
 ## Credits & Licensing
+
+- **Game Framework:** Built using [pygame-ce](https://pyga.me/) (Community Edition), licensed under the [GNU LGPL v2.1](licenses/LGPL-2.1-pygame-ce.txt).
 
 - **Original Tutorial Inspiration:** [KidsCanCode](https://www.youtube.com/c/Kidscancode)
     
