@@ -12,8 +12,8 @@ class SettingsState(BaseState):
         self.show_confirmation = False
         self.pending_action = False
         self.high_score_reset_message = False
-        self.now = pg.time.get_ticks()
-        self.message_timer = pg.time.get_ticks()
+        self.animation_frame_time = 0
+        self.message_timer = 0
         
     def startup(self):
         super().startup()
@@ -25,7 +25,7 @@ class SettingsState(BaseState):
                     if self.pending_action == "reset_high_score":
                         reset_high_score(self.game)
                         self.high_score_reset_message = True
-                        self.message_timer = pg.time.get_ticks()
+                        self.message_timer = 0
                     self.show_confirmation = False
                     self.pending_action = None
                 elif event.key == pg.K_n or event.key == pg.K_ESCAPE:
@@ -67,18 +67,18 @@ class SettingsState(BaseState):
                 
     
     def update(self, dt):
-        self.now = pg.time.get_ticks()
-        if self.now - self.game.graphics_manager.last_highlight_time > self.game.graphics_manager.highlight_delay:
-            self.game.graphics_manager.last_highlight_time = self.now
+        self.animation_frame_time += dt * 1000
+        if self.animation_frame_time > self.game.graphics_manager.highlight_delay:
+            self.animation_frame_time = 0
             for icon in self.game.graphics_manager.arrows_list:
                 icon.set_alpha(150)
             self.game.graphics_manager.arrows_list[self.game.graphics_manager.highlight_index].set_alpha(255)
             self.game.graphics_manager.highlight_index = (self.game.graphics_manager.highlight_index + 1) % 4
         # Check if the message timer has expired
         if self.high_score_reset_message:
-            self.now = pg.time.get_ticks()
-            if self.now - self.message_timer > MESSAGE_DISPLAY_TIME:
-                self.high_score_reset_message = False  # Hide the message       
+            self.message_timer += dt * 1000
+            if self.message_timer > MESSAGE_DISPLAY_TIME:
+                self.high_score_reset_message = False  # Hide the message          
     
     def draw(self, surface):
         surface.blit(self.game.graphics_manager.background_image, (0, 0))
