@@ -49,39 +49,36 @@ class SettingsState(BaseState):
                     self.current_sound_volume_step -= 1
                     new_sound_volume = self.current_sound_volume_step / 10
                     self.game.sound_manager.set_sound_volume(new_sound_volume)
+
                 if event.key == pg.K_ESCAPE:
-                    self.return_state = self.game.previous_state                    
-                    if self.return_state == "PAUSE":
-                        self.done = True
-                        self.next_state = "PAUSE"
-                        self.return_state = "RESUME"                       
-                    elif self.return_state == "TITLE":
-                        self.done = True
-                        self.next_state = "TITLE"
-                        self.return_state = "RESUME_GAME"                        
+                    self.done = True
+                    self.next_state = self.game.previous_state
+                       
                 if event.key == pg.K_s:
                     self.game.sound_manager.sound_enabled = not self.game.sound_manager.sound_enabled
                     self.game.sound_manager.set_sound_volume(1.0 if self.game.sound_manager.sound_enabled else 0.0)
+
                 if event.key == pg.K_m:
                     self.game.sound_manager.music_enabled = self.game.sound_manager.toggle_music()
+
                 if event.key == pg.K_r:
                     self.pending_action = "reset_high_score"
                     self.show_confirmation = True
-                self.now = pg.time.get_ticks()
-                if self.now - self.game.graphics_manager.last_highlight_time > self.game.graphics_manager.highlight_delay:
-                    self.game.graphics_manager.last_highlight_time = self.now
-                    for icon in self.game.graphics_manager.arrows_list:
-                        icon.set_alpha(150)
-                    self.game.graphics_manager.arrows_list[self.game.graphics_manager.highlight_index].set_alpha(255)
-                    self.game.graphics_manager.highlight_index = (self.game.graphics_manager.highlight_index + 1) % 4
-                # Check if the message timer has expired
-                if self.high_score_reset_message:
-                    self.now = pg.time.get_ticks()
-                    if self.now - self.message_timer > MESSAGE_DISPLAY_TIME:
-                        self.high_score_reset_message = False  # Hide the message       
+                
     
     def update(self, dt):
-        return super().update(dt)
+        self.now = pg.time.get_ticks()
+        if self.now - self.game.graphics_manager.last_highlight_time > self.game.graphics_manager.highlight_delay:
+            self.game.graphics_manager.last_highlight_time = self.now
+            for icon in self.game.graphics_manager.arrows_list:
+                icon.set_alpha(150)
+            self.game.graphics_manager.arrows_list[self.game.graphics_manager.highlight_index].set_alpha(255)
+            self.game.graphics_manager.highlight_index = (self.game.graphics_manager.highlight_index + 1) % 4
+        # Check if the message timer has expired
+        if self.high_score_reset_message:
+            self.now = pg.time.get_ticks()
+            if self.now - self.message_timer > MESSAGE_DISPLAY_TIME:
+                self.high_score_reset_message = False  # Hide the message       
     
     def draw(self, surface):
         surface.blit(self.game.graphics_manager.background_image, (0, 0))
