@@ -55,8 +55,7 @@ class SettingsState(BaseState):
                     self.next_state = self.game.previous_state
                        
                 if event.key == pg.K_s:
-                    self.game.sound_manager.sound_enabled = not self.game.sound_manager.sound_enabled
-                    self.game.sound_manager.set_sound_volume(1.0 if self.game.sound_manager.sound_enabled else 0.0)
+                    self.game.sound_manager.toggle_sound()                    
 
                 if event.key == pg.K_m:
                     self.game.sound_manager.music_enabled = self.game.sound_manager.toggle_music()
