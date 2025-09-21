@@ -66,6 +66,7 @@ game.stars_group = pg.sprite.Group()
 game.meteors_group = pg.sprite.Group() 
 game.powerups_group = pg.sprite.Group()
 game.players_group = pg.sprite.Group()
+game.scale_factor = scale_factor
 game.WIDTH = WIDTH
 game.HEIGHT = HEIGHT
 game.BG_COLOUR = BG_COLOUR

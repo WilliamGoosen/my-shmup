@@ -17,6 +17,7 @@ class Game:
         self.players_group = None
 
         # Screen Properties
+        self.scale_factor = 1.0
         self.WIDTH = 0
         self.HEIGHT = 0
         self.BG_COLOUR = pg.Color(BG_COLOUR) # Use a simple default
