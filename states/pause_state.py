@@ -42,9 +42,10 @@ class PauseState(BaseState):
                     self.next_state = "SETTINGS"
                     self.game.previous_state = "PAUSE"
 
-    def draw(self, surface):
+    def draw(self, surface: pg.Surface):
         """Render pause state to surface."""
         self.game.all_sprites_group.draw(surface)
+        scale_factor = self.game.scale_factor
         overlay = pg.Surface((self.game.WIDTH, self.game.HEIGHT), pg.SRCALPHA)
         overlay.fill(PAUSE_OVERLAY)
         surface.blit(overlay, (0, 0))
@@ -52,7 +53,7 @@ class PauseState(BaseState):
         draw_text(
              surface,
              "Score: " + str(self.game.score),
-             22,
+             round(22 * scale_factor),
              self.game.WIDTH / 2,
              self.game.HEIGHT * 0.01,
              self.game.font_name,
@@ -74,21 +75,20 @@ class PauseState(BaseState):
         if self.show_confirmation:
             draw_confirm_popup(surface, self.game)    
 
-    def draw_pause_menu(self, surface):
+    def draw_pause_menu(self, surface: pg.Surface):
+        scale_factor = self.game.scale_factor
         icon_x = self.game.WIDTH * 0.42
-        icon_text_padding_x = 0.06
-        text_x = icon_x + self.game.WIDTH * icon_text_padding_x
+        text_x = icon_x + self.game.WIDTH * 0.06
         icon_y = self.game.HEIGHT * 0.7
-        icon_text_padding_y = 0.026
-        text_y = icon_y + self.game.WIDTH * icon_text_padding_y
+        text_y = icon_y + self.game.WIDTH * 0.026
 
-        draw_text(surface, "PAUSED", 48, self.game.WIDTH / 2, self.game.HEIGHT / 4, self.game.font_name)
+        draw_text(surface, "PAUSED", round(48 * scale_factor), self.game.WIDTH / 2, self.game.HEIGHT / 4, self.game.font_name)
 
-        draw_icon(surface, self.game.graphics_manager.icons["spacebar_icon"], icon_x, icon_y + icon_text_padding_y)
-        draw_icon_text(surface, "Resume", 22, text_x, text_y, self.game.font_name)
+        draw_icon(surface, self.game.graphics_manager.icons["spacebar_icon"], icon_x, icon_y)
+        draw_icon_text(surface, "Resume", round(22 * scale_factor), text_x, text_y, self.game.font_name)
 
         draw_icon(surface, self.game.graphics_manager.icons["esc_icon"], self.game.WIDTH * 0.07, self.game.HEIGHT * 0.92)
-        draw_icon_text(surface, "Quit to Title", 18, self.game.WIDTH * 0.11, self.game.HEIGHT * 0.940, self.game.font_name)
+        draw_icon_text(surface, "Quit to Title", round(18 * scale_factor), self.game.WIDTH * 0.11, self.game.HEIGHT * 0.940, self.game.font_name)
 
         draw_icon(surface, self.game.graphics_manager.icons["enter_icon"], self.game.WIDTH * 0.92, self.game.HEIGHT * 0.915)
-        draw_icon_text(surface, "Settings", 18, self.game.WIDTH * 0.78, self.game.HEIGHT * 0.940, self.game.font_name)
+        draw_icon_text(surface, "Settings", round(18 * scale_factor), self.game.WIDTH * 0.78, self.game.HEIGHT * 0.940, self.game.font_name)
