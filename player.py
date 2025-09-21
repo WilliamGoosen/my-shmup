@@ -2,14 +2,20 @@ import pygame as pg
 import math
 from sprites import Bullet
 from settings import *
+from typing import TYPE_CHECKING
+
+# Use the TYPE_CHECKING guard to import for type hints only
+if TYPE_CHECKING:
+    from game import Game
 
 class Player(pg.sprite.Sprite):
-    def __init__(self, game):
+    def __init__(self, game: 'Game'):
         pg.sprite.Sprite.__init__(self)
         self.image = game.graphics_manager.player_image
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.bullet_image = None
+        self.scale_factor: float = game.scale_factor
         self.screen_width = game.WIDTH
         self.screen_height = game.HEIGHT
         self.rect.centerx = game.WIDTH / 2
@@ -46,17 +52,17 @@ class Player(pg.sprite.Sprite):
 
             self.speedx = 0
             if keystate[pg.K_LEFT] and not keystate[pg.K_RIGHT]:
-                self.speedx = -PLAYER_SPEED
+                self.speedx = -PLAYER_SPEED * self.scale_factor
             elif keystate[pg.K_RIGHT] and not keystate[pg.K_LEFT]:
-                self.speedx = PLAYER_SPEED
+                self.speedx = PLAYER_SPEED * self.scale_factor
             else:
                 self.speedx = 0
 
             self.speedy = 0
             if keystate[pg.K_UP] and not keystate[pg.K_DOWN]:
-                self.speedy = -PLAYER_SPEED
+                self.speedy = -PLAYER_SPEED * self.scale_factor
             elif keystate[pg.K_DOWN] and not keystate[pg.K_UP]:
-                self.speedy = PLAYER_SPEED
+                self.speedy = PLAYER_SPEED * self.scale_factor
             else:
                 self.speedy = 0
             
@@ -107,7 +113,7 @@ class Player(pg.sprite.Sprite):
                                     (self.rect.left, self.rect.centery),
                                     (self.rect.right, self.rect.centery)]
                 for bullet_location in bullet_locations:
-                    bullet = Bullet(bullet_location[0], bullet_location[1], self.bullet_image)
+                    bullet = Bullet(bullet_location[0], bullet_location[1], self.scale_factor, self.bullet_image)
                     self.all_sprites.add(bullet)
                     self.bullets.add(bullet)
                 sound_manager.play("shoot")

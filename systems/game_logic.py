@@ -39,7 +39,7 @@ def handle_bullet_meteoroid_collisions(meteors_group, bullets_group, current_sco
         explosion = Explosion(meteor.rect.center, 'large_explosion', graphics_mgr.explosion_animations)
         all_sprites_group.add(explosion)
         if random() < POWERUP_DROP_CHANCE:
-            power = Powerup(graphics_mgr.powerup_icons, meteor.rect.center, width, height)
+            power = Powerup(graphics_mgr.powerup_icons, meteor.rect.center, width, height, scale_factor)
             all_sprites_group.add(power)
             powerups_group.add(power)
         if meteor.can_split():
