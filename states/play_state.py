@@ -2,13 +2,19 @@ import pygame as pg
 from states.base_state import BaseState
 from systems import game_logic
 from sprites import Explosion
-from utilities import draw_lives, draw_shield_bar, draw_text
+from utilities import draw_lives, draw_health_bar, draw_text
 from settings import *
+from typing import TYPE_CHECKING
+
+# Use the TYPE_CHECKING guard to import for type hints only
+if TYPE_CHECKING:
+    from game import Game
 
 class PlayState(BaseState):
-    def __init__(self, game):
+    def __init__(self, game: 'Game'):
         super().__init__(game)
         self.death_explosion = None
+        self.game: Game
 
     def startup(self):
         super().startup()
@@ -28,7 +34,8 @@ class PlayState(BaseState):
             self.game.WIDTH,
             self.game.HEIGHT,
             self.game.all_sprites_group,
-            self.game.meteors_group
+            self.game.meteors_group,
+            self.game.scale_factor
         )
             
         # check to see if a bullet hit a meteoroid
@@ -41,7 +48,8 @@ class PlayState(BaseState):
             self.game.all_sprites_group,
             self.game.powerups_group,
             self.game.WIDTH,
-            self.game.HEIGHT
+            self.game.HEIGHT,
+            self.game.scale_factor
         )
 
         # check to see if a meteoroid hits the player
@@ -54,7 +62,8 @@ class PlayState(BaseState):
             self.game.sound_manager,
             self.game.graphics_manager,
             self.game.WIDTH,
-            self.game.HEIGHT
+            self.game.HEIGHT,
+            self.game.scale_factor
             )
         
         # If the function says the player died, THEN we create the explosion here in main.py.
@@ -78,11 +87,13 @@ class PlayState(BaseState):
                 self.game.new_high_score_achieved = game_logic.new_high_score_check(self.game)        
 
     def draw(self, surface):
+        scale_factor = self.game.scale_factor
         self.game.all_sprites_group.draw(surface)
+        
         draw_text(
              surface,
              "Score: " + str(self.game.score),
-             22,
+             round(22 * scale_factor),
              self.game.WIDTH / 2,
              self.game.HEIGHT * 0.01,
              self.game.font_name,
@@ -90,14 +101,12 @@ class PlayState(BaseState):
         )
         draw_lives(
              surface,
-             5,
-             5,
+             self.game,
              self.game.player.lives,
              self.game.graphics_manager.player_icon
         )
-        draw_shield_bar(
+        draw_health_bar(
              surface,
-             self.game.WIDTH - BAR_LENGTH - 5,
-             5,
+             self.game,
              self.game.player.shield
         )

@@ -1,6 +1,11 @@
 import pygame as pg
 from settings import *
 from os import path
+from typing import TYPE_CHECKING
+
+# Use the TYPE_CHECKING guard to import for type hints only
+if TYPE_CHECKING:
+    from game import Game
 
 def reset_high_score(game):    
     game.high_score = 0
@@ -97,20 +102,27 @@ def draw_icon(surf, image, x, y):
     surf.blit(image, icon_rect)
 
 
-def draw_lives(surf, x, y, lives, player_mini_img):
+def draw_lives(surf: pg.Surface, game: 'Game', lives: int, player_mini_img: pg.Surface) -> None:
+    lives_icon_spacing = PLAYER_LIVES_ICON_SPACING * game.scale_factor
+    screen_edge_offset_x = 5 * game.scale_factor
+    screen_edge_offset_y = 5 * game.scale_factor
     for i in range(lives):
         img_rect = player_mini_img.get_rect()
-        img_rect.x = x + PLAYER_LIVES_ICON_SPACING * i
-        img_rect.y = y
+        img_rect.x = screen_edge_offset_x + lives_icon_spacing  * i
+        img_rect.y = screen_edge_offset_y
         surf.blit(player_mini_img, img_rect)
 
 
-def draw_shield_bar(surf, x, y, percent):
+def draw_health_bar(surf: pg.Surface, game: 'Game', percent: float) -> None:
+    health_bar_length = BAR_LENGTH * game.scale_factor
+    health_bar_height = BAR_HEIGHT * game.scale_factor
+    screen_edge_offset_x = game.WIDTH - health_bar_length - 5 * game.scale_factor
+    screen_edge_offset_y = 5 * game.scale_factor
     if percent < 0:
         percent = 0
-    fill = (percent / 100) * BAR_LENGTH
-    outline_rect = pg.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
-    fill_rect = pg.Rect(x, y, fill, BAR_HEIGHT)
+    fill = (percent / 100) * health_bar_length
+    outline_rect = pg.Rect(screen_edge_offset_x, screen_edge_offset_y, health_bar_length, health_bar_height)
+    fill_rect = pg.Rect(screen_edge_offset_x, screen_edge_offset_y, fill, health_bar_height)
     pg.draw.rect(surf, RED, fill_rect)
     pg.draw.rect(surf, WHITE, outline_rect, 2)
 

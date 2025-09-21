@@ -1,6 +1,6 @@
 import pygame as pg
 from states.base_state import BaseState
-from utilities import draw_text, draw_lives, draw_shield_bar, draw_icon, draw_icon_text, draw_confirm_popup
+from utilities import draw_text, draw_lives, draw_health_bar, draw_icon, draw_icon_text, draw_confirm_popup
 from settings import *
 
 class PauseState(BaseState):
@@ -60,15 +60,13 @@ class PauseState(BaseState):
         )
         draw_lives(
              surface,
-             5,
-             5,
+             self.game,
              self.game.player.lives,
              self.game.graphics_manager.player_icon
         )
-        draw_shield_bar(
+        draw_health_bar(
              surface,
-             self.game.WIDTH - BAR_LENGTH - 5,
-             5,
+             self.game,
              self.game.player.shield
         )
         
