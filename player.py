@@ -26,10 +26,14 @@ class Player(pg.sprite.Sprite):
         self.bullets = game.bullets_group
         self.power = PLAYER_START_POWER
         self.just_respawned = False
+        self.input_cooldown_timer = 0.3
         self.power_time = pg.time.get_ticks()
         self.sound_manager = game.sound_manager
 
     def update(self, dt):
+        if self.input_cooldown_timer > 0:
+            self.input_cooldown_timer -= dt
+            return
         if not self.hidden:
             keystate= pg.key.get_pressed()
             if keystate[pg.K_SPACE]:

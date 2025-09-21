@@ -40,11 +40,7 @@ class PauseState(BaseState):
                 elif event.key == pg.K_RETURN:
                     self.done = True                    
                     self.next_state = "SETTINGS"
-                    self.game.previous_state = "PAUSE"                    
-
-    def update(self, dt):
-        """Update pause state logic."""
-        # self.game.all_sprites_group.update(dt)
+                    self.game.previous_state = "PAUSE"
 
     def draw(self, surface):
         """Render pause state to surface."""

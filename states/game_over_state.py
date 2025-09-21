@@ -28,11 +28,8 @@ class GameOverState(BaseState):
                     
             else:
                 if event.key == pg.K_SPACE:
-                    # start_game()
                     self.done = True
-                    self.next_state = "PLAY"
-                        # game.current_state = PlayState(game)
-                        # game.current_state.startup()
+                    self.next_state = "PLAY"                        
                 elif event.key == pg.K_q:
                     self.pending_action = "quit_game"
                     self.show_confirmation = True
@@ -40,12 +37,6 @@ class GameOverState(BaseState):
                 elif event.key == pg.K_ESCAPE:
                     self.done = True
                     self.next_state = "TITLE"
-                        # game.current_state = TitleState(game)
-                        # game.current_state.startup()
-    
-    def update(self, dt):
-        # return super().update(dt)
-        self.game.all_sprites_group.update(dt)
     
     def draw(self, surface):
         surface.blit(self.game.graphics_manager.background_image, (0, 0))

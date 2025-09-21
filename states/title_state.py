@@ -23,10 +23,7 @@ class TitleState(BaseState):
             elif event.key == pg.K_ESCAPE:
                 self.quit = True
                 self.done = True
-
-    def update(self, dt):
-        self.game.all_sprites_group.update(dt)
-
+    
     def draw(self, surface):
         surface.blit(self.game.graphics_manager.background_image, (0, 0))
         self.draw_title_menu(surface)
