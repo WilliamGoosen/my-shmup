@@ -4,19 +4,9 @@ from settings import *
 from sprites import Starfield
 from player import Player
 from systems import SoundManager, GraphicsManager, game_logic
-from utilities import spawn_wave, load_or_create_file
+from utilities import spawn_wave, load_or_create_file, load_config
 from game import Game
 from states import PlayState, PauseState, TitleState, GameOverState, SettingsState
-
-def load_config():
-    config_dict = {}
-    config_lines = load_or_create_file(CONFIG_FILE, 'scale_factor=1.0').splitlines()
-
-    for line in config_lines:
-        if "=" in line:
-            key, value = line.split("=", 1)
-            config_dict[key] = value
-    return config_dict
 
 def new_star():
     s = Starfield(WIDTH, HEIGHT)

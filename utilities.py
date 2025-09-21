@@ -7,6 +7,16 @@ def reset_high_score(game):
     with open(HS_FILE, 'w') as f:
         f.write('0')    
 
+def load_config():
+    config_dict = {}
+    config_lines = load_or_create_file(CONFIG_FILE, 'scale_factor=1.0\nmusic_volume=0.5\nsound_volume=0.5').splitlines()
+
+    for line in config_lines:
+        if "=" in line:
+            key, value = line.split("=", 1)
+            config_dict[key] = value
+    return config_dict
+    
 def load_or_create_file(file_path, default_value):
     # Check if the file exists first
     if path.exists(file_path):
