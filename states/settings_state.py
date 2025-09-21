@@ -1,7 +1,7 @@
 import pygame as pg
 from states.base_state import BaseState
 from states import PauseState, TitleState
-from utilities import draw_text, draw_icon, draw_icon_text, draw_confirm_popup, reset_high_score
+from utilities import draw_text, draw_icon, draw_icon_text, draw_confirm_popup, reset_high_score, update_config
 from settings import *
 
 class SettingsState(BaseState):
@@ -37,18 +37,25 @@ class SettingsState(BaseState):
                     self.current_volume_step += 1
                     new_volume = self.current_volume_step / 10
                     self.game.sound_manager.set_music_volume(new_volume)
+                    update_config("music_volume", new_volume)
+
                 if event.key == pg.K_LEFT and self.current_volume_step > 0:
                     self.current_volume_step -= 1
                     new_volume = self.current_volume_step / 10
                     self.game.sound_manager.set_music_volume(new_volume)
+                    update_config("music_volume", new_volume)
+
                 if event.key == pg.K_UP and self.current_sound_volume_step < 10:
                     self.current_sound_volume_step += 1
                     new_sound_volume = self.current_sound_volume_step / 10
                     self.game.sound_manager.set_sound_volume(new_sound_volume)
+                    update_config("sound_volume", new_sound_volume)
+
                 if event.key == pg.K_DOWN and self.current_sound_volume_step > 0:
                     self.current_sound_volume_step -= 1
                     new_sound_volume = self.current_sound_volume_step / 10
                     self.game.sound_manager.set_sound_volume(new_sound_volume)
+                    update_config("sound_volume", new_sound_volume)
 
                 if event.key == pg.K_ESCAPE:
                     self.done = True
