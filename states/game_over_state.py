@@ -45,27 +45,26 @@ class GameOverState(BaseState):
             draw_confirm_popup(surface, self.game)
     
     def draw_game_over_title(self, surface):
+        scale_factor = self.game.scale_factor
         icon_x = self.game.WIDTH * 0.42
-        icon_text_padding_x = 0.06
-        text_x = icon_x + self.game.WIDTH * icon_text_padding_x
+        text_x = icon_x + self.game.WIDTH * 0.06
         icon_y = self.game.HEIGHT * 0.7
-        icon_text_padding_y = 0.026
-        text_y = icon_y + self.game.WIDTH * icon_text_padding_y
-        y_increment = 40
+        text_y = icon_y + self.game.WIDTH * 0.026
+        y_increment = 40 * scale_factor
 
-        draw_text(surface, "High Score: " + str(self.game.high_score), 22, self.game.WIDTH / 2, 15, self.game.font_name)
-        draw_text(surface, "GAME OVER", 48, self.game.WIDTH / 2, self.game.HEIGHT / 4, self.game.font_name)
-        draw_text(surface, "Score: " + str(self.game.score), 30, self.game.WIDTH / 2, self.game.HEIGHT * 2 / 5 + y_increment, self.game.font_name)
+        draw_text(surface, "High Score: " + str(self.game.high_score), round(22 * scale_factor), self.game.WIDTH * 0.5, self.game.HEIGHT * 0.02, self.game.font_name)
+        draw_text(surface, "GAME OVER", round(48 * scale_factor), self.game.WIDTH / 2, self.game.HEIGHT / 4, self.game.font_name)
+        draw_text(surface, "Score: " + str(self.game.score), round(30 * scale_factor), self.game.WIDTH / 2, self.game.HEIGHT * 2 / 5 + y_increment, self.game.font_name)
 
         if self.game.new_high_score_achieved:
-            draw_text(surface, "NEW HIGH SCORE!", 30, self.game.WIDTH / 2, self.game.HEIGHT * 2 / 5, self.game.font_name, GREEN)
+            draw_text(surface, "NEW HIGH SCORE!", round(30 * scale_factor), self.game.WIDTH / 2, self.game.HEIGHT * 2 / 5, self.game.font_name, GREEN)
 
-        draw_icon(surface, self.game.graphics_manager.icons["spacebar_icon"], icon_x, icon_y + icon_text_padding_y)
-        draw_icon_text(surface, "Try Again", 22, text_x, text_y, self.game.font_name)
+        draw_icon(surface, self.game.graphics_manager.icons["spacebar_icon"], icon_x, icon_y)
+        draw_icon_text(surface, "Try Again", round(22 * scale_factor), text_x, text_y, self.game.font_name)
 
         draw_icon(surface, self.game.graphics_manager.icons["esc_icon"], self.game.WIDTH * 0.07, self.game.HEIGHT * 0.92)
-        draw_icon_text(surface, "Quit to Title", 18, self.game.WIDTH * 0.11, self.game.HEIGHT * 0.940, self.game.font_name)
+        draw_icon_text(surface, "Quit to Title", round(18 * scale_factor), self.game.WIDTH * 0.11, self.game.HEIGHT * 0.940, self.game.font_name)
 
         draw_icon(surface, self.game.graphics_manager.icons["q_icon"], self.game.WIDTH * 0.93, self.game.HEIGHT * 0.92)
-        draw_icon_text(surface, "Quit Game", 18, self.game.WIDTH * 0.770, self.game.HEIGHT * 0.940, self.game.font_name)
+        draw_icon_text(surface, "Quit Game", round(18 * scale_factor), self.game.WIDTH * 0.770, self.game.HEIGHT * 0.940, self.game.font_name)
 

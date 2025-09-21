@@ -29,21 +29,20 @@ class TitleState(BaseState):
         self.draw_title_menu(surface)
 
     def draw_title_menu(self, surface):
+        scale_factor = self.game.scale_factor
         icon_x = self.game.WIDTH * 0.40
-        icon_text_padding_x = 0.06
-        text_x = icon_x + self.game.WIDTH * icon_text_padding_x
+        text_x = icon_x + self.game.WIDTH * 0.06
         icon_y = self.game.HEIGHT * 0.7
-        icon_text_padding_y = 0.026
-        text_y = icon_y + self.game.WIDTH * icon_text_padding_y
+        text_y = icon_y + self.game.WIDTH * 0.026
 
-        draw_text(surface, "High Score: " + str(self.game.high_score), 22, self.game.WIDTH * 0.5, self.game.HEIGHT * 0.02, self.game.font_name)
-        draw_text(surface, "SHMUP!", 64, self.game.WIDTH / 2, self.game.HEIGHT / 4, self.game.font_name)
+        draw_text(surface, "High Score: " + str(self.game.high_score), round(22 * scale_factor), self.game.WIDTH * 0.5, self.game.HEIGHT * 0.02, self.game.font_name)
+        draw_text(surface, "SHMUP!", round(64 * scale_factor), self.game.WIDTH / 2, self.game.HEIGHT / 4, self.game.font_name)
 
-        draw_icon(surface, self.game.graphics_manager.icons["spacebar_icon"], icon_x, icon_y + icon_text_padding_y)
-        draw_icon_text(surface, "Start Game", 22, text_x, text_y, self.game.font_name)
+        draw_icon(surface, self.game.graphics_manager.icons["spacebar_icon"], icon_x, icon_y)
+        draw_icon_text(surface, "Start Game", round(22 * scale_factor), text_x, text_y, self.game.font_name)
 
         draw_icon(surface, self.game.graphics_manager.icons["enter_icon"], self.game.WIDTH * 0.92, self.game.HEIGHT * 0.915)
-        draw_icon_text(surface, "Settings", 18, self.game.WIDTH * 0.78, self.game.HEIGHT * 0.940, self.game.font_name) 
+        draw_icon_text(surface, "Settings", round(18 * scale_factor), self.game.WIDTH * 0.78, self.game.HEIGHT * 0.940, self.game.font_name) 
 
         draw_icon(surface, self.game.graphics_manager.icons["esc_icon"], self.game.WIDTH * 0.07, self.game.HEIGHT * 0.92)
-        draw_icon_text(surface, "Quit Game", 18, self.game.WIDTH * 0.11, self.game.HEIGHT * 0.940, self.game.font_name)
+        draw_icon_text(surface, "Quit Game", round(18 * scale_factor), self.game.WIDTH * 0.11, self.game.HEIGHT * 0.940, self.game.font_name)

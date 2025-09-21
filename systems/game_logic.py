@@ -14,8 +14,8 @@ def new_high_score_check(game):
     else:
         return False    
 
-def new_meteroid(meteor_images, width, height, all_sprites_group, meteors_group, position = None, velocity = None, is_medium = False):
-    m = Meteoroid(meteor_images, width, height, position, velocity, is_medium)
+def new_meteroid(meteor_images, width, height, all_sprites_group, meteors_group, scale_factor: float, position = None, velocity = None, is_medium = False):
+    m = Meteoroid(meteor_images, width, height, scale_factor, position, velocity, is_medium)
     all_sprites_group.add(m)
     meteors_group.add(m)
 
@@ -27,11 +27,11 @@ def clear_game_objects(meteors_group, bullets_group, powerups_group):
     for powerup in powerups_group:
         powerup.kill()
 
-def spawn_meteoroid_wave(meteor_images, width, height, all_sprites_group, meteors_group):
-    spawn_wave(new_meteroid, NUMBER_OF_METEOROIDS, meteor_images, width, height, all_sprites_group, meteors_group)
+def spawn_meteoroid_wave(meteor_images, width, height, all_sprites_group, meteors_group, scale_factor: float):
+    spawn_wave(new_meteroid, NUMBER_OF_METEOROIDS, meteor_images, width, height, all_sprites_group, meteors_group, scale_factor)
 
 def handle_bullet_meteoroid_collisions(meteors_group, bullets_group, current_score, sound_mgr,
-                                       graphics_mgr, all_sprites_group, powerups_group, width, height):
+                                       graphics_mgr, all_sprites_group, powerups_group, width, height, scale_factor: float):
     meteoroid_is_hit = pg.sprite.groupcollide(meteors_group, bullets_group, True, True)
     for meteor in meteoroid_is_hit:
         current_score += 62 - meteor.radius
@@ -39,7 +39,7 @@ def handle_bullet_meteoroid_collisions(meteors_group, bullets_group, current_sco
         explosion = Explosion(meteor.rect.center, 'large_explosion', graphics_mgr.explosion_animations)
         all_sprites_group.add(explosion)
         if random() < POWERUP_DROP_CHANCE:
-            power = Powerup(graphics_mgr.powerup_icons, meteor.rect.center, width, height)
+            power = Powerup(graphics_mgr.powerup_icons, meteor.rect.center, width, height, scale_factor)
             all_sprites_group.add(power)
             powerups_group.add(power)
         if meteor.can_split():
@@ -50,10 +50,10 @@ def handle_bullet_meteoroid_collisions(meteors_group, bullets_group, current_sco
             meteor.kill()
         else:
             if len(meteors_group) < NUMBER_OF_METEOROIDS:
-                new_meteroid(graphics_mgr.meteoroid_images, width, height, all_sprites_group, meteors_group)
+                new_meteroid(graphics_mgr.meteoroid_images, width, height, all_sprites_group, meteors_group, scale_factor)
     return current_score
 
-def handle_player_meteoroid_collisions(player, meteors_group, bullets_group, powerups_group, all_sprites_group, sound_mgr, graphics_mgr, width, height):
+def handle_player_meteoroid_collisions(player, meteors_group, bullets_group, powerups_group, all_sprites_group, sound_mgr, graphics_mgr, width, height, scale_factor: float):
     player_is_hit = pg.sprite.spritecollide(player, meteors_group, True, pg.sprite.collide_circle)
     for meteor in player_is_hit:
         sound_mgr.play("explosion")
@@ -61,7 +61,7 @@ def handle_player_meteoroid_collisions(player, meteors_group, bullets_group, pow
         player.shield -= meteor.radius * 2
         explosion = Explosion(meteor.rect.center, 'small_explosion', graphics_mgr.explosion_animations)
         all_sprites_group.add(explosion)
-        new_meteroid(graphics_mgr.meteoroid_images, width, height, all_sprites_group, meteors_group)
+        new_meteroid(graphics_mgr.meteoroid_images, width, height, all_sprites_group, meteors_group, scale_factor)
         if player.shield <= 0:
             sound_mgr.play("player_die")
             clear_game_objects(meteors_group, bullets_group, powerups_group)
@@ -87,9 +87,9 @@ def handle_player_powerup_collisions(player, powerups_group, sound_mgr):
             sound_mgr.play("bolt_gold")
 
 
-def handle_player_respawn(player, graphics_mgr, width, height, all_sprites_group, meteors_group):
+def handle_player_respawn(player, graphics_mgr, width, height, all_sprites_group, meteors_group, scale_factor: float):
     if player.just_respawned:        
-        spawn_meteoroid_wave(graphics_mgr.meteoroid_images, width, height, all_sprites_group, meteors_group)
+        spawn_meteoroid_wave(graphics_mgr.meteoroid_images, width, height, all_sprites_group, meteors_group, scale_factor)
         player.rect.centerx = width / 2
         player.rect.bottom = height - PLAYER_START_Y_OFFSET
         player.just_respawned = False

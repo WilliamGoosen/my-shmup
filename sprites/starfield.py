@@ -3,13 +3,14 @@ from random import uniform, randint, choice
 from settings import *
 
 class Starfield(pg.sprite.Sprite):
-    def __init__(self, screen_width, screen_height):
+    def __init__(self, screen_width, screen_height, scale_factor: float):
         pg.sprite.Sprite.__init__(self)
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.radius = randint(1, STAR_MAX_RADIUS)
+        self.scale_factor = scale_factor
         self.pos_y = uniform(0, screen_height)
-        self.speedy = uniform(STAR_MIN_SPEED, STAR_MAX_SPEED + 1)
+        self.speedy = uniform(STAR_MIN_SPEED, STAR_MAX_SPEED + 1) * self.scale_factor
         shapes = ['pixel', 'square', 'circle']
         shape = choice(shapes)
 
@@ -19,13 +20,15 @@ class Starfield(pg.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.rect.x = randint(0, self.screen_width - self.rect.width)
         elif shape == 'square':
-            self.image = pg.Surface((2, 2), pg.SRCALPHA)
+            scaled_size = max(1, int(2 * self.scale_factor))
+            self.image = pg.Surface((scaled_size, scaled_size), pg.SRCALPHA)
             pg.draw.rect(self.image, WHITE, self.image.get_rect())
             self.rect = self.image.get_rect()
             self.rect.x = randint(0, self.screen_width - self.rect.width)
         elif shape == 'circle':
-            self.image = pg.Surface((self.radius * 2, self.radius * 2), pg.SRCALPHA)
-            pg.draw.circle(self.image, WHITE, (self.radius, self.radius), self.radius)
+            scaled_radius = max(1, int(self.radius * self.scale_factor ))
+            self.image = pg.Surface((scaled_radius * 2, scaled_radius * 2), pg.SRCALPHA)
+            pg.draw.circle(self.image, WHITE, (scaled_radius, scaled_radius), scaled_radius)
             self.rect = self.image.get_rect()
             self.rect.x = randint(0, self.screen_width - self.rect.width)
 

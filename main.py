@@ -9,7 +9,7 @@ from game import Game
 from states import PlayState, PauseState, TitleState, GameOverState, SettingsState
 
 def new_star():
-    s = Starfield(WIDTH, HEIGHT)
+    s = Starfield(game.WIDTH, game.HEIGHT, game.scale_factor)
     game.all_sprites_group.add(s)
     game.stars_group.add(s)
 
@@ -38,7 +38,7 @@ def start_game():
     game.players_group.add(game.player)
 
     spawn_starfield()
-    game_logic.spawn_meteoroid_wave(game.graphics_manager.meteoroid_images, WIDTH, HEIGHT, game.all_sprites_group, game.meteors_group)
+    game_logic.spawn_meteoroid_wave(game.graphics_manager.meteoroid_images, WIDTH, HEIGHT, game.all_sprites_group, game.meteors_group, game.scale_factor)
 
 # Constants and initialisation
 config = load_config()
@@ -66,6 +66,7 @@ game.stars_group = pg.sprite.Group()
 game.meteors_group = pg.sprite.Group() 
 game.powerups_group = pg.sprite.Group()
 game.players_group = pg.sprite.Group()
+game.scale_factor = scale_factor
 game.WIDTH = WIDTH
 game.HEIGHT = HEIGHT
 game.BG_COLOUR = BG_COLOUR

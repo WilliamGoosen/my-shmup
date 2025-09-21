@@ -3,11 +3,12 @@ from random import randrange, randint, choice
 from settings import *
 
 class Meteoroid(pg.sprite.Sprite):
-    def __init__(self, meteor_images, screen_width, screen_height, 
+    def __init__(self, meteor_images, screen_width, screen_height, scale_factor: float,
                  position=None, velocity=None, is_medium=False):
         pg.sprite.Sprite.__init__(self)
         self.screen_width = screen_width
         self.screen_height = screen_height
+        self.scale_factor = scale_factor
         self.meteor_images = meteor_images
         self.is_medium = is_medium
         self.pos = pg.math.Vector2(0, 0) # Float position tracking
@@ -48,8 +49,8 @@ class Meteoroid(pg.sprite.Sprite):
         if velocity:
             self.speedx, self.speedy = velocity
         else:
-            self.speedx = randint(METEOROID_MIN_SPEED_X, METEOROID_MAX_SPEED_X)
-            self.speedy = randint(METEOROID_MIN_SPEED_Y, METEOROID_MAX_SPEED_Y)
+            self.speedx = randint(METEOROID_MIN_SPEED_X, METEOROID_MAX_SPEED_X) * self.scale_factor
+            self.speedy = randint(METEOROID_MIN_SPEED_Y, METEOROID_MAX_SPEED_Y) * self.scale_factor
 
         # Rotation
         self.rot = 0
@@ -57,7 +58,7 @@ class Meteoroid(pg.sprite.Sprite):
         self.rot_speed = randint(METEOROID_MIN_ROTATE_SPEED, METEOROID_MAX_ROTATE_SPEED)
 
     def can_split(self):
-        return self.radius > 40  # Extract constant
+        return self.radius > 40 * self.scale_factor  # Extract constant
 
     def create_split_meteoroids(self, meteor_images_medium):
         """Return new meteoroids from split, without adding to groups"""
@@ -68,9 +69,9 @@ class Meteoroid(pg.sprite.Sprite):
         right_velocity = (self.speedx + METEOROID_SPLIT_SPEED_BOOST, self.speedy)
 
         return [
-            Meteoroid(meteor_images_medium, self.screen_width, self.screen_height,
+            Meteoroid(meteor_images_medium, self.screen_width, self.screen_height, self.scale_factor,
                      position=left_pos, velocity=left_velocity, is_medium=True),
-            Meteoroid(meteor_images_medium, self.screen_width, self.screen_height,
+            Meteoroid(meteor_images_medium, self.screen_width, self.screen_height, self.scale_factor,
                      position=right_pos, velocity=right_velocity, is_medium=True)
         ]
 
