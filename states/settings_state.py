@@ -95,23 +95,21 @@ class SettingsState(BaseState):
     def draw_settings_menu(self, surface):
         scale_factor = self.game.scale_factor
         icon_x = self.game.WIDTH * 0.37
-        icon_text_padding_x = 0.05
-        text_x = icon_x + self.game.WIDTH * icon_text_padding_x
+        text_x = icon_x + self.game.WIDTH * 0.05
         icon_y = self.game.HEIGHT * 2 / 5
-        icon_text_padding_y = 0.026
-        text_y = icon_y + self.game.WIDTH * icon_text_padding_y
+        text_y = icon_y + self.game.WIDTH * 0.026
         y_increment = 0.056 * self.game.HEIGHT
 
         draw_text(surface, "High Score: " + str(self.game.high_score), round(22 * scale_factor), self.game.WIDTH * 0.5, self.game.HEIGHT * 0.02, self.game.font_name) 
         draw_text(surface, "SETTINGS", round(48 * scale_factor), self.game.WIDTH * 0.5, self.game.HEIGHT * 0.25, self.game.font_name)
 
-        draw_icon(surface, self.game.graphics_manager.icons["s_icon"], icon_x, icon_y + icon_text_padding_y)
+        draw_icon(surface, self.game.graphics_manager.icons["s_icon"], icon_x, icon_y)
         draw_icon_text(surface, f"Sound: {"ON" if self.game.sound_manager.sound_enabled else "OFF"}", round(22 * scale_factor), text_x, text_y, self.game.font_name) 
 
-        draw_icon(surface, self.game.graphics_manager.icons["m_icon"], icon_x, icon_y + icon_text_padding_y + y_increment)
+        draw_icon(surface, self.game.graphics_manager.icons["m_icon"], icon_x, icon_y + y_increment)
         draw_icon_text(surface, f"Music: {"ON" if self.game.sound_manager.music_enabled else "OFF"}", round(22 * scale_factor), text_x, text_y + y_increment, self.game.font_name)
 
-        draw_icon(surface, self.game.graphics_manager.icons["r_icon"], icon_x, icon_y + icon_text_padding_y + 2 * y_increment)
+        draw_icon(surface, self.game.graphics_manager.icons["r_icon"], icon_x, icon_y + 2 * y_increment)
         draw_icon_text(surface, "Reset High Score", round(22 * scale_factor), text_x, text_y + 2 * y_increment, self.game.font_name)
         if self.high_score_reset_message:
             draw_text(surface, "High Score Reset!", round(22 * scale_factor), self.game.WIDTH / 2, self.game.HEIGHT * 0.56, self.game.font_name, GREEN)
