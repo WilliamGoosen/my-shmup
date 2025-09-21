@@ -34,7 +34,7 @@ def handle_bullet_meteoroid_collisions(meteors_group, bullets_group, current_sco
                                        graphics_mgr, all_sprites_group, powerups_group, width, height, scale_factor: float):
     meteoroid_is_hit = pg.sprite.groupcollide(meteors_group, bullets_group, True, True)
     for meteor in meteoroid_is_hit:
-        current_score += 62 - meteor.radius
+        current_score += 62 - round(meteor.radius / scale_factor)
         sound_mgr.play("explosion")
         explosion = Explosion(meteor.rect.center, 'large_explosion', graphics_mgr.explosion_animations)
         all_sprites_group.add(explosion)
@@ -58,7 +58,7 @@ def handle_player_meteoroid_collisions(player, meteors_group, bullets_group, pow
     for meteor in player_is_hit:
         sound_mgr.play("explosion")
         player.power = 1
-        player.shield -= meteor.radius * 2
+        player.shield -= meteor.radius * 2 / scale_factor
         explosion = Explosion(meteor.rect.center, 'small_explosion', graphics_mgr.explosion_animations)
         all_sprites_group.add(explosion)
         new_meteroid(graphics_mgr.meteoroid_images, width, height, all_sprites_group, meteors_group, scale_factor)
