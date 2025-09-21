@@ -4,19 +4,9 @@ from settings import *
 from sprites import Starfield
 from player import Player
 from systems import SoundManager, GraphicsManager, game_logic
-from utilities import spawn_wave, load_or_create_file
+from utilities import spawn_wave, load_or_create_file, load_config
 from game import Game
 from states import PlayState, PauseState, TitleState, GameOverState, SettingsState
-
-def load_config():
-    config_dict = {}
-    config_lines = load_or_create_file(CONFIG_FILE, 'scale_factor=1.0').splitlines()
-
-    for line in config_lines:
-        if "=" in line:
-            key, value = line.split("=", 1)
-            config_dict[key] = value
-    return config_dict
 
 def new_star():
     s = Starfield(WIDTH, HEIGHT)
@@ -53,7 +43,8 @@ def start_game():
 # Constants and initialisation
 config = load_config()
 scale_factor = float(config.get("scale_factor", 1.0))
-music_volume = float(config.get("music_volume", 0.1))
+music_volume = float(config.get("music_volume", 0.5))
+sound_volume = float(config.get("sound_volume", 0.5))
 WIDTH = int(BASE_WIDTH * scale_factor)
 HEIGHT = int(BASE_HEIGHT * scale_factor)
 img_dir = path.join(path.dirname(__file__), 'img')
@@ -68,7 +59,7 @@ clock = pg.time.Clock()
 # --- Create the Game object and populate it ---
 game = Game()
 game.graphics_manager = GraphicsManager(scale_factor)
-game.sound_manager = SoundManager()
+game.sound_manager = SoundManager(music_volume = music_volume, sound_volume = sound_volume)
 game.all_sprites_group = pg.sprite.Group()
 game.bullets_group = pg.sprite.Group()
 game.stars_group = pg.sprite.Group()

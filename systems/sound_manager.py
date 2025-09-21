@@ -4,11 +4,11 @@ from random import choice
 from settings import *
 
 class SoundManager:
-    def __init__(self):
+    def __init__(self, music_volume, sound_volume):
         self.sounds = {} # Holds the pg.mixer.Sound objects
         self.volumes = {} # Remembers the original volume for each sound
-        self.sound_volume = 0.5
-        self.music_volume = 0.4
+        self.music_volume = music_volume
+        self.sound_volume = sound_volume
         self.current_track = None
         self.music_enabled = True
         self.sound_enabled = True
