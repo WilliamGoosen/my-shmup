@@ -22,7 +22,7 @@ class Meteoroid(pg.sprite.Sprite):
         self.pos.y += self.speedy * dt
         
         # Update integer rect for drawing/collision
-        self.rect.center = (int(self.pos.x), int(self.pos.y))
+        self.rect.center = (round(self.pos.x), round(self.pos.y))
 
         if self.is_off_screen():
             self.initialize_meteoroid()  # Full reset
@@ -82,7 +82,7 @@ class Meteoroid(pg.sprite.Sprite):
             self.image = new_image
             self.rect = self.image.get_rect()
             self.pos = current_pos
-            self.rect.center = (int(self.pos.x), int(self.pos.y))
+            self.rect.center = (round(self.pos.x), round(self.pos.y))
 
     def is_off_screen(self):
         return (self.rect.top > self.screen_height + self.rect.height or 
