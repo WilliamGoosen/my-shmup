@@ -65,8 +65,8 @@ class Meteoroid(pg.sprite.Sprite):
         left_pos = (self.rect.centerx, self.rect.centery)
         right_pos = (self.rect.centerx, self.rect.centery)
         
-        left_velocity = (self.speedx - METEOROID_SPLIT_SPEED_BOOST, self.speedy)
-        right_velocity = (self.speedx + METEOROID_SPLIT_SPEED_BOOST, self.speedy)
+        left_velocity = (self.speedx - METEOROID_SPLIT_SPEED_BOOST * self.scale_factor, self.speedy)
+        right_velocity = (self.speedx + METEOROID_SPLIT_SPEED_BOOST * self.scale_factor, self.speedy)
 
         return [
             Meteoroid(meteor_images_medium, self.screen_width, self.screen_height, self.scale_factor,
