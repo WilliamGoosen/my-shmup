@@ -36,14 +36,14 @@ This game can be packaged into a standalone application using [PyInstaller](htt
     **Option 1: Create a Distribution Folder (Recommended for testing)**
     *Easier to debug if necessary, as all files are in one folder.*
     ```bash
-    pyinstaller --onedir --windowed --add-data "img;img" --add-data "snd;snd" --icon=game_icon.ico main.py
+    pyinstaller --onedir --windowed --add-data "img;img" --add-data "snd;snd" --add-data "licenses;licenses" --icon=game_icon.ico main.py
     ```
     *The executable and all required game files will be created in a new distribution directory.*
 
     **Option 2: Create a Single Executable File**
     *Creates a single, portable `.exe` file for distribution.*
     ```bash
-    pyinstaller --onefile --windowed --add-data "img;img" --add-data "snd;snd" --icon=game_icon.ico main.py
+    pyinstaller --onefile --windowed --add-data "img;img" --add-data "snd;snd" --add-data "licenses;licenses" --icon=game_icon.ico main.py
     ```
     *A single executable file will be created in the `dist/` directory.*
     
