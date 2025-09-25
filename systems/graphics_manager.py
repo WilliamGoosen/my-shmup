@@ -8,9 +8,9 @@ class GraphicsManager:
         self.ui_scale_factor = ui_scale_factor
         self.meteoroid_images = self.load_meteoroid_images(ALL_METEOROID_FILES)
         self.meteoroid_images_medium = self.load_meteoroid_images(MEDIUM_METEOROID_FILES)
-        self.player_image = None
-        self.player_icon = None
-        self.bullet_image = None
+        self.player_image: pg.Surface
+        self.player_icon: pg.Surface
+        self.bullet_image: pg.Surface
         self.icons = {}
         self.arrows = {}
         self.powerup_icons = {}
@@ -21,9 +21,9 @@ class GraphicsManager:
         self.highlight_delay = 600
         self.base_height = BASE_HEIGHT
         self.base_width = BASE_WIDTH
-        self.background_image = None
-        self.confirm_overlay = None
-        self.popup_bg = None
+        self.background_image: pg.Surface
+        self.confirm_overlay: pg.Surface
+        self.popup_bg: pg.Surface
         self.create_ui_surfaces()
         self.load_background()
         self.load_player_image()

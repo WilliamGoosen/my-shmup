@@ -13,20 +13,20 @@ class Player(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self)
         self.image = game.graphics_manager.player_image
         self.image.set_colorkey(BLACK)
-        self.rect = self.image.get_rect()
-        self.bullet_image = None
+        self.rect: pg.Rect = self.image.get_rect()
+        self.bullet_image: pg.Surface
         self.scale_factor: float = game.scale_factor
-        self.screen_width = game.WIDTH
-        self.screen_height = game.HEIGHT
-        self.rect.centerx = game.WIDTH / 2
-        self.rect.bottom = game.HEIGHT - PLAYER_START_Y_OFFSET
+        self.screen_width = game.screen_width
+        self.screen_height = game.screen_height
+        self.rect.centerx = game.screen_width / 2
+        self.rect.bottom = game.screen_height - PLAYER_START_Y_OFFSET
         self.speedx = 0
         self.speedy = 0
         self.shield = PLAYER_MAX_SHIELD
         self.shoot_delay = PLAYER_SHOOT_DELAY
         self.bullet_frame_time = 0
         self.space_was_pressed = False
-        self.lives = PLAYER_START_LIVES
+        self.lives: int = PLAYER_START_LIVES
         self.hidden = False
         self.all_sprites = game.all_sprites_group
         self.bullets = game.bullets_group

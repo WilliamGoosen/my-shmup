@@ -9,7 +9,7 @@ from game import Game
 from states import PlayState, PauseState, TitleState, GameOverState, SettingsState
 
 def new_star():
-    s = Starfield(game.WIDTH, game.HEIGHT, game.scale_factor)
+    s = Starfield(game)
     game.all_sprites_group.add(s)
     game.stars_group.add(s)
 
@@ -17,7 +17,7 @@ def spawn_starfield():
     spawn_wave(new_star, NUMBER_OF_STARS)
 
 def start_game():
-    global score, game_state, life_gained, player
+    global score, life_gained
 
     score = 0
     game.score = 0
@@ -67,9 +67,9 @@ game.meteors_group = pg.sprite.Group()
 game.powerups_group = pg.sprite.Group()
 game.players_group = pg.sprite.Group()
 game.scale_factor = scale_factor
-game.WIDTH = WIDTH
-game.HEIGHT = HEIGHT
-game.BG_COLOUR = BG_COLOUR
+game.screen_width = WIDTH
+game.screen_height = HEIGHT
+game.background_colour = BG_COLOUR
 game.font_name = pg.font.match_font(FONT_NAME)
 game.high_score = int(load_or_create_file(HS_FILE, 0))
 game.current_state = TitleState(game)

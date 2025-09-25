@@ -8,9 +8,9 @@ class Powerup(pg.sprite.Sprite):
         self.screen_width = screen_width
         self.screen_height = screen_height
         self.type = choice(["shield_gold", "bolt_gold"])
-        self.image = powerup_images[self.type]
+        self.image: pg.Surface = powerup_images[self.type]
         self.image.set_colorkey(BLACK)
-        self.rect = self.image.get_rect()
+        self.rect: pg.Rect = self.image.get_rect()
         self.rect.center = center
         self.speedy = POWERUP_SPEED * scale_factor
 

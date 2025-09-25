@@ -11,6 +11,7 @@ class Meteoroid(pg.sprite.Sprite):
         self.scale_factor = scale_factor
         self.meteor_images = meteor_images
         self.is_medium = is_medium
+        self.rect: pg.Rect
         self.pos = pg.math.Vector2(0, 0) # Float position tracking
         
         # Initialize state
