@@ -124,7 +124,7 @@ def draw_health_bar(surf: pg.Surface, game: 'Game', percent: float) -> None:
     outline_rect = pg.Rect(screen_edge_offset_x, screen_edge_offset_y, health_bar_length, health_bar_height)
     fill_rect = pg.Rect(screen_edge_offset_x, screen_edge_offset_y, fill, health_bar_height)
     pg.draw.rect(surf, RED, fill_rect)
-    pg.draw.rect(surf, WHITE, outline_rect, 2)
+    pg.draw.rect(surf, WHITE, outline_rect, int(2 * game.scale_factor))
 
 
 def spawn_wave(function_to_call, count, *args):

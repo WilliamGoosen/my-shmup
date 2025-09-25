@@ -7,7 +7,7 @@ class Powerup(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self)
         self.screen_width = screen_width
         self.screen_height = screen_height
-        self.type = choice(["shield_gold", "bolt_gold"])
+        self.type = choice(["heart", "bolt_gold"])
         self.image: pg.Surface = powerup_images[self.type]
         self.image.set_colorkey(BLACK)
         self.rect: pg.Rect = self.image.get_rect()

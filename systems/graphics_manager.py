@@ -88,9 +88,10 @@ class GraphicsManager:
     def load_powerup_icons(self):
         self.powerup_icons = {}
         icon_list = POWERUP_LIST # Your full icon list
+        special_scales = {"heart": 1/2}
         
         for file in icon_list:
-            key, loaded_icon = self._load_image_base(file, default_scale=1, scale_factor=self.ui_scale_factor)
+            key, loaded_icon = self._load_image_base(file, default_scale=1, special_scales=special_scales, scale_factor=self.ui_scale_factor)
             self.powerup_icons[key] = loaded_icon
         
     def load_background(self):
