@@ -116,7 +116,7 @@ def draw_lives(surf: pg.Surface, game: 'Game', lives: int, player_mini_img: pg.S
 def draw_health_bar(surf: pg.Surface, game: 'Game', percent: float) -> None:
     health_bar_length = BAR_LENGTH * game.scale_factor
     health_bar_height = BAR_HEIGHT * game.scale_factor
-    screen_edge_offset_x = game.WIDTH - health_bar_length - 5 * game.scale_factor
+    screen_edge_offset_x = game.screen_width - health_bar_length - 5 * game.scale_factor
     screen_edge_offset_y = 5 * game.scale_factor
     if percent < 0:
         percent = 0
@@ -139,17 +139,19 @@ def spawn_wave(function_to_call, count, *args):
     for _ in range(count):
         function_to_call(*args)
 
-def draw_confirm_popup(surface, game):
+def draw_confirm_popup(surface: pg.Surface, game: 'Game'):
     scale_factor = game.scale_factor
+    screen_width = game.screen_width
+    screen_height = game.screen_height
 
     surface.blit(game.graphics_manager.confirm_overlay, (0, 0))
-    popup_rect = game.graphics_manager.popup_bg.get_rect(center = (game.WIDTH // 2, game.HEIGHT // 2))
+    popup_rect = game.graphics_manager.popup_bg.get_rect(center = (screen_width // 2, screen_height // 2))
     surface.blit(game.graphics_manager.popup_bg, popup_rect.topleft)
 
-    draw_text(surface, "Are you sure?", round(24 * scale_factor), game.WIDTH * 0.5, game.HEIGHT * 0.45, game.font_name, WHITE)
+    draw_text(surface, "Are you sure?", round(24 * scale_factor), screen_width * 0.5, screen_height * 0.45, game.font_name, WHITE)
 
-    draw_icon(surface, game.graphics_manager.icons["y_icon"], game.WIDTH * 0.4, game.HEIGHT * 0.497)
-    draw_text(surface, "Yes", round(24 * scale_factor), game.WIDTH * 0.455, game.HEIGHT * 0.497, game.font_name, WHITE)
+    draw_icon(surface, game.graphics_manager.icons["y_icon"], screen_width * 0.4, screen_height * 0.497)
+    draw_text(surface, "Yes", round(24 * scale_factor), screen_width * 0.455, screen_height * 0.497, game.font_name, WHITE)
 
-    draw_icon(surface, game.graphics_manager.icons["n_icon"], game.WIDTH * 0.55, game.HEIGHT * 0.497)
-    draw_text(surface, "No", round(24 * scale_factor), game.WIDTH * 0.60, game.HEIGHT * 0.497, game.font_name, WHITE)
+    draw_icon(surface, game.graphics_manager.icons["n_icon"], screen_width * 0.55, screen_height * 0.497)
+    draw_text(surface, "No", round(24 * scale_factor), screen_width * 0.60, screen_height * 0.497, game.font_name, WHITE)

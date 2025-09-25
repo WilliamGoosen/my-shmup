@@ -7,7 +7,7 @@ class Explosion(pg.sprite.Sprite):
         self.size = size
         self.explosion_animation = explosion_animation
         self.image = explosion_animation[self.size][0]
-        self.rect = self.image.get_rect()
+        self.rect: pg.Rect = self.image.get_rect()
         self.rect.center = center
         self.frame = 0
         self.frame_time = 0

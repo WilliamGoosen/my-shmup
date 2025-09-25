@@ -14,7 +14,7 @@ class PlayState(BaseState):
     def __init__(self, game: 'Game'):
         super().__init__(game)
         self.death_explosion = None
-        self.game: Game
+        self.game: Game = game
 
     def startup(self):
         super().startup()
@@ -31,8 +31,8 @@ class PlayState(BaseState):
         game_logic.handle_player_respawn(
             self.game.player,
             self.game.graphics_manager,
-            self.game.WIDTH,
-            self.game.HEIGHT,
+            self.game.screen_width,
+            self.game.screen_height,
             self.game.all_sprites_group,
             self.game.meteors_group,
             self.game.scale_factor
@@ -47,8 +47,8 @@ class PlayState(BaseState):
             self.game.graphics_manager,
             self.game.all_sprites_group,
             self.game.powerups_group,
-            self.game.WIDTH,
-            self.game.HEIGHT,
+            self.game.screen_width,
+            self.game.screen_height,
             self.game.scale_factor
         )
 
@@ -61,8 +61,8 @@ class PlayState(BaseState):
             self.game.all_sprites_group,
             self.game.sound_manager,
             self.game.graphics_manager,
-            self.game.WIDTH,
-            self.game.HEIGHT,
+            self.game.screen_width,
+            self.game.screen_height,
             self.game.scale_factor
             )
         
@@ -94,8 +94,8 @@ class PlayState(BaseState):
              surface,
              "Score: " + str(self.game.score),
              round(22 * scale_factor),
-             self.game.WIDTH / 2,
-             self.game.HEIGHT * 0.01,
+             self.game.screen_width / 2,
+             self.game.screen_height * 0.01,
              self.game.font_name,
              WHITE
         )

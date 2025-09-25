@@ -1,11 +1,15 @@
 import pygame as pg
 from states.base_state import BaseState
-from states import PauseState, TitleState
 from utilities import draw_text, draw_icon, draw_icon_text, draw_confirm_popup, reset_high_score, update_config
 from settings import *
+from typing import TYPE_CHECKING
+
+# Use the TYPE_CHECKING guard to import for type hints only
+if TYPE_CHECKING:
+    from game import Game
 
 class SettingsState(BaseState):
-    def __init__(self, game):
+    def __init__(self, game: 'Game'):
         super().__init__(game)
         self.current_volume_step = int(self.game.sound_manager.music_volume * 10)
         self.current_sound_volume_step = int(self.game.sound_manager.sound_volume * 10)
@@ -14,6 +18,7 @@ class SettingsState(BaseState):
         self.high_score_reset_message = False
         self.animation_frame_time = 0
         self.message_timer = 0
+        self.game = game
         
     def startup(self):
         super().startup()
@@ -94,14 +99,16 @@ class SettingsState(BaseState):
     
     def draw_settings_menu(self, surface):
         scale_factor = self.game.scale_factor
-        icon_x = self.game.WIDTH * 0.37
-        text_x = icon_x + self.game.WIDTH * 0.05
-        icon_y = self.game.HEIGHT * 2 / 5
-        text_y = icon_y + self.game.WIDTH * 0.026
-        y_increment = 0.056 * self.game.HEIGHT
+        screen_width = self.game.screen_width
+        screen_height = self.game.screen_height
+        icon_x = screen_width * 0.37
+        text_x = icon_x + screen_width * 0.05
+        icon_y = screen_height * 2 / 5
+        text_y = icon_y + screen_width * 0.026
+        y_increment = 0.056 * screen_height
 
-        draw_text(surface, "High Score: " + str(self.game.high_score), round(22 * scale_factor), self.game.WIDTH * 0.5, self.game.HEIGHT * 0.02, self.game.font_name) 
-        draw_text(surface, "SETTINGS", round(48 * scale_factor), self.game.WIDTH * 0.5, self.game.HEIGHT * 0.25, self.game.font_name)
+        draw_text(surface, "High Score: " + str(self.game.high_score), round(22 * scale_factor), screen_width * 0.5, screen_height * 0.02, self.game.font_name) 
+        draw_text(surface, "SETTINGS", round(48 * scale_factor), screen_width * 0.5, screen_height * 0.25, self.game.font_name)
 
         draw_icon(surface, self.game.graphics_manager.icons["s_icon"], icon_x, icon_y)
         draw_icon_text(surface, f"Sound: {"ON" if self.game.sound_manager.sound_enabled else "OFF"}", round(22 * scale_factor), text_x, text_y, self.game.font_name) 
@@ -112,13 +119,13 @@ class SettingsState(BaseState):
         draw_icon(surface, self.game.graphics_manager.icons["r_icon"], icon_x, icon_y + 2 * y_increment)
         draw_icon_text(surface, "Reset High Score", round(22 * scale_factor), text_x, text_y + 2 * y_increment, self.game.font_name)
         if self.high_score_reset_message:
-            draw_text(surface, "High Score Reset!", round(22 * scale_factor), self.game.WIDTH / 2, self.game.HEIGHT * 0.56, self.game.font_name, GREEN)
+            draw_text(surface, "High Score Reset!", round(22 * scale_factor), screen_width / 2, screen_height * 0.56, self.game.font_name, GREEN)
 
-        block_width = int(15 / 576 * self.game.WIDTH)
-        block_height = 15 / 720 * self.game.HEIGHT
+        block_width = int(15 / 576 * screen_width)
+        block_height = 15 / 720 * screen_height
         block_spacing = 0
-        icon_spacing = 5 / 576 * self.game.WIDTH
-        start_x = self.game.WIDTH // 2 - (10 * (block_width + block_spacing)) // 2  # Center the row
+        icon_spacing = 5 / 576 * screen_width
+        start_x = screen_width // 2 - (10 * (block_width + block_spacing)) // 2  # Center the row
         last_block_x = start_x + (11 * (block_width + block_spacing)) - 1.5 * block_spacing
         plus_x = last_block_x + 1.6 * icon_spacing
         minus_x = start_x - (block_width + icon_spacing)
@@ -129,11 +136,11 @@ class SettingsState(BaseState):
             else:
                 color = GRAY   # Empty block for inactive
             # Draw a rectangle for each block
-            block_rect = pg.Rect(start_x, self.game.HEIGHT * 3.4 / 5, block_width, block_height)
+            block_rect = pg.Rect(start_x, screen_height * 3.4 / 5, block_width, block_height)
             pg.draw.rect(surface, color, block_rect)
             start_x += block_width + block_spacing
 
-        start_x = self.game.WIDTH // 2 - (10 * (block_width + block_spacing)) // 2  # Center the row
+        start_x = screen_width // 2 - (10 * (block_width + block_spacing)) // 2  # Center the row
         last_sound_block_x = start_x + (11 * (block_width + block_spacing)) - 1.5 * block_spacing
         up_x = last_sound_block_x + 1.6 * icon_spacing
         down_x = start_x - (block_width + icon_spacing)
@@ -144,32 +151,32 @@ class SettingsState(BaseState):
             else:
                 color = GRAY   # Empty block for inactive
             # Draw a rectangle for each block
-            block_rect = pg.Rect(start_x, self.game.HEIGHT * 3.85 / 5, block_width, block_height)
+            block_rect = pg.Rect(start_x, screen_height * 3.85 / 5, block_width, block_height)
             pg.draw.rect(surface, color, block_rect)
             start_x += block_width + block_spacing
 
-        draw_text(surface, f"Music Volume: {self.current_volume_step}", round(22 * scale_factor), self.game.WIDTH // 2, self.game.HEIGHT * 3.15 / 5, self.game.font_name)
-        draw_icon(surface, self.game.graphics_manager.icons["left_icon"], minus_x, self.game.HEIGHT * 3.35 / 5)
-        draw_icon(surface, self.game.graphics_manager.icons["right_icon"], plus_x, self.game.HEIGHT * 3.35 / 5)
+        draw_text(surface, f"Music Volume: {self.current_volume_step}", round(22 * scale_factor), screen_width // 2, screen_height * 3.15 / 5, self.game.font_name)
+        draw_icon(surface, self.game.graphics_manager.icons["left_icon"], minus_x, screen_height * 3.35 / 5)
+        draw_icon(surface, self.game.graphics_manager.icons["right_icon"], plus_x, screen_height * 3.35 / 5)
 
-        draw_text(surface, f"Sound Volume: {self.current_sound_volume_step}", round(22 * scale_factor), self.game.WIDTH // 2, self.game.HEIGHT * 3.6 / 5, self.game.font_name)
-        draw_icon(surface, self.game.graphics_manager.icons["down_icon"], down_x, self.game.HEIGHT * 3.8 / 5)
-        draw_icon(surface, self.game.graphics_manager.icons["up_icon"], up_x, self.game.HEIGHT * 3.8 / 5)
+        draw_text(surface, f"Sound Volume: {self.current_sound_volume_step}", round(22 * scale_factor), screen_width // 2, screen_height * 3.6 / 5, self.game.font_name)
+        draw_icon(surface, self.game.graphics_manager.icons["down_icon"], down_x, screen_height * 3.8 / 5)
+        draw_icon(surface, self.game.graphics_manager.icons["up_icon"], up_x, screen_height * 3.8 / 5)
 
-        draw_icon(surface, self.game.graphics_manager.icons["esc_icon"], self.game.WIDTH * 0.07, self.game.HEIGHT * 0.92)
-        draw_icon_text(surface, "Back", round(18 * scale_factor), self.game.WIDTH * 0.11, self.game.HEIGHT * 0.940, self.game.font_name)
+        draw_icon(surface, self.game.graphics_manager.icons["esc_icon"], screen_width * 0.07, screen_height * 0.92)
+        draw_icon_text(surface, "Back", round(18 * scale_factor), screen_width * 0.11, screen_height * 0.940, self.game.font_name)
 
         # Draw animated arrows for game control tutorial
-        draw_icon(surface, self.game.graphics_manager.icons["spacebar_icon"], self.game.WIDTH * 0.92, self.game.HEIGHT * 0.92)
-        draw_icon_text(surface, "Shoot", round(18 * scale_factor), self.game.WIDTH * 0.78, self.game.HEIGHT * 0.940, self.game.font_name)
+        draw_icon(surface, self.game.graphics_manager.icons["spacebar_icon"], screen_width * 0.92, screen_height * 0.92)
+        draw_icon_text(surface, "Shoot", round(18 * scale_factor), screen_width * 0.78, screen_height * 0.940, self.game.font_name)
 
-        arrow_x = self.game.WIDTH * 0.945
-        arrow_y = self.game.HEIGHT * 0.90
-        arrow_spacing_x = 16 / 576 * self.game.WIDTH
-        arrow_spacing_y = 16 / 576 * self.game.HEIGHT
+        arrow_x = screen_width * 0.945
+        arrow_y = screen_height * 0.90
+        arrow_spacing_x = 16 / 576 * screen_width
+        arrow_spacing_y = 16 / 576 * screen_height
 
         draw_icon(surface, self.game.graphics_manager.arrows["right_icon"], arrow_x, arrow_y - arrow_spacing_y)
         draw_icon(surface, self.game.graphics_manager.arrows["left_icon"], arrow_x - 2 * arrow_spacing_x, arrow_y - arrow_spacing_y)
         draw_icon(surface, self.game.graphics_manager.arrows["up_icon"], arrow_x - arrow_spacing_x, arrow_y - 2 * arrow_spacing_y)
         draw_icon(surface, self.game.graphics_manager.arrows["down_icon"], arrow_x - arrow_spacing_x, arrow_y - arrow_spacing_y)
-        draw_icon_text(surface, "Move", round(18 * scale_factor), self.game.WIDTH * 0.78, self.game.HEIGHT * 0.89, self.game.font_name)
+        draw_icon_text(surface, "Move", round(18 * scale_factor), screen_width * 0.78, screen_height * 0.89, self.game.font_name)

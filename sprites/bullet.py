@@ -5,7 +5,7 @@ class Bullet(pg.sprite.Sprite):
     def __init__(self, x, y, scale_factor: float, bullet_image: pg.Surface):
         pg.sprite.Sprite.__init__(self)
         self.image = bullet_image
-        self.rect = self.image.get_rect()
+        self.rect: pg.Rect = self.image.get_rect()
         self.rect.bottom = y
         self.rect.centerx = x
         self.speedy = BULLET_SPEED * scale_factor

@@ -1,18 +1,24 @@
 import pygame as pg
-from random import uniform, randint, choice
+from random import randint, uniform, choice
 from settings import *
+from typing import TYPE_CHECKING
+
+# Use the TYPE_CHECKING guard to import for type hints only
+if TYPE_CHECKING:
+    from game import Game
 
 class Starfield(pg.sprite.Sprite):
-    def __init__(self, screen_width, screen_height, scale_factor: float):
+    def __init__(self, game: 'Game'):
         pg.sprite.Sprite.__init__(self)
-        self.screen_width = screen_width
-        self.screen_height = screen_height
+        self.screen_width: int = game.screen_width
+        self.screen_height: int = game.screen_height
         self.radius = randint(1, STAR_MAX_RADIUS)
-        self.scale_factor = scale_factor
-        self.pos_y = uniform(0, screen_height)
+        self.scale_factor = game.scale_factor
+        self.pos_y = uniform(0, self.screen_height)
         self.speedy = uniform(STAR_MIN_SPEED, STAR_MAX_SPEED + 1) * self.scale_factor
         shapes = ['pixel', 'square', 'circle']
         shape = choice(shapes)
+        self.rect: pg.Rect
 
         if shape == 'pixel':
             self.image = pg.Surface((1, 1), pg.SRCALPHA)
