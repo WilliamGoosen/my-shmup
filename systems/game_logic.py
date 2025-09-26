@@ -77,9 +77,9 @@ def handle_player_meteoroid_collisions(player, meteors_group, bullets_group, pow
 def handle_player_powerup_collisions(player, powerups_group, sound_mgr):
     powerup_is_hit = pg.sprite.spritecollide(player, powerups_group, True)
     for power in powerup_is_hit:
-        if power.type == "heart":
+        if power.type == "health_up":
             player.shield += randint(10, 30)
-            sound_mgr.play("heart")
+            sound_mgr.play("health_up")
             if player.shield >= 100:
                 player.shield = 100
         if power.type == "bolt_gold":
