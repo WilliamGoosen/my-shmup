@@ -124,7 +124,7 @@ SOUND_CONFIG = {
 }
 
 MUSIC_CONFIG = {
-    "gameplay": {"file":"tgfcoder-FrozenJam-SeamlessLoop.ogg", "volume": 0.2, "loops": -1}
+    "gameplay": {"file":"frozenjam-seamlessloop.ogg", "volume": 0.2, "loops": -1}
 }
 
 # Explosion attributes
