@@ -1,0 +1,45 @@
+CREDITS
+
+This game includes content from various sources:
+
+GAME FRAMEWORK
+--------------
+pygame-ce (Community Edition)
+License: GNU LGPL v2.1
+See: licenses/LGPL-2.1-pygame-ce.txt
+
+MUSIC
+-----
+"Frozen Jam" 
+- Original Composer: Elle Trudgett (Copyright 2008)
+- Editor: qubodup
+- Source: https://opengameart.org/content/frozen-jam-seamless-loop
+- License: Creative Commons Attribution 3.0
+- License URL: https://creativecommons.org/licenses/by/3.0/
+
+ART ASSETS & JINGLES
+--------------------
+From Kenney.nl (Public Domain)
+Source: https://kenney.nl/assets
+
+SOUND EFFECTS
+-------------
+Explosion1.wav, Explosion2.wav, Laser_Shoot2.wav
+- Created by WilliamGoosen using Bfxr
+- Tools: https://www.bfxr.net/
+
+CORE CONCEPT INSPIRATION
+------------------------
+KidsCanCode YouTube channel (2015 tutorial)
+https://www.youtube.com/c/Kidscancode
+
+Note: This project's core game concept was inspired by a 9-year-old
+KidsCanCode tutorial that I followed 2 years ago. The current codebase
+represents a complete from-scratch rewrite with custom architecture,
+state management, menu systems, boss battles, and significant feature
+additions that substantially deviate from the original tutorial.
+
+CODE & IMPLEMENTATION
+---------------------
+By WilliamGoosen
+License: MIT License

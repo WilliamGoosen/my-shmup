@@ -36,14 +36,14 @@ This game can be packaged into a standalone application using [PyInstaller](htt
     **Option 1: Create a Distribution Folder (Recommended for testing)**
     *Easier to debug if necessary, as all files are in one folder.*
     ```bash
-    pyinstaller --onedir --windowed --add-data "img;img" --add-data "snd;snd" --add-data "licenses;licenses" --icon=game_icon.ico main.py
+    pyinstaller --onedir --windowed --add-data "img;img" --add-data "snd;snd" --add-data "licenses;licenses" --add-data "CREDITS.txt;." --icon=game_icon.ico main.py
     ```
     *The executable and all required game files will be created in a new distribution directory.*
 
     **Option 2: Create a Single Executable File**
     *Creates a single, portable `.exe` file for distribution.*
     ```bash
-    pyinstaller --onefile --windowed --add-data "img;img" --add-data "snd;snd" --add-data "licenses;licenses" --icon=game_icon.ico main.py
+    pyinstaller --onefile --windowed --add-data "img;img" --add-data "snd;snd" --add-data "licenses;licenses" --add-data "CREDITS.txt;." --icon=game_icon.ico main.py
     ```
     *A single executable file will be created in the `dist/` directory.*
     
@@ -63,9 +63,13 @@ This game can be packaged into a standalone application using [PyInstaller](htt
 
 - **Game Framework:** Built using [pygame-ce](https://pyga.me/) (Community Edition), licensed under the [GNU LGPL v2.1](licenses/LGPL-2.1-pygame-ce.txt).
 
-- **Original Tutorial Inspiration:** [KidsCanCode](https://www.youtube.com/c/Kidscancode)
+- **Original Concept Inspiration:** [KidsCanCode](https://www.youtube.com/c/Kidscancode) - *This project began as a tutorial implementation 2 years ago, but has been completely rewritten from scratch with custom architecture, menus, boss battles, state management, and significant feature expansion.*
     
-- **Music:** "Frozen Jam" by tgfcoder ([https://twitter.com/tgfcoder](https://twitter.com/tgfcoder)) licensed under [CC-BY-3](<http://creativecommons.org/licenses/by/3.0/>)
+- **Music:** "Frozen Jam" by Elle Trudgett, edited by qubodup
+  - Composer: [Elle Trudgett](https://github.com/elle-trudgett) (Copyright 2008)
+  - Editor: [qubodup](https://opengameart.org/users/qubodup)
+  - Source: [OpenGameArt.org](https://opengameart.org/content/frozen-jam-seamless-loop)
+  - License: [CC-BY-3.0](https://creativecommons.org/licenses/by/3.0/)
     
 - **Art Assets & Jingles:** From [Kenney.nl](https://kenney.nl/assets) (Public Domain)
     
