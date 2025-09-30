@@ -24,6 +24,13 @@ def new_boss(game: 'Game'):
     game.all_sprites_group.add(boss)
     game.bosses_group.add(boss)
 
+def cleanup_meteoroids(game: 'Game'):
+    for meteor in game.meteors_group:
+        game.sound_manager.play("explosion")
+        explosion = Explosion(meteor.rect.center, 'large_explosion', game.graphics_manager.explosion_animations)
+        game.all_sprites_group.add(explosion)
+        meteor.kill()
+
 def new_meteroid(meteor_images, width, height, all_sprites_group, meteors_group, scale_factor: float, position = None, velocity = None, is_medium = False):
     m = Meteoroid(meteor_images, width, height, scale_factor, position, velocity, is_medium)
     all_sprites_group.add(m)

@@ -67,6 +67,7 @@ class PlayState(BaseState):
             )
         
         if len(self.game.bosses_group) == 0 and self.game.score > BOSS_SPAWN_SCORE:
+            game_logic.cleanup_meteoroids(self.game)
             game_logic.new_boss(self.game)
         
         # If the function says the player died, THEN we create the explosion here in main.py.
