@@ -21,9 +21,11 @@ class Game:
         self.bullets_group: pg.sprite.Group
         self.stars_group: pg.sprite.Group 
         self.meteors_group: pg.sprite.Group
-        self.powerups_group: pg.sprite.Group | None = None
+        self.powerups_group: pg.sprite.Group
         self.players_group: pg.sprite.Group
         self.bullets_group: pg.sprite.Group
+        self.bosses_group: pg.sprite.Group
+        self.boss_bullets_group: pg.sprite.Group = pg.sprite.Group()
         # Screen Properties
         self.scale_factor: float = 1.0
         self.screen_width: int = 0
@@ -36,6 +38,7 @@ class Game:
 
         # Other important variables from main.py
         self.player: Player
+        self.boss_defeated: bool = False
         self.score: int = 0
         self.high_score: int = 0
         self.new_high_score_achieved: bool = False
