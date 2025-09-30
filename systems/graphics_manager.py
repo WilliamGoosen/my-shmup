@@ -11,6 +11,7 @@ class GraphicsManager:
         self.player_image: pg.Surface
         self.player_icon: pg.Surface
         self.bullet_image: pg.Surface
+        self.boss_bullet_image: pg.Surface
         self.icons = {}
         self.arrows = {}
         self.powerup_icons = {}
@@ -31,18 +32,18 @@ class GraphicsManager:
         self.load_icons()
         self.load_arrows()
         self.load_powerup_icons()
-        self.load_explosion_animations()        
+        self.load_explosion_animations()
 
 
     def load_player_image(self):
         player_image_original = pg.image.load(path.join("img", "playerShip1_orange.png")).convert_alpha()
         self.player_image = pg.transform.scale_by(player_image_original, 0.5 * self.ui_scale_factor)
         self.player_icon = pg.transform.scale_by(player_image_original, 0.25 * self.ui_scale_factor)
-        
+
     def load_bullet_image(self):
         bullet_image_original = pg.image.load(path.join("img", "laserRed16.png")).convert_alpha()
         self.bullet_image = pg.transform.scale_by(bullet_image_original, self.ui_scale_factor)
-        
+        self.boss_bullet_image = pg.transform.rotate(self.bullet_image, 180)
 
     def load_meteoroid_images(self, meteoroid_filenames):
         """Loads and returns a list of meteoroid image surfaces."""

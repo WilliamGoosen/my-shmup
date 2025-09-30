@@ -33,7 +33,6 @@ def start_game():
 
     # player = Player(game)
     game.player = Player(game)
-    game.player.bullet_image = game.graphics_manager.bullet_image
     game.all_sprites_group.add(game.player)
     game.players_group.add(game.player)
 

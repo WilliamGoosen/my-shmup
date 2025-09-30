@@ -54,7 +54,7 @@ METEOROID_SPAWN_Y_MAX = 150
 NUMBER_OF_METEOROIDS = 15
 
 # Bullet attributes
-BULLET_SPEED = -600
+BULLET_SPEED = 600
 
 # Meteoroid image filename
 ALL_METEOROID_FILES = [

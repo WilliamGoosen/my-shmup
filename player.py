@@ -1,6 +1,6 @@
 import pygame as pg
 import math
-from sprites import Bullet
+from sprites import PlayerBullet
 from settings import *
 from typing import TYPE_CHECKING
 
@@ -14,7 +14,7 @@ class Player(pg.sprite.Sprite):
         self.image = game.graphics_manager.player_image
         self.image.set_colorkey(BLACK)
         self.rect: pg.Rect = self.image.get_rect()
-        self.bullet_image: pg.Surface
+        self.bullet_image: pg.Surface = game.graphics_manager.bullet_image
         self.scale_factor: float = game.scale_factor
         self.screen_width = game.screen_width
         self.screen_height = game.screen_height
@@ -113,7 +113,7 @@ class Player(pg.sprite.Sprite):
                                     (self.rect.left, self.rect.centery),
                                     (self.rect.right, self.rect.centery)]
                 for bullet_location in bullet_locations:
-                    bullet = Bullet(bullet_location[0], bullet_location[1], self.scale_factor, self.bullet_image)
+                    bullet = PlayerBullet(bullet_location[0], bullet_location[1], self.scale_factor, self.bullet_image)
                     self.all_sprites.add(bullet)
                     self.bullets.add(bullet)
                 sound_manager.play("shoot")
