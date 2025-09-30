@@ -11,7 +11,7 @@ class Bullet(pg.sprite.Sprite):
         self.speedy = BULLET_SPEED * scale_factor * speed_direction
         
         # Position based on direction
-        if speed_direction > 0: # Downward bullets (enemy): start at top of sprite
+        if speed_direction < 0: # Downward bullets (enemy): start at top of sprite
             self.rect.bottom = y
         else: # Upward bullets (player): start at bottom of sprite  
             self.rect.top = y
@@ -27,5 +27,5 @@ class PlayerBullet(Bullet):
         super().__init__(x, y, scale_factor, bullet_image, speed_direction = -1)
         
 class BossBullet(Bullet):
-    def __init__(self, x, y, scale_factor, bullet_image):
+    def __init__(self, x: int, y: int, scale_factor: float, bullet_image: pg.Surface):
         super().__init__(x, y, scale_factor, bullet_image, speed_direction = 1)
