@@ -24,6 +24,7 @@ def start_game():
     life_gained = 0
 
     game.all_sprites_group.empty()
+    game.bosses_group.empty()
     game.bullets_group.empty()
     game.meteors_group.empty()
     game.players_group.empty()
@@ -64,6 +65,7 @@ game.bullets_group = pg.sprite.Group()
 game.stars_group = pg.sprite.Group()
 game.meteors_group = pg.sprite.Group() 
 game.powerups_group = pg.sprite.Group()
+game.bosses_group = pg.sprite.Group()
 game.players_group = pg.sprite.Group()
 game.scale_factor = scale_factor
 game.screen_width = WIDTH

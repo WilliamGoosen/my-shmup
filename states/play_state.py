@@ -66,6 +66,9 @@ class PlayState(BaseState):
             self.game.scale_factor
             )
         
+        if len(self.game.bosses_group) == 0 and self.game.score > BOSS_SPAWN_SCORE:
+            game_logic.new_boss(self.game)
+        
         # If the function says the player died, THEN we create the explosion here in main.py.
         if player_died:
             self.death_explosion = Explosion(

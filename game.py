@@ -23,6 +23,7 @@ class Game:
         self.meteors_group: pg.sprite.Group
         self.powerups_group: pg.sprite.Group | None = None
         self.players_group: pg.sprite.Group
+        self.bosses_group: pg.sprite.Group
         self.bullets_group: pg.sprite.Group
         # Screen Properties
         self.scale_factor: float = 1.0

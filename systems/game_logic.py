@@ -1,10 +1,15 @@
 import pygame as pg
-from sprites import Explosion, Powerup, Meteoroid
+from sprites import Explosion, Powerup, Meteoroid, Boss
 from utilities import spawn_wave
 from random import random, randint
 from settings import *
+from typing import TYPE_CHECKING
 
-def new_high_score_check(game):
+# Use the TYPE_CHECKING guard to import for type hints only
+if TYPE_CHECKING:
+    from game import Game
+
+def new_high_score_check(game: 'Game'):
     
     if game.score > game.high_score:
         game.high_score = game.score
@@ -12,7 +17,12 @@ def new_high_score_check(game):
             f.write(str(game.score))
         return True
     else:
-        return False    
+        return False
+    
+def new_boss(game: 'Game'):
+    boss = Boss(game)
+    game.all_sprites_group.add(boss)
+    game.bosses_group.add(boss)
 
 def new_meteroid(meteor_images, width, height, all_sprites_group, meteors_group, scale_factor: float, position = None, velocity = None, is_medium = False):
     m = Meteoroid(meteor_images, width, height, scale_factor, position, velocity, is_medium)
