@@ -14,6 +14,7 @@ class PlayState(BaseState):
     def __init__(self, game: 'Game'):
         super().__init__(game)
         self.death_explosion = None
+        self.final_death = False
         self.game: Game = game
 
     def startup(self):
@@ -28,15 +29,8 @@ class PlayState(BaseState):
     def update(self, dt):
         self.game.all_sprites_group.update(dt)
 
-        game_logic.handle_player_respawn(
-            self.game.player,
-            self.game.graphics_manager,
-            self.game.screen_width,
-            self.game.screen_height,
-            self.game.all_sprites_group,
-            self.game.meteors_group,
-            self.game.scale_factor
-        )
+        game_logic.handle_player_respawn(self.game)
+            
             
         # check to see if a bullet hit a meteoroid
         self.game.score = game_logic.handle_bullet_meteoroid_collisions(
@@ -53,7 +47,7 @@ class PlayState(BaseState):
         )
 
         # check to see if a meteoroid hits the player
-        player_died = game_logic.handle_player_meteoroid_collisions(
+        player_died_meteoroid = game_logic.handle_player_meteoroid_collisions(
             self.game.player,
             self.game.meteors_group,
             self.game.bullets_group,
@@ -66,12 +60,17 @@ class PlayState(BaseState):
             self.game.scale_factor
             )
         
-        if len(self.game.bosses_group) == 0 and self.game.score > BOSS_SPAWN_SCORE:
+        player_died_boss_bullet = game_logic.handle_boss_bullet_player_collisions(self.game)
+        
+        # check to see if a player bullet hit the boss
+        game_logic.handle_bullet_boss_collisions(self.game)
+        
+        if len(self.game.bosses_group) == 0 and self.game.score > BOSS_SPAWN_SCORE and not self.game.boss_defeated:
             game_logic.cleanup_meteoroids(self.game)
             game_logic.new_boss(self.game)
         
         # If the function says the player died, THEN we create the explosion here in main.py.
-        if player_died:
+        if player_died_meteoroid or player_died_boss_bullet:
             self.death_explosion = Explosion(
                 self.game.player.rect.center,
                 'player_explosion',
@@ -79,16 +78,20 @@ class PlayState(BaseState):
             self.game.all_sprites_group.add(self.death_explosion)
             self.game.player.hide()
 
+            if self.game.player.lives == 0:
+                 self.final_death = True
+
         # check to see if player hit a powerup
         game_logic.handle_player_powerup_collisions(
             self.game.player,
             self.game.powerups_group,
             self.game.sound_manager) 
 
-        if self.game.player.lives == 0 and self.death_explosion and not self.death_explosion.alive():
+        if self.final_death and self.death_explosion and not self.death_explosion.alive():
                 self.done = True
                 self.next_state = "GAME_OVER"
-                self.game.new_high_score_achieved = game_logic.new_high_score_check(self.game)        
+                self.game.new_high_score_achieved = game_logic.new_high_score_check(self.game)
+                self.final_death = False
 
     def draw(self, surface):
         scale_factor = self.game.scale_factor
@@ -112,5 +115,5 @@ class PlayState(BaseState):
         draw_health_bar(
              surface,
              self.game,
-             self.game.player.shield
+             self.game.player.health
         )

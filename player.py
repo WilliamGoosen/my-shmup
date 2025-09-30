@@ -22,7 +22,7 @@ class Player(pg.sprite.Sprite):
         self.rect.bottom = game.screen_height - PLAYER_START_Y_OFFSET
         self.speedx = 0
         self.speedy = 0
-        self.shield = PLAYER_MAX_SHIELD
+        self.health = PLAYER_MAX_HEALTH
         self.shoot_delay = PLAYER_SHOOT_DELAY
         self.bullet_frame_time = 0
         self.space_was_pressed = False
@@ -122,5 +122,5 @@ class Player(pg.sprite.Sprite):
         # hide the player temporarily
         self.hidden = True
         self.hide_timer = pg.time.get_ticks()
-        self.rect.center = (self.screen_width / 2, self.screen_height + self.rect.height / 2)
+        self.rect.center = (self.screen_width / 2, self.screen_height + 2 * self.rect.height)
 

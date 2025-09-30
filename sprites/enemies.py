@@ -1,4 +1,5 @@
 import pygame as pg
+from sprites import BossBullet
 from settings import *
 from typing import TYPE_CHECKING
 
@@ -28,6 +29,7 @@ class Enemy(pg.sprite.Sprite):
 class Boss(Enemy):
     def __init__(self, game: 'Game'):
         super().__init__(game, health = 100, points= 5000)
+        self.game = game
         self.scale_factor = game.scale_factor
         self.screen_width = game.screen_width
         self.screen_height = game.screen_height
@@ -49,7 +51,9 @@ class Boss(Enemy):
         
         # Shooting variables
         self.shoot_delay = 750
-        self.last_shot = pg.time.get_ticks()
+        self.bullet_frame_time: float = 0
+        self.bullet_image: pg.Surface = game.graphics_manager.boss_bullet_image
+        # self.last_shot = pg.time.get_ticks()
         
     def update(self, dt):
         self.rotate()
@@ -72,7 +76,7 @@ class Boss(Enemy):
         # Start side-to-side movement and shooting once positioned
         if self.speedy == 0 and self.rect.bottom == int(self.rect.height / 2):
             
-            # self.shoot()  # We'll implement this next
+            self.shoot(dt)
             if self.speedx == 0:
                 self.speedx = 120 * self.scale_factor
                 
@@ -94,3 +98,18 @@ class Boss(Enemy):
             self.image = new_image
             self.rect = self.image.get_rect()
             self.rect.center = old_center
+
+    def shoot(self, dt):
+        self.bullet_frame_time += dt * 1000
+        if self.bullet_frame_time > self.shoot_delay:
+            self.bullet_frame_time = 0
+            bullet_locations = [
+                (self.rect.centerx, self.rect.bottom - 0.4 * self.radius),
+                (self.rect.centerx - 0.7 * self.radius, self.rect.bottom - 0.7 * self.radius),
+                (self.rect.centerx + 0.7 * self.radius, self.rect.bottom - 0.7 * self.radius)
+                ]
+            for bullet_location in bullet_locations:
+                bullet = BossBullet(bullet_location[0], bullet_location[1], self.scale_factor, self.bullet_image)
+                self.game.all_sprites_group.add(bullet)
+                self.game.boss_bullets_group.add(bullet)
+            self.game.sound_manager.play("shoot")

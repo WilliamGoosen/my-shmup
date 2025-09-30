@@ -1,5 +1,6 @@
 import pygame as pg
 from sprites import Explosion, Powerup, Meteoroid, Boss
+from systems import game_logic
 from utilities import spawn_wave
 from random import random, randint
 from settings import *
@@ -75,15 +76,14 @@ def handle_player_meteoroid_collisions(player, meteors_group, bullets_group, pow
     for meteor in player_is_hit:
         sound_mgr.play("explosion")
         player.power = 1
-        player.shield -= meteor.radius * 2 / scale_factor
+        player.health -= meteor.radius * 2 / scale_factor
         explosion = Explosion(meteor.rect.center, 'small_explosion', graphics_mgr.explosion_animations)
         all_sprites_group.add(explosion)
         new_meteroid(graphics_mgr.meteoroid_images, width, height, all_sprites_group, meteors_group, scale_factor)
-        if player.shield <= 0:
+        if player.health <= 0:
             sound_mgr.play("player_die")
             clear_game_objects(meteors_group, bullets_group, powerups_group)
             player.lives -= 1
-            player.shield = 100
             # Return True to signal that the main loop should create the death explosion
             return True
         
@@ -95,18 +95,70 @@ def handle_player_powerup_collisions(player, powerups_group, sound_mgr):
     powerup_is_hit = pg.sprite.spritecollide(player, powerups_group, True)
     for power in powerup_is_hit:
         if power.type == "health_up":
-            player.shield += randint(10, 30)
+            player.health += randint(10, 30)
             sound_mgr.play("health_up")
-            if player.shield >= 100:
-                player.shield = 100
+            if player.health >= 100:
+                player.health = 100
         if power.type == "bolt_gold":
             player.powerup()
             sound_mgr.play("bolt_gold")
 
 
-def handle_player_respawn(player, graphics_mgr, width, height, all_sprites_group, meteors_group, scale_factor: float):
-    if player.just_respawned:        
-        spawn_meteoroid_wave(graphics_mgr.meteoroid_images, width, height, all_sprites_group, meteors_group, scale_factor)
-        player.rect.centerx = width / 2
-        player.rect.bottom = height - PLAYER_START_Y_OFFSET
-        player.just_respawned = False
+def handle_player_respawn(game: 'Game'):
+    if game.player.just_respawned:
+        if len(game.bosses_group) == 0 or game.boss_defeated:
+            spawn_meteoroid_wave(game.graphics_manager.meteoroid_images, game.screen_width, game.screen_height, game.all_sprites_group, game.meteors_group, game.scale_factor)
+        game.player.rect.centerx = game.screen_width / 2
+        game.player.rect.bottom = game.screen_height - PLAYER_START_Y_OFFSET
+        game.player.health = 100
+        game.player.just_respawned = False
+
+
+def handle_bullet_boss_collisions(game: 'Game'):
+    boss_hits = pg.sprite.groupcollide(game.bosses_group, game.bullets_group, False, True, pg.sprite.collide_circle)
+    for boss, bullets in boss_hits.items():
+        for bullet in bullets:
+            game.sound_manager.play("explosion")
+            explosion = Explosion(bullet.rect.midtop, 'small_explosion', game.graphics_manager.explosion_animations)
+            game.all_sprites_group.add(explosion)
+            boss.take_damage(2)
+            if random() < 0.05:
+                power = Powerup(game.graphics_manager.powerup_icons, bullet.rect.center, game.screen_width, game.screen_height, game.scale_factor)
+                game.all_sprites_group.add(power)
+                game.powerups_group.add(power)
+
+            if not boss.alive:
+                game.score += boss.points
+                game.sound_manager.play("player_die")
+                death_explosion = Explosion(boss.rect.center, 'boss_explosion', game.graphics_manager.explosion_animations)
+                game.all_sprites_group.add(death_explosion)
+                game.boss_defeated = True
+                for bullet in game.boss_bullets_group:
+                    bullet.kill()
+
+                # Resume meteoroid spawning
+                for _ in range(NUMBER_OF_METEOROIDS):
+                    game_logic.new_meteroid(
+                        game.graphics_manager.meteoroid_images,
+                        game.screen_width, game.screen_height,
+                        game.all_sprites_group,
+                        game.meteors_group,
+                        game.scale_factor
+                        )
+                    
+def handle_boss_bullet_player_collisions(game: 'Game'):
+    """Handle boss bullets hitting player. Returns True if player died."""
+    player_is_hit = pg.sprite.spritecollide(game.player, game.boss_bullets_group, True)
+    for hit in player_is_hit:
+        game.sound_manager.play("explosion")
+        game.player.health -= 10
+        explosion = Explosion(hit.rect.center, 'small_explosion', game.graphics_manager.explosion_animations)
+        game.all_sprites_group.add(explosion)
+        
+        if game.player.health <= 0:
+            game.sound_manager.play("player_die")
+            clear_game_objects(game.meteors_group, game.bullets_group, game.powerups_group)
+            game.player.lives -= 1
+            return True  # Signal player death
+    
+    return False

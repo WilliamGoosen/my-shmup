@@ -78,7 +78,7 @@ class PauseState(BaseState):
         draw_health_bar(
              surface,
              self.game,
-             self.game.player.shield
+             self.game.player.health
         )
         
         self.draw_pause_menu(surface)

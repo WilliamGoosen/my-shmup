@@ -17,15 +17,14 @@ def spawn_starfield():
     spawn_wave(new_star, NUMBER_OF_STARS)
 
 def start_game():
-    global score, life_gained
 
-    score = 0
     game.score = 0
-    life_gained = 0
+    game.boss_defeated = False
 
     game.all_sprites_group.empty()
     game.bosses_group.empty()
     game.bullets_group.empty()
+    game.boss_bullets_group.empty()
     game.meteors_group.empty()
     game.players_group.empty()
     game.stars_group.empty()

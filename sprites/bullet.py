@@ -27,5 +27,6 @@ class PlayerBullet(Bullet):
         super().__init__(x, y, scale_factor, bullet_image, speed_direction = -1)
         
 class BossBullet(Bullet):
-    def __init__(self, x: int, y: int, scale_factor: float, bullet_image: pg.Surface):
+    def __init__(self, x: int, y: int, scale_factor: float, bullet_image: pg.Surface, bullet_speed = 300):
         super().__init__(x, y, scale_factor, bullet_image, speed_direction = 1)
+        self.speedy = bullet_speed
