@@ -33,32 +33,10 @@ class PlayState(BaseState):
             
             
         # check to see if a bullet hit a meteoroid
-        self.game.score = game_logic.handle_bullet_meteoroid_collisions(
-            self.game.meteors_group,
-            self.game.bullets_group,
-            self.game.score,
-            self.game.sound_manager,
-            self.game.graphics_manager,
-            self.game.all_sprites_group,
-            self.game.powerups_group,
-            self.game.screen_width,
-            self.game.screen_height,
-            self.game.scale_factor
-        )
+        game_logic.handle_bullet_meteoroid_collisions(self.game)
 
         # check to see if a meteoroid hits the player
-        player_died_meteoroid = game_logic.handle_player_meteoroid_collisions(
-            self.game.player,
-            self.game.meteors_group,
-            self.game.bullets_group,
-            self.game.powerups_group,
-            self.game.all_sprites_group,
-            self.game.sound_manager,
-            self.game.graphics_manager,
-            self.game.screen_width,
-            self.game.screen_height,
-            self.game.scale_factor
-            )
+        player_died_meteoroid = game_logic.handle_player_meteoroid_collisions(self.game)
         
         player_died_boss_bullet = game_logic.handle_boss_bullet_player_collisions(self.game)
         
@@ -82,10 +60,7 @@ class PlayState(BaseState):
                  self.final_death = True
 
         # check to see if player hit a powerup
-        game_logic.handle_player_powerup_collisions(
-            self.game.player,
-            self.game.powerups_group,
-            self.game.sound_manager) 
+        game_logic.handle_player_powerup_collisions(self.game)
 
         if self.final_death and self.death_explosion and not self.death_explosion.alive():
                 self.done = True

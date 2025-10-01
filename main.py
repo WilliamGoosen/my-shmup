@@ -29,7 +29,7 @@ def start_game():
     game.players_group.empty()
     game.stars_group.empty()
 
-    game_logic.clear_game_objects(game.meteors_group, game.bullets_group, game.powerups_group)
+    game_logic.clear_game_objects(game)
 
     # player = Player(game)
     game.player = Player(game)
@@ -37,7 +37,7 @@ def start_game():
     game.players_group.add(game.player)
 
     spawn_starfield()
-    game_logic.spawn_meteoroid_wave(game.graphics_manager.meteoroid_images, game.screen_width, game.screen_height, game.all_sprites_group, game.meteors_group, game.scale_factor)
+    game_logic.spawn_meteoroid_wave(game)
 
 # Constants and initialisation
 config: dict = load_config()
