@@ -1,16 +1,23 @@
 import pygame as pg
 from random import randrange, randint, choice
 from settings import *
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from game import Game
 
 class Meteoroid(pg.sprite.Sprite):
-    def __init__(self, meteor_images, screen_width, screen_height, scale_factor: float,
-                 position=None, velocity=None, is_medium=False):
+    def __init__(self, game: 'Game', position=None, velocity=None, is_medium=False):
         pg.sprite.Sprite.__init__(self)
-        self.screen_width = screen_width
-        self.screen_height = screen_height
-        self.scale_factor = scale_factor
-        self.meteor_images = meteor_images
+        self.game = game
+        self.screen_width = game.screen_width
+        self.screen_height = game.screen_height
+        self.scale_factor = game.scale_factor
         self.is_medium = is_medium
+        if not is_medium:
+            self.meteor_images = game.graphics_manager.meteoroid_images
+        else:
+            self.meteor_images = game.graphics_manager.meteoroid_images_medium
         self.rect: pg.Rect
         self.pos = pg.math.Vector2(0, 0) # Float position tracking
         
@@ -70,10 +77,8 @@ class Meteoroid(pg.sprite.Sprite):
         right_velocity = (self.speedx + METEOROID_SPLIT_SPEED_BOOST * self.scale_factor, self.speedy)
 
         return [
-            Meteoroid(meteor_images_medium, self.screen_width, self.screen_height, self.scale_factor,
-                     position=left_pos, velocity=left_velocity, is_medium=True),
-            Meteoroid(meteor_images_medium, self.screen_width, self.screen_height, self.scale_factor,
-                     position=right_pos, velocity=right_velocity, is_medium=True)
+            Meteoroid(self.game, position=left_pos, velocity=left_velocity, is_medium=True),
+            Meteoroid(self.game, position=right_pos, velocity=right_velocity, is_medium=True)
         ]
 
     def rotate(self, dt):
