@@ -60,7 +60,7 @@ def handle_bullet_meteoroid_collisions(game: 'Game'):
             game.all_sprites_group.add(power)
             game.powerups_group.add(power)
         if meteor.can_split():
-            new_meteoroids = meteor.create_split_meteoroids(game.graphics_manager.meteoroid_images_medium)
+            new_meteoroids = meteor.create_split_meteoroids()
             for new_meteor in new_meteoroids:
                 game.all_sprites_group.add(new_meteor)
                 game.meteors_group.add(new_meteor)
