@@ -38,7 +38,6 @@ class Meteoroid(pg.sprite.Sprite):
     def initialize_meteoroid(self, position=None, velocity=None):
         """Initialize or reset meteoroid with optional position/velocity"""
         self.image_orig = choice(self.meteor_images)
-        self.image_orig.set_colorkey(BLACK)
         self.image = self.image_orig.copy()
         self.rect = self.image.get_rect()
         self.radius = int(self.rect.width * 0.85 / 2)
@@ -68,7 +67,7 @@ class Meteoroid(pg.sprite.Sprite):
     def can_split(self):
         return self.radius > 40 * self.scale_factor  # Extract constant
 
-    def create_split_meteoroids(self, meteor_images_medium):
+    def create_split_meteoroids(self):
         """Return new meteoroids from split, without adding to groups"""
         left_pos = (self.rect.centerx, self.rect.centery)
         right_pos = (self.rect.centerx, self.rect.centery)
