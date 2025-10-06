@@ -36,14 +36,14 @@ This game can be packaged into a standalone application using [PyInstaller](htt
     **Option 1: Create a Distribution Folder (Recommended for testing)**
     *Easier to debug if necessary, as all files are in one folder.*
     ```bash
-    pyinstaller --onedir --windowed --add-data "img;img" --add-data "snd;snd" --add-data "licenses;licenses" --add-data "CREDITS.txt;." --icon=game_icon.ico main.py
+    pyinstaller --onedir --windowed --contents-directory "." --add-data "img;img" --add-data "snd;snd" --add-data "licenses;licenses" --add-data "CREDITS.txt;." --icon=game_icon.ico main.py
     ```
     *The executable and all required game files will be created in a new distribution directory.*
 
     **Option 2: Create a Single Executable File**
     *Creates a single, portable `.exe` file for distribution.*
     ```bash
-    pyinstaller --onefile --windowed --add-data "img;img" --add-data "snd;snd" --add-data "licenses;licenses" --add-data "CREDITS.txt;." --icon=game_icon.ico main.py
+    pyinstaller --onefile --windowed --contents-directory "." --add-data "img;img" --add-data "snd;snd" --add-data "licenses;licenses" --add-data "CREDITS.txt;." --icon=game_icon.ico main.py
     ```
     *A single executable file will be created in the `dist/` directory.*
     
@@ -73,7 +73,11 @@ This game can be packaged into a standalone application using [PyInstaller](htt
     
 - **Art Assets & Jingles:** From [Kenney.nl](https://kenney.nl/assets) (Public Domain)
     
-- **Sound Effects (`Explosion1.wav`, `Explosion2.wav`, `Laser_Shoot2.wav`)**: Created by [WilliamGoosen](https://github.com/WilliamGoosen) using [Bfxr](https://www.bfxr.net/).
+- **Sound Effects:** Created by [WilliamGoosen](https://github.com/WilliamGoosen) using [Bfxr](https://www.bfxr.net/)
+  - `Explosion1.wav`, `Explosion2.wav`, `Laser_Shoot2.wav` (CC BY 4.0)
+
+- **Custom Art:** Created by [WilliamGoosen](https://github.com/WilliamGoosen)
+  - Background: `starfield_576x720.png` (CC BY 4.0)
     
 - **Code:** This implementation and its ongoing architectural evolution is by [WilliamGoosen](https://github.com/WilliamGoosen).
     

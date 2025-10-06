@@ -22,11 +22,18 @@ ART ASSETS & JINGLES
 From Kenney.nl (Public Domain)
 Source: https://kenney.nl/assets
 
+starfield_576x720.png
+- Created by WilliamGoosen using Inkscape  
+- License: Creative Commons Attribution 4.0
+- License URL: https://creativecommons.org/licenses/by/4.0/
+
 SOUND EFFECTS
 -------------
 Explosion1.wav, Explosion2.wav, Laser_Shoot2.wav
 - Created by WilliamGoosen using Bfxr
 - Tools: https://www.bfxr.net/
+- License: Creative Commons Attribution 4.0
+- License URL: https://creativecommons.org/licenses/by/4.0/
 
 CORE CONCEPT INSPIRATION
 ------------------------
