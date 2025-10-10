@@ -1,43 +1,9 @@
 import pygame as pg
-from os import path
 from settings import *
-from sprites import Starfield
-from player import Player
-from systems import game_logic
-from utilities import spawn_wave, load_config
+from utilities import load_config
 from game import Game
+from systems import game_logic
 from states import PlayState, PauseState, TitleState, GameOverState, SettingsState
-
-def new_star(game):
-    s = Starfield(game)
-    game.all_sprites_group.add(s)
-    game.stars_group.add(s)
-
-def spawn_starfield(game):
-    spawn_wave(new_star, NUMBER_OF_STARS, game)
-
-def start_game(game):
-
-    game.score = 0
-    game.boss_defeated = False
-
-    game.all_sprites_group.empty()
-    game.bosses_group.empty()
-    game.bullets_group.empty()
-    game.boss_bullets_group.empty()
-    game.meteors_group.empty()
-    game.players_group.empty()
-    game.stars_group.empty()
-
-    game_logic.clear_game_objects(game)
-
-    # player = Player(game)
-    game.player = Player(game)
-    game.all_sprites_group.add(game.player)
-    game.players_group.add(game.player)
-
-    spawn_starfield(game)
-    game_logic.spawn_meteoroid_wave(game)
 
 def main():
     # Constants and initialisation
@@ -78,7 +44,7 @@ def main():
                 if game.current_state.return_state == "RESUME_GAME":
                     game.current_state = PlayState(game)
                 else:
-                    start_game(game)
+                    game_logic.start_game(game)
                     game.current_state = PlayState(game)
             elif game.current_state.next_state == "TITLE":
                 game.current_state = TitleState(game)

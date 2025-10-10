@@ -1,5 +1,6 @@
 import pygame as pg
-from sprites import Explosion, Powerup, Meteoroid, Boss
+from sprites import Explosion, Powerup, Meteoroid, Boss, Starfield
+from player import Player
 from systems import game_logic
 from utilities import spawn_wave
 from random import random, randint
@@ -87,7 +88,6 @@ def handle_player_meteoroid_collisions(game: 'Game'):
     # Return False if the player didn't die in this collision
     return False
 
-
 def handle_player_powerup_collisions(game: 'Game'):
     powerup_is_hit = pg.sprite.spritecollide(game.player, game.powerups_group, True)
     for power in powerup_is_hit:
@@ -100,7 +100,6 @@ def handle_player_powerup_collisions(game: 'Game'):
             game.player.powerup()
             game.sound_manager.play("bolt_gold")
 
-
 def handle_player_respawn(game: 'Game'):
     if game.player.just_respawned:
         if len(game.bosses_group) == 0 or game.boss_defeated:
@@ -109,7 +108,6 @@ def handle_player_respawn(game: 'Game'):
         game.player.rect.bottom = game.screen_height - PLAYER_START_Y_OFFSET
         game.player.health = 100
         game.player.just_respawned = False
-
 
 def handle_bullet_boss_collisions(game: 'Game'):
     boss_hits = pg.sprite.groupcollide(game.bosses_group, game.bullets_group, False, True, pg.sprite.collide_circle)
@@ -153,3 +151,34 @@ def handle_boss_bullet_player_collisions(game: 'Game'):
             return True  # Signal player death
     
     return False
+
+def new_star(game):
+    s = Starfield(game)
+    game.all_sprites_group.add(s)
+    game.stars_group.add(s)
+
+def spawn_starfield(game):
+    spawn_wave(new_star, NUMBER_OF_STARS, game)
+
+def start_game(game):
+
+    game.score = 0
+    game.boss_defeated = False
+
+    game.all_sprites_group.empty()
+    game.bosses_group.empty()
+    game.bullets_group.empty()
+    game.boss_bullets_group.empty()
+    game.meteors_group.empty()
+    game.players_group.empty()
+    game.stars_group.empty()
+
+    game_logic.clear_game_objects(game)
+
+    # player = Player(game)
+    game.player = Player(game)
+    game.all_sprites_group.add(game.player)
+    game.players_group.add(game.player)
+
+    spawn_starfield(game)
+    game_logic.spawn_meteoroid_wave(game)
