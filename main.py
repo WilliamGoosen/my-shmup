@@ -5,6 +5,24 @@ from game import Game
 from systems import game_logic
 from states import PlayState, PauseState, TitleState, GameOverState, SettingsState
 
+def _handle_state_transition(game: Game) -> None:
+    """Handle transitioning between different game states."""
+    next_state = game.current_state.next_state
+    return_state = game.current_state.return_state
+    
+    state_map = {
+        "GAME_OVER": GameOverState,
+        "PAUSE": PauseState, 
+        "PLAY": PlayState,
+        "TITLE": TitleState,
+        "SETTINGS": SettingsState
+    }
+    
+    if next_state in state_map:
+        if next_state == "PLAY" and return_state != "RESUME_GAME":
+            game_logic.start_game(game)  # Only reset for new games, not resumes
+        game.current_state = state_map[next_state](game)
+
 def main():
     # Constants and initialisation
     config: dict = load_config()
@@ -35,28 +53,11 @@ def main():
             if game.current_state.quit:
                 running = False
                 continue
-
-            if game.current_state.next_state == "GAME_OVER":
-                game.current_state = GameOverState(game)
-            elif game.current_state.next_state == "PAUSE":
-                game.current_state = PauseState(game)
-            elif game.current_state.next_state == "PLAY":
-                if game.current_state.return_state == "RESUME_GAME":
-                    game.current_state = PlayState(game)
-                else:
-                    game_logic.start_game(game)
-                    game.current_state = PlayState(game)
-            elif game.current_state.next_state == "TITLE":
-                game.current_state = TitleState(game)
-            elif game.current_state.next_state == "SETTINGS":
-                game.current_state = SettingsState(game)
+            _handle_state_transition(game)
 
         # --- DRAWING SECTION ---
-
         screen.fill(BG_COLOUR)
         game.current_state.draw(screen)
-
-
         pg.display.flip()
     pg.quit()
 
